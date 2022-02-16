@@ -1,0 +1,228 @@
+{"collisions": 22110, "list": [29, 59, 158563, 15077, 43, 59809, 31, 19, 17, 58543, 97, 67], "embedding": 16, "alphabet": 55000, "num_primes": 12}
+{"collisions": 270, "list": [23, 61, 39857, 79, 31, 1009, 67, 37, 29, 131, 97, 53], "embedding": 24, "alphabet": 55000, "num_primes": 12}
+{"collisions": 1, "list": [89, 79, 31, 53, 29, 71, 73, 97, 19, 1321, 67, 23], "embedding": 32, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [19, 43, 1861, 53, 59, 61, 67, 71, 73, 79, 83, 89], "embedding": 40, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [67, 89, 43, 83, 71, 31, 73, 61, 17, 59, 41, 19], "embedding": 48, "alphabet": 55000, "num_primes": 12}
+{"collisions": 22247, "list": [19, 31, 30859, 17, 47, 1549, 59, 43, 349, 61, 48733], "embedding": 16, "alphabet": 55000, "num_primes": 11}
+{"collisions": 368, "list": [227, 71, 31, 97, 19, 61, 59, 47, 919, 43, 67], "embedding": 24, "alphabet": 55000, "num_primes": 11}
+{"collisions": 6, "list": [31, 58427, 73, 79, 61, 83, 89, 185363, 29, 67, 47], "embedding": 32, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [89, 59, 37, 71, 67, 83, 53, 23, 17, 31, 499], "embedding": 40, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [83, 43, 23, 71, 73, 47, 79, 67, 53, 41, 59], "embedding": 48, "alphabet": 55000, "num_primes": 11}
+{"collisions": 23208, "list": [19, 631, 1783, 83, 71, 59, 23, 17, 1279, 79], "embedding": 16, "alphabet": 55000, "num_primes": 10}
+{"collisions": 575, "list": [17, 1667, 61, 83, 71, 23, 43, 31, 97, 1783], "embedding": 24, "alphabet": 55000, "num_primes": 10}
+{"collisions": 16, "list": [29, 71, 37, 73, 89, 23, 83, 47, 31, 83], "embedding": 32, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [73, 67, 61, 37, 71, 83, 1789, 19, 89, 29], "embedding": 40, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [43, 73, 61, 683, 17, 67, 53, 71, 601, 83], "embedding": 48, "alphabet": 55000, "num_primes": 10}
+{"collisions": 25454, "list": [17, 541, 73, 797, 61, 186689, 68053, 29, 71], "embedding": 16, "alphabet": 55000, "num_primes": 9}
+{"collisions": 984, "list": [17, 55337, 467, 23, 41, 61, 48281, 97, 59], "embedding": 24, "alphabet": 55000, "num_primes": 9}
+{"collisions": 38, "list": [179899, 61, 89, 1153, 73, 96179, 29, 37, 71], "embedding": 32, "alphabet": 55000, "num_primes": 9}
+{"collisions": 1, "list": [43, 37, 59, 53, 79, 1747, 29, 97, 337], "embedding": 40, "alphabet": 55000, "num_primes": 9}
+{"collisions": 0, "list": [37, 53, 29, 997, 47, 1609, 73, 41, 79], "embedding": 48, "alphabet": 55000, "num_primes": 9}
+{"collisions": 29025, "list": [102061, 19, 23, 1871, 1523, 26029, 593, 43], "embedding": 16, "alphabet": 55000, "num_primes": 8}
+{"collisions": 1805, "list": [29, 1129, 239, 22861, 142049, 89, 53, 23], "embedding": 24, "alphabet": 55000, "num_primes": 8}
+{"collisions": 131, "list": [29, 31, 883, 181, 156119, 53, 97, 1667], "embedding": 32, "alphabet": 55000, "num_primes": 8}
+{"collisions": 15, "list": [31, 191, 457, 53, 16111, 653, 29, 89], "embedding": 40, "alphabet": 55000, "num_primes": 8}
+{"collisions": 0, "list": [43, 199, 66343, 89, 59, 61, 941, 31], "embedding": 48, "alphabet": 55000, "num_primes": 8}
+{"collisions": 21869, "list": [467, 47819, 181, 432277, 97, 41, 47, 1327, 87973, 109, 17, 29, 2557, 19, 412031, 74051], "embedding": 16, "alphabet": 55000, "num_primes": 16}
+{"collisions": 115, "list": [107, 19, 53, 131, 149, 380839, 743, 41, 29, 23, 89, 43, 113, 83, 137, 11981], "embedding": 24, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [127, 53, 41, 17, 29, 131, 83, 79, 37, 43, 97, 137, 31, 47, 61, 19], "embedding": 32, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [127, 83, 109, 37, 73, 131, 61, 139, 149, 101, 17, 23, 71, 67, 59, 19], "embedding": 40, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [53, 139, 47, 73, 103, 43, 67, 59, 97, 29, 101, 37, 71, 31, 149, 127], "embedding": 48, "alphabet": 55000, "num_primes": 16}
+{"collisions": 22664, "list": [1973, 61837, 43, 23, 2503, 43049, 431, 89, 131, 493877, 59, 53, 94961, 209801, 17], "embedding": 16, "alphabet": 55000, "num_primes": 15}
+{"collisions": 142, "list": [1259, 131, 73, 37, 23, 61, 137, 103, 41, 53, 29, 2677, 101, 127, 2963], "embedding": 24, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [59, 47, 29, 31, 83, 149, 37, 71, 797, 1451, 61, 103, 17, 79, 23], "embedding": 32, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [103, 53, 73, 79, 41, 127, 59, 107, 131, 67, 43, 23, 139, 83, 71], "embedding": 40, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [109, 97, 47, 19, 149, 127, 79, 137, 73, 131, 71, 43, 61, 23, 31], "embedding": 48, "alphabet": 55000, "num_primes": 15}
+{"collisions": 22106, "list": [89, 109481, 23, 87427, 127, 31, 19, 53069, 21611, 107, 480449, 1747, 84143, 79, 357239, 67], "embedding": 16, "alphabet": 55000, "num_primes": 16}
+{"collisions": 122, "list": [59, 97, 29, 31, 73, 33751, 247847, 997, 47, 43, 107, 109, 71, 37, 83, 61], "embedding": 24, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [103, 97, 79, 31, 113, 89, 139, 107, 127, 19, 67, 73, 37, 17, 41, 919], "embedding": 32, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [103, 43, 53, 79, 73, 37, 83, 71, 149, 41, 113, 17, 137, 19, 29, 31], "embedding": 40, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [53, 59, 43, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109], "embedding": 48, "alphabet": 55000, "num_primes": 16}
+{"collisions": 23274, "list": [254413, 19, 23, 29, 919, 32783, 70717, 72421, 47, 53, 11071, 61, 232187, 4969, 79], "embedding": 16, "alphabet": 55000, "num_primes": 15}
+{"collisions": 150, "list": [59, 73, 101, 251, 109, 53, 89, 97, 61, 139, 1423, 23, 31, 43, 127], "embedding": 24, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [103, 101, 37, 563, 41, 73, 31, 1153, 1741, 61, 47, 79, 107, 109, 149], "embedding": 32, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [127, 101, 103, 53, 73, 23, 29, 17, 61, 31, 139, 79, 83, 43, 89], "embedding": 40, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [113, 41, 47, 67, 109, 101, 17, 107, 79, 97, 137, 31, 71, 83, 103], "embedding": 48, "alphabet": 55000, "num_primes": 15}
+{"collisions": 23164, "list": [139, 37, 73, 1289, 787, 127, 19, 97, 2437, 1831, 79, 2473, 19, 67], "embedding": 16, "alphabet": 55000, "num_primes": 14}
+{"collisions": 178, "list": [53, 41, 101, 89, 47, 2593, 31, 23, 43, 79, 19, 188527, 139, 29], "embedding": 24, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [109, 131, 19, 107, 29, 101, 59, 43, 83, 97, 2287, 113, 991, 23], "embedding": 32, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [23, 61, 137, 71, 103, 29, 19, 107, 73, 83, 113, 53, 101, 59], "embedding": 40, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [53, 59, 61, 67, 71, 73, 79, 31, 89, 97, 101, 103, 107, 109], "embedding": 48, "alphabet": 55000, "num_primes": 14}
+{"collisions": 22492, "list": [283, 47, 88379, 127, 137443, 107, 59, 17, 58193, 113, 61, 73517, 593], "embedding": 16, "alphabet": 55000, "num_primes": 13}
+{"collisions": 220, "list": [23, 137, 967, 42451, 37, 53, 31, 29, 113, 144737, 149, 17, 131], "embedding": 24, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [23, 67, 109, 149, 283, 139, 83, 37, 107, 1109, 131, 19, 31], "embedding": 32, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [131, 139, 23, 19, 73, 29, 97, 101, 2797, 2861, 83, 67, 47], "embedding": 40, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [31, 41, 139, 53, 37, 23, 107, 83, 17, 67, 137, 109, 101], "embedding": 48, "alphabet": 55000, "num_primes": 13}
+{"collisions": 22185, "list": [31, 79, 83737, 457, 101, 23, 2381, 2647, 7457, 19, 41, 17], "embedding": 16, "alphabet": 55000, "num_primes": 12}
+{"collisions": 290, "list": [19, 1597, 41, 53, 1861, 1913, 71, 139, 149, 109, 23, 73], "embedding": 24, "alphabet": 55000, "num_primes": 12}
+{"collisions": 1, "list": [83, 647, 23, 377749, 59, 137, 113, 177167, 103, 43, 29, 17], "embedding": 32, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [67, 61, 97, 71, 79, 37, 109, 59, 89, 149, 19, 53], "embedding": 40, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [79, 23, 31, 53, 83, 43, 149, 19, 89, 137, 73, 71], "embedding": 48, "alphabet": 55000, "num_primes": 12}
+{"collisions": 22587, "list": [23, 131, 1609, 2297, 43, 67, 53, 113, 37, 31, 61], "embedding": 16, "alphabet": 55000, "num_primes": 11}
+{"collisions": 426, "list": [23, 47, 37, 31, 67, 59, 53, 109, 2447, 101, 127], "embedding": 24, "alphabet": 55000, "num_primes": 11}
+{"collisions": 11, "list": [53, 19, 1423, 101, 2753, 79, 127, 41, 109, 29, 23], "embedding": 32, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [107, 47, 71, 89, 43, 1619, 17, 83, 149, 61, 103], "embedding": 40, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [53, 59, 41, 67, 71, 73, 79, 83, 89, 97, 101], "embedding": 48, "alphabet": 55000, "num_primes": 11}
+{"collisions": 23400, "list": [17, 1787, 643, 139, 31, 47, 61, 571, 131, 23], "embedding": 16, "alphabet": 55000, "num_primes": 10}
+{"collisions": 549, "list": [19, 47, 101, 73, 53, 103, 1777, 23, 67, 59], "embedding": 24, "alphabet": 55000, "num_primes": 10}
+{"collisions": 18, "list": [37, 31, 43, 47, 53, 87671, 456377, 1709, 1873, 73], "embedding": 32, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [101, 29, 97, 67, 1483, 37, 419, 1619, 71, 79], "embedding": 40, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [53, 59, 61, 37, 1493, 73, 79, 83, 89, 97], "embedding": 48, "alphabet": 55000, "num_primes": 10}
+{"collisions": 25305, "list": [19, 73, 2383, 89, 127, 17, 2239, 661, 137], "embedding": 16, "alphabet": 55000, "num_primes": 9}
+{"collisions": 1085, "list": [23, 37, 97, 2833, 79, 53, 89, 43, 263], "embedding": 24, "alphabet": 55000, "num_primes": 9}
+{"collisions": 47, "list": [29, 617, 43, 47, 83, 23, 2953, 149, 71], "embedding": 32, "alphabet": 55000, "num_primes": 9}
+{"collisions": 2, "list": [41, 127, 17, 2239, 103, 37, 787, 131, 23], "embedding": 40, "alphabet": 55000, "num_primes": 9}
+{"collisions": 0, "list": [41, 89, 31, 97, 127, 1559, 137, 17, 73], "embedding": 48, "alphabet": 55000, "num_primes": 9}
+{"collisions": 29048, "list": [17, 109, 41, 2239, 61, 79, 2027, 863], "embedding": 16, "alphabet": 55000, "num_primes": 8}
+{"collisions": 1971, "list": [31, 71, 1163, 23, 37, 127, 1523, 2749], "embedding": 24, "alphabet": 55000, "num_primes": 8}
+{"collisions": 162, "list": [2621, 2851, 61, 149, 37, 109, 47, 127], "embedding": 32, "alphabet": 55000, "num_primes": 8}
+{"collisions": 8, "list": [41, 1297, 47, 53, 59, 61, 67, 2953], "embedding": 40, "alphabet": 55000, "num_primes": 8}
+{"collisions": 0, "list": [53, 59, 61, 67, 71, 73, 47, 83], "embedding": 48, "alphabet": 55000, "num_primes": 8}
+{"collisions": 34262, "list": [17, 1913, 30323, 29, 31, 613, 303493], "embedding": 16, "alphabet": 55000, "num_primes": 7}
+{"collisions": 4096, "list": [19, 2111, 53, 48973, 31, 207371, 2357], "embedding": 24, "alphabet": 55000, "num_primes": 7}
+{"collisions": 469, "list": [23, 28627, 241, 29, 47, 391631, 1663], "embedding": 32, "alphabet": 55000, "num_primes": 7}
+{"collisions": 58, "list": [41, 43, 2011, 53, 2551, 821, 67], "embedding": 40, "alphabet": 55000, "num_primes": 7}
+{"collisions": 10, "list": [47, 127, 103, 59, 2791, 109, 757], "embedding": 48, "alphabet": 55000, "num_primes": 7}
+{"collisions": 41168, "list": [17, 2143, 2741, 29, 31, 2017], "embedding": 16, "alphabet": 55000, "num_primes": 6}
+{"collisions": 9014, "list": [19, 109, 853, 103, 149, 787], "embedding": 24, "alphabet": 55000, "num_primes": 6}
+{"collisions": 1903, "list": [37, 41, 2719, 2473, 53, 1409], "embedding": 32, "alphabet": 55000, "num_primes": 6}
+{"collisions": 365, "list": [41, 55589, 47, 324773, 1181, 61], "embedding": 40, "alphabet": 55000, "num_primes": 6}
+{"collisions": 78, "list": [47, 8741, 31, 356731, 73, 2393], "embedding": 48, "alphabet": 55000, "num_primes": 6}
+{"collisions": 48135, "list": [19, 139, 149, 1213, 911], "embedding": 16, "alphabet": 55000, "num_primes": 5}
+{"collisions": 23150, "list": [29, 31, 37, 1621, 839], "embedding": 24, "alphabet": 55000, "num_primes": 5}
+{"collisions": 5975, "list": [31, 2591, 64969, 476977, 43], "embedding": 32, "alphabet": 55000, "num_primes": 5}
+{"collisions": 1981, "list": [41, 28283, 47, 53, 2411], "embedding": 40, "alphabet": 55000, "num_primes": 5}
+{"collisions": 683, "list": [43, 47, 113, 971, 149], "embedding": 48, "alphabet": 55000, "num_primes": 5}
+{"collisions": 52484, "list": [2243, 19, 23, 1627], "embedding": 16, "alphabet": 55000, "num_primes": 4}
+{"collisions": 42307, "list": [287059, 73, 257, 4507], "embedding": 24, "alphabet": 55000, "num_primes": 4}
+{"collisions": 24109, "list": [29, 593, 71, 2621], "embedding": 32, "alphabet": 55000, "num_primes": 4}
+{"collisions": 11314, "list": [37, 432721, 137, 127], "embedding": 40, "alphabet": 55000, "num_primes": 4}
+{"collisions": 5687, "list": [47, 418603, 53, 1451], "embedding": 48, "alphabet": 55000, "num_primes": 4}
+{"collisions": 22637, "list": [1627, 137873, 79, 19, 270437, 223577, 51347, 17, 67, 1559, 29, 94889, 39733, 312197, 64817, 37], "embedding": 16, "alphabet": 55000, "num_primes": 16}
+{"collisions": 134, "list": [2897, 17, 137, 31, 47, 139, 127, 149, 29, 2111, 2621, 103, 19, 23, 79, 73], "embedding": 24, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [41, 61, 31, 139, 17, 71, 19, 67, 127, 79, 29, 137, 113, 53, 131, 47], "embedding": 32, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [19, 43, 131, 89, 83, 109, 137, 17, 31, 41, 61, 59, 107, 23, 37, 71], "embedding": 40, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [47, 71, 139, 107, 29, 23, 67, 31, 19, 101, 83, 103, 131, 89, 41, 137], "embedding": 48, "alphabet": 55000, "num_primes": 16}
+{"collisions": 21669, "list": [23, 47, 19, 61253, 79, 82307, 43, 61, 131, 264779, 2851, 124309, 17, 190027, 70619], "embedding": 16, "alphabet": 55000, "num_primes": 15}
+{"collisions": 153, "list": [79, 61, 137, 71, 43, 59, 101, 31, 23, 107, 29, 83, 1061, 127, 73], "embedding": 24, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [113, 19, 31, 17, 101, 97, 159437, 83, 137, 61, 2671, 29, 37, 1063, 73], "embedding": 32, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 2377, 97, 953, 37], "embedding": 40, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [53, 59, 61, 67, 71, 73, 79, 83, 23, 97, 101, 103, 107, 109], "embedding": 48, "alphabet": 55000, "num_primes": 15}
+{"collisions": 22817, "list": [1321, 19, 47969, 419, 82279, 37, 311, 43, 53441, 53, 2087, 61, 88589, 329111], "embedding": 16, "alphabet": 55000, "num_primes": 14}
+{"collisions": 180, "list": [43, 97, 23, 37, 59, 73, 113, 71, 41, 109, 149, 911, 1487, 1123], "embedding": 24, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [53, 97, 47, 139, 2851, 131, 31, 83, 71, 23, 61, 41, 17, 1511], "embedding": 32, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [37, 23, 29, 41, 107, 61, 17, 71, 53, 131, 59, 101, 127, 73], "embedding": 40, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [53, 43, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109], "embedding": 48, "alphabet": 55000, "num_primes": 14}
+{"collisions": 22944, "list": [31, 73, 83, 19, 149, 307367, 113, 109, 53, 107, 821, 137, 41], "embedding": 16, "alphabet": 55000, "num_primes": 13}
+{"collisions": 234, "list": [53, 359, 109, 1303, 23, 59, 17, 41, 43, 101, 242093, 83, 45139], "embedding": 24, "alphabet": 55000, "num_primes": 13}
+{"collisions": 1, "list": [107, 19, 61, 240043, 97, 89, 79, 29173, 1933, 41, 17, 23, 71], "embedding": 32, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [19, 89, 113, 23, 47, 31, 29, 109, 43, 103, 137, 127, 107], "embedding": 40, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [53, 59, 61, 67, 71, 73, 79, 41, 89, 97, 101, 103, 107], "embedding": 48, "alphabet": 55000, "num_primes": 13}
+{"collisions": 22444, "list": [131, 61, 139, 37, 53437, 31, 11279, 17, 19, 73, 75571, 1367], "embedding": 16, "alphabet": 55000, "num_primes": 12}
+{"collisions": 270, "list": [2879, 23, 97, 127, 61, 2789, 139, 67, 17, 149, 107, 19], "embedding": 24, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [47, 114809, 2141, 139, 17, 37, 79, 67, 149, 89, 31, 1613], "embedding": 32, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [53, 137, 17, 19, 97, 31, 23, 101, 41, 127, 43, 59], "embedding": 40, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [71, 53, 107, 67, 23, 41, 37, 113, 137, 127, 19, 31], "embedding": 48, "alphabet": 55000, "num_primes": 12}
+{"collisions": 22526, "list": [31, 17, 29, 1447, 107, 59, 97, 71, 149, 43, 1823], "embedding": 16, "alphabet": 55000, "num_primes": 11}
+{"collisions": 411, "list": [23, 441257, 17, 97, 37, 59, 28703, 47, 103, 89, 137], "embedding": 24, "alphabet": 55000, "num_primes": 11}
+{"collisions": 6, "list": [59, 29, 23, 57389, 149111, 1733, 2089, 2861, 31, 19, 89], "embedding": 32, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [89, 2161, 127, 17, 43, 113, 149, 47, 103, 67, 79], "embedding": 40, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [83, 109, 149, 101, 73, 557, 127, 17, 107, 23, 97], "embedding": 48, "alphabet": 55000, "num_primes": 11}
+{"collisions": 23240, "list": [23, 149, 66569, 103, 73, 739, 17, 19, 1901, 5147], "embedding": 16, "alphabet": 55000, "num_primes": 10}
+{"collisions": 620, "list": [416389, 37, 131, 29, 86171, 17, 103, 73, 113, 1361], "embedding": 24, "alphabet": 55000, "num_primes": 10}
+{"collisions": 19, "list": [37, 17, 31, 127, 53, 971, 79, 139, 347401, 467], "embedding": 32, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [107, 149, 37, 59, 103, 23, 71, 113, 1103, 53], "embedding": 40, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [101, 23, 131, 41, 2971, 29, 17, 97, 73, 113], "embedding": 48, "alphabet": 55000, "num_primes": 10}
+{"collisions": 25434, "list": [17, 2791, 422267, 29, 149, 37, 21269, 2377, 1979], "embedding": 16, "alphabet": 55000, "num_primes": 9}
+{"collisions": 1058, "list": [919, 31, 281, 41, 479, 47, 53, 59, 61], "embedding": 24, "alphabet": 55000, "num_primes": 9}
+{"collisions": 62, "list": [31, 97, 23, 67, 19, 71, 29, 853, 1571], "embedding": 32, "alphabet": 55000, "num_primes": 9}
+{"collisions": 2, "list": [19, 67, 83, 827, 61, 397633, 79, 101, 117833], "embedding": 40, "alphabet": 55000, "num_primes": 9}
+{"collisions": 0, "list": [43, 59, 61, 67, 71, 73, 79, 2999, 89], "embedding": 48, "alphabet": 55000, "num_primes": 9}
+{"collisions": 29008, "list": [17, 19, 419, 2417, 2311, 2267, 41, 1427], "embedding": 16, "alphabet": 55000, "num_primes": 8}
+{"collisions": 1910, "list": [23, 103, 83, 41, 211, 101, 137, 2719], "embedding": 24, "alphabet": 55000, "num_primes": 8}
+{"collisions": 152, "list": [29, 37, 691, 2267, 1151, 53, 103, 83], "embedding": 32, "alphabet": 55000, "num_primes": 8}
+{"collisions": 19, "list": [41, 43, 47, 1213, 1229, 2377, 2129, 71], "embedding": 40, "alphabet": 55000, "num_primes": 8}
+{"collisions": 0, "list": [43, 139, 127, 53, 29581, 97, 1721, 37], "embedding": 48, "alphabet": 55000, "num_primes": 8}
+{"collisions": 34355, "list": [17, 149, 23, 131, 83, 1381, 137], "embedding": 16, "alphabet": 55000, "num_primes": 7}
+{"collisions": 3854, "list": [1303, 131, 67, 109, 47, 2749, 1229], "embedding": 24, "alphabet": 55000, "num_primes": 7}
+{"collisions": 492, "list": [31, 839, 43, 2447, 53, 59, 2777], "embedding": 32, "alphabet": 55000, "num_primes": 7}
+{"collisions": 40, "list": [41, 1951, 1163, 31, 47, 467, 2099], "embedding": 40, "alphabet": 55000, "num_primes": 7}
+{"collisions": 9, "list": [43, 47, 80071, 149, 485689, 19, 113], "embedding": 48, "alphabet": 55000, "num_primes": 7}
+{"collisions": 41134, "list": [17, 19, 443, 29, 1619, 499], "embedding": 16, "alphabet": 55000, "num_primes": 6}
+{"collisions": 9315, "list": [17, 313, 107, 97, 631, 1217], "embedding": 24, "alphabet": 55000, "num_primes": 6}
+{"collisions": 1560, "list": [23, 74857, 26161, 223, 37, 97], "embedding": 32, "alphabet": 55000, "num_primes": 6}
+{"collisions": 370, "list": [41, 43, 167, 79, 445507, 61], "embedding": 40, "alphabet": 55000, "num_primes": 6}
+{"collisions": 79, "list": [41, 2647, 109, 322537, 39209, 61], "embedding": 48, "alphabet": 55000, "num_primes": 6}
+{"collisions": 48133, "list": [17, 31, 97, 372979, 56041], "embedding": 16, "alphabet": 55000, "num_primes": 5}
+{"collisions": 21250, "list": [19, 107, 1373, 137, 761], "embedding": 24, "alphabet": 55000, "num_primes": 5}
+{"collisions": 6075, "list": [31, 83, 1607, 277, 139], "embedding": 32, "alphabet": 55000, "num_primes": 5}
+{"collisions": 1987, "list": [43, 54277, 1621, 86257, 41], "embedding": 40, "alphabet": 55000, "num_primes": 5}
+{"collisions": 600, "list": [41, 71, 587, 109, 139], "embedding": 48, "alphabet": 55000, "num_primes": 5}
+{"collisions": 52484, "list": [17, 1051, 23, 19001], "embedding": 16, "alphabet": 55000, "num_primes": 4}
+{"collisions": 42352, "list": [66797, 1873, 487, 41], "embedding": 24, "alphabet": 55000, "num_primes": 4}
+{"collisions": 24076, "list": [478729, 79, 26849, 2879], "embedding": 32, "alphabet": 55000, "num_primes": 4}
+{"collisions": 11564, "list": [547, 71, 643, 1583], "embedding": 40, "alphabet": 55000, "num_primes": 4}
+{"collisions": 5222, "list": [43, 418739, 263, 47293], "embedding": 48, "alphabet": 55000, "num_primes": 4}
+{"collisions": 23178, "list": [23, 107, 269189, 256313, 345271, 100271, 28669, 103, 482663, 98953, 127, 59, 30871, 1489, 71, 19], "embedding": 16, "alphabet": 55000, "num_primes": 16}
+{"collisions": 140, "list": [19, 37, 1987, 113, 67, 71, 97, 41, 204163, 23, 79, 109, 47, 127, 43, 53], "embedding": 24, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [47, 61, 127, 23, 41, 107, 1997, 131, 101, 139, 79, 29, 113, 2441, 89, 109], "embedding": 32, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [127, 131, 37, 61, 29, 17, 103, 139, 89, 53, 83, 149, 19, 137, 41, 113], "embedding": 40, "alphabet": 55000, "num_primes": 16}
+{"collisions": 0, "list": [61, 139, 103, 107, 31, 89, 23, 131, 71, 43, 149, 137, 79, 101, 17, 113], "embedding": 48, "alphabet": 55000, "num_primes": 16}
+{"collisions": 22956, "list": [303469, 29, 937, 43, 489539, 23, 50651, 139, 2719, 401593, 61519, 17, 63691, 31, 334637], "embedding": 16, "alphabet": 55000, "num_primes": 15}
+{"collisions": 161, "list": [67, 127, 41, 29, 149, 19, 73, 71, 107, 2339, 23, 31, 472253, 79, 59], "embedding": 24, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [41, 139, 89, 131, 37, 113, 61, 127, 71, 67, 47, 461, 31, 101, 59], "embedding": 32, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [101, 139, 19, 83, 79, 97, 71, 137, 43, 659, 127, 31, 109, 67, 59], "embedding": 40, "alphabet": 55000, "num_primes": 15}
+{"collisions": 0, "list": [103, 41, 17, 31, 113, 29, 73, 101, 23, 131, 149, 107, 89, 53, 43], "embedding": 48, "alphabet": 55000, "num_primes": 15}
+{"collisions": 23432, "list": [2557, 19, 23, 221659, 31, 60811, 441827, 43, 47, 173, 59, 434593, 2531, 2591], "embedding": 16, "alphabet": 55000, "num_primes": 14}
+{"collisions": 167, "list": [29, 71, 641, 139, 23, 41, 17, 97, 146323, 769, 103, 110273, 53, 19], "embedding": 24, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [23, 241, 17, 139, 79, 101, 2137, 31, 29, 373, 109, 59, 149, 37], "embedding": 32, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [149, 59, 139, 103, 17, 137, 23, 31, 43, 61, 83, 89, 101, 109], "embedding": 40, "alphabet": 55000, "num_primes": 14}
+{"collisions": 0, "list": [17, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109], "embedding": 48, "alphabet": 55000, "num_primes": 14}
+{"collisions": 23028, "list": [17, 19163, 23, 103, 2693, 37, 41, 1489, 2677, 53, 59, 10111, 71], "embedding": 16, "alphabet": 55000, "num_primes": 13}
+{"collisions": 202, "list": [17, 109, 37, 113, 29, 43, 647, 137, 103, 131, 41, 23, 59], "embedding": 24, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [37, 1409, 17, 23, 67, 131, 43, 75853, 89, 127, 107, 103, 139], "embedding": 32, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [29, 37, 101, 97, 23, 109, 17, 131, 67, 137, 61, 43, 139], "embedding": 40, "alphabet": 55000, "num_primes": 13}
+{"collisions": 0, "list": [41, 73, 97, 71, 43, 29, 37, 53, 79, 103, 59, 113, 61], "embedding": 48, "alphabet": 55000, "num_primes": 13}
+{"collisions": 22253, "list": [73, 19, 97, 17, 37, 59, 149, 2671, 1231, 139, 127, 61], "embedding": 16, "alphabet": 55000, "num_primes": 12}
+{"collisions": 286, "list": [41, 71, 2251, 47, 19, 2543, 23, 163, 109, 1733, 127, 2837], "embedding": 24, "alphabet": 55000, "num_primes": 12}
+{"collisions": 2, "list": [19, 23, 14081, 71, 131, 101, 79, 31, 113, 310643, 43, 139], "embedding": 32, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [61, 137, 31, 17, 19, 73, 149, 101, 109, 103, 127, 1451], "embedding": 40, "alphabet": 55000, "num_primes": 12}
+{"collisions": 0, "list": [103, 67, 131, 37, 43, 17, 23, 137, 83, 29, 71, 127], "embedding": 48, "alphabet": 55000, "num_primes": 12}
+{"collisions": 22302, "list": [29, 1429, 17, 109, 19, 1091, 59, 2281, 101, 307, 127], "embedding": 16, "alphabet": 55000, "num_primes": 11}
+{"collisions": 413, "list": [23, 61, 31, 41, 107, 53, 37, 8867, 149, 135593, 73], "embedding": 24, "alphabet": 55000, "num_primes": 11}
+{"collisions": 10, "list": [17, 1249, 61, 101, 2551, 103, 31, 137, 67, 37, 2767], "embedding": 32, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [137, 19, 79, 47, 67, 17, 2677, 41, 97, 113, 103], "embedding": 40, "alphabet": 55000, "num_primes": 11}
+{"collisions": 0, "list": [43, 89, 149, 17, 137, 23, 811, 131, 29, 97, 61], "embedding": 48, "alphabet": 55000, "num_primes": 11}
+{"collisions": 23029, "list": [19, 73, 139, 149, 1327, 17, 269, 47, 67, 61], "embedding": 16, "alphabet": 55000, "num_primes": 10}
+{"collisions": 629, "list": [19, 83, 23, 107, 67, 101, 1597, 131, 73, 127], "embedding": 24, "alphabet": 55000, "num_primes": 10}
+{"collisions": 21, "list": [659, 89, 139, 107, 109, 29, 103, 2053, 17, 101], "embedding": 32, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [109, 37, 79, 101, 107, 983, 97, 31, 73, 67], "embedding": 40, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [53, 59, 1493, 67, 71, 73, 23, 83, 89, 97], "embedding": 48, "alphabet": 55000, "num_primes": 10}
+{"collisions": 25353, "list": [569, 2621, 53, 137, 107, 83, 19, 1801, 29], "embedding": 16, "alphabet": 55000, "num_primes": 9}
+{"collisions": 986, "list": [23, 103, 71, 1999, 137, 43, 17, 127, 149], "embedding": 24, "alphabet": 55000, "num_primes": 9}
+{"collisions": 65, "list": [29, 89, 43, 31, 41, 19, 107, 2843, 823], "embedding": 32, "alphabet": 55000, "num_primes": 9}
+{"collisions": 1, "list": [67, 61, 2659, 2003, 2129, 131, 37, 109, 101], "embedding": 40, "alphabet": 55000, "num_primes": 9}
+{"collisions": 0, "list": [79, 31, 61, 23, 863, 47, 71, 97, 53], "embedding": 48, "alphabet": 55000, "num_primes": 9}
+{"collisions": 29022, "list": [17, 19, 2393, 1907, 1069, 37, 421, 480587], "embedding": 16, "alphabet": 55000, "num_primes": 8}
+{"collisions": 2038, "list": [23, 59, 2657, 37, 48871, 89, 159721, 137], "embedding": 24, "alphabet": 55000, "num_primes": 8}
+{"collisions": 158, "list": [23, 101, 2819, 107, 97, 71, 1621, 29], "embedding": 32, "alphabet": 55000, "num_primes": 8}
+{"collisions": 11, "list": [47, 1987, 113, 37, 2963, 53, 29, 1213], "embedding": 40, "alphabet": 55000, "num_primes": 8}
+{"collisions": 0, "list": [41, 227, 2843, 23, 67, 131, 43, 37], "embedding": 48, "alphabet": 55000, "num_primes": 8}
+{"collisions": 34139, "list": [17, 1217, 73, 227, 109, 113, 1291], "embedding": 16, "alphabet": 55000, "num_primes": 7}
+{"collisions": 4017, "list": [29, 499, 23, 137, 79, 309241, 11257], "embedding": 24, "alphabet": 55000, "num_primes": 7}
+{"collisions": 575, "list": [941, 79, 1009, 83, 29, 131, 107], "embedding": 32, "alphabet": 55000, "num_primes": 7}
+{"collisions": 68, "list": [1607, 83, 97, 79, 53, 43, 823], "embedding": 40, "alphabet": 55000, "num_primes": 7}
+{"collisions": 8, "list": [47, 89, 97, 11863, 308501, 113, 41], "embedding": 48, "alphabet": 55000, "num_primes": 7}
+{"collisions": 41030, "list": [2293, 19, 1229, 29, 1019, 1747], "embedding": 16, "alphabet": 55000, "num_primes": 6}
+{"collisions": 9866, "list": [29, 73, 1319, 17, 97, 2731], "embedding": 24, "alphabet": 55000, "num_primes": 6}
+{"collisions": 1572, "list": [23, 997, 127, 29, 313883, 58909], "embedding": 32, "alphabet": 55000, "num_primes": 6}
+{"collisions": 364, "list": [41, 43, 599, 911, 1811, 61], "embedding": 40, "alphabet": 55000, "num_primes": 6}
+{"collisions": 65, "list": [47, 149, 86297, 83, 90403, 41], "embedding": 48, "alphabet": 55000, "num_primes": 6}
+{"collisions": 48135, "list": [17, 1753, 47, 59, 67], "embedding": 16, "alphabet": 55000, "num_primes": 5}
+{"collisions": 21067, "list": [23, 2917, 54547, 436313, 313], "embedding": 24, "alphabet": 55000, "num_primes": 5}
+{"collisions": 7144, "list": [37, 41, 1217, 911, 229], "embedding": 32, "alphabet": 55000, "num_primes": 5}
+{"collisions": 539, "list": [631, 2027, 1499, 31, 137, 23, 29, 2699, 47, 89], "embedding": 24, "alphabet": 55000, "num_primes": 10}
+{"collisions": 6, "list": [29, 103, 109, 47, 211, 67, 2833, 19, 127, 23], "embedding": 32, "alphabet": 55000, "num_primes": 10}
+{"collisions": 0, "list": [47, 61, 37, 113, 139, 79, 137, 29, 59, 131], "embedding": 40, "alphabet": 55000, "num_primes": 10}
+{"collisions": 12, "list": [43, 31, 29, 79, 1451, 67, 587, 2417, 127, 41], "embedding": 32, "alphabet": 55000, "num_primes": 10}
+{"collisions": 37, "list": [23, 31, 149, 127, 1997, 157, 109, 43, 2251], "embedding": 32, "alphabet": 55000, "num_primes": 9}

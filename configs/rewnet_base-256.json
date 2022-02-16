@@ -1,0 +1,80 @@
+{
+    "name": "base-256",
+    "version": "1.16",
+    "size": 256,
+    "max_len": 16,
+    "char_embedding_size": 16,
+
+    "epochs": 1000,
+    "batch_size": 1024,
+    "steps_per_epoch": 5000,
+    "save_freq_epochs": 50,
+    "validation_steps": 50,
+    "lr": 0.002,
+    "lr_decay": "linear",
+    "shuffle_buffer": 200000,
+
+    "models": {
+        "rewcnn": {
+            "projection_dim": 0,
+            "char_embedding_size": 16,
+            "encoder_initial_kernel_size": 9,
+            "encoder_filters": 64,
+            "encoder_kernel_size_1": 3,
+            "expansion_1": 4,
+            "encoder_kernel_size_2": 3,
+            "expansion_2": 4,
+            "use_fused_mbconv": true,
+            "encoder_activation": "swish",
+            "encoder_out_dim": null,
+            "tokenizer_dim": 256,
+            "tokenizer_activation": "softsign",
+            "spatial_dropout_rate": 0.05,
+            "feature_dropout_rate": 0.05,
+            "tokenizer_dropout_rate": 0.05
+        },
+        "rewmix": {
+            "dropout_rate": 0,
+            "batch_norm": true,
+            "char_embedding_size": 16,
+            "num_blocks": 8,
+            "encoder_dim": 16,
+            "encoder_hidden_dim": 128,
+            "encoder_combine_filters": 16,
+            "encoder_activation": "swish",
+            "tokenizer_dim": 256,
+            "tokenizer_activation": "softsign"
+        },
+        "rewbert": {
+            "projection_dim": 0,
+            "char_encoding_size": 64,
+            "encoder_blocks": 2,
+            "encoder_heads": 8,
+            "encoder_hidden_dim": 128,
+            "encoder_head_dim": 32,
+            "encoder_dropout": 0.05,
+            "encoder_gated_ffn": true,
+            "epsilon": 1e-12,
+            "encoder_out_dim": null,
+            "encoder_activation": "swish",
+            "encoder_use_t5": true,
+            "encoder_buckets": 16,
+            "encoder_max_distance": 16,
+            "tokenizer_dim": 256,
+            "tokenizer_activation": "softsign",
+            "tokenizer_dropout_rate": 0.05,
+            "encoder_spatial_dropout": 0.05
+        }
+    },
+    "outputs": {
+        "similarity_dim": 256,
+        "original_decoder_size": 256,
+        "aug_decoder_size": 256,
+        "complexity_dim": 0,
+        "lang_dim": 0,
+        "aug_vector_dim": 0,
+        "aug_matrix_dim": 0,
+        "outputs_norm_type": "batch",
+        "similarity_norm_type": "batch"
+    }
+}

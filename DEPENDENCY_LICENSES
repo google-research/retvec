@@ -1,0 +1,10 @@
+Package                License       Category            Homepage
+---------------------  ------------  ------------------  ----------------------------------------------------------
+tensorflow>=2.6        Apache 2.0    notice              https://www.tensorflow.org/
+tensorflow_similarity  Apache 2.0    notice              https://github.com/tensorflow/similarity
+google-cloud           Apache 2.0    notice              https://github.com/GoogleCloudPlatform/google-cloud-python
+numpy                  BSD           notice              https://www.numpy.org
+tabulate               MIT           notice              https://github.com/astanin/python-tabulate
+tabulate               MIT           notice              https://github.com/astanin/python-tabulate
+tqdm                   MPLv2.0, MIT  reciprocal, notice  https://tqdm.github.io
+matplotlib             PSF           notice              https://matplotlib.org
