@@ -1,0 +1,16 @@
+Package                License       Category            Homepage
+---------------------  ------------  ------------------  --------------------------------------------
+tensorflow>=2.6        Apache 2.0    notice              https://www.tensorflow.org/
+datasets               Apache 2.0    notice              https://github.com/huggingface/datasets
+tokenizers             Apache 2.0    notice              https://github.com/huggingface/tokenizers
+tensorflow_addons      Apache 2.0    notice              UNKNOWN
+google-cloud-storage   Apache 2.0    notice              https://github.com/googleapis/python-storage
+tensorflow_similarity  Apache 2.0    notice              https://github.com/tensorflow/similarity
+numpy                  BSD           notice              https://www.numpy.org
+mypy                   MIT           notice              http://www.mypy-lang.org/
+pytest                 MIT           notice              https://docs.pytest.org/en/latest/
+flake8                 MIT           notice              https://github.com/pycqa/flake8
+pytest-cov             MIT           notice              https://github.com/pytest-dev/pytest-cov
+wandb                  MIT license                       https://github.com/wandb/wandb
+tqdm                   MPLv2.0, MIT  reciprocal, notice  https://tqdm.github.io
+twine                  Apache 2.0    notice              https://github.com/pypa/twine

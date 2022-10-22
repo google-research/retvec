@@ -1,0 +1,13 @@
+{
+    "epochs": 50,
+    "batch_size": 1024,
+    "steps_per_epoch": 5000,
+    "save_freq_epochs": 50,
+    "validation_steps": 10,
+    "optimizer": "lamb",
+    "init_lr": 0.001,
+    "warmup_steps": 1000,
+    "warmup_learning_rate": 0.0,
+    "end_lr": 0.00001,
+    "shuffle_buffer": 100000
+}
