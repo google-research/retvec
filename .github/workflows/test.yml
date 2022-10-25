@@ -2,7 +2,7 @@ name: Testing
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
 
 jobs:
@@ -44,7 +44,7 @@ jobs:
       run: |
         coverage run -m pytest tests/
     - name: Upload coverage to Coveralls
-      if: ${{ github.ref == 'refs/heads/master' }}
+      if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         coveralls --service=github
       env:
