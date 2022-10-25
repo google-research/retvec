@@ -22,12 +22,14 @@ from tensorflow.keras import layers
 from tensorflow.keras.layers import Layer
 
 
-def dense_block(x: Tensor,
-                units: int,
-                activation: str,
-                norm_type: str = 'batch',
-                norm_epsilon: float = 1e-6,
-                **dense_kwargs) -> Tensor:
+def dense_block(
+    x: Tensor,
+    units: int,
+    activation: str,
+    norm_type: str = "batch",
+    norm_epsilon: float = 1e-6,
+    **dense_kwargs,
+) -> Tensor:
     """Build a dense block for a TF model."""
     x = layers.Dense(units, **dense_kwargs)(x)
 
@@ -40,13 +42,13 @@ def dense_block(x: Tensor,
 
 def get_activation_layer(activation: str):
     """Get activation layer or function for TF model."""
-    if activation == 'sqrrelu':
+    if activation == "sqrrelu":
         return sqrrelu
-    elif activation == 'sin':
+    elif activation == "sin":
         return tf.sin
-    elif activation == 'cos':
+    elif activation == "cos":
         return tf.cos
-    elif activation == 'id':
+    elif activation == "id":
         return lambda x: x
     else:
         return tf.keras.layers.Activation(activation)
@@ -54,16 +56,16 @@ def get_activation_layer(activation: str):
 
 def get_norm_layer(norm: str, **kwargs):
     """Get normalization layer for TF model."""
-    if norm == 'layer':
+    if norm == "layer":
         return layers.LayerNormalization(**kwargs)
-    elif norm == 'batch':
+    elif norm == "batch":
         return layers.BatchNormalization(**kwargs)
-    elif norm == 'scaled':
+    elif norm == "scaled":
         return ScaledNorm(**kwargs)
-    elif norm == 'l2':
+    elif norm == "l2":
         return L2Norm(**kwargs)
     else:
-        raise ValueError(f'Unsupported norm type {norm}')
+        raise ValueError(f"Unsupported norm type {norm}")
 
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
@@ -103,10 +105,7 @@ class BertPooling(Layer):
 class ScaledNorm(Layer):
     """ScaledNorm layer."""
 
-    def __init__(self,
-                 begin_axis: int = -1,
-                 epsilon: float = 1e-5,
-                 **kwargs) -> None:
+    def __init__(self, begin_axis: int = -1, epsilon: float = 1e-5, **kwargs) -> None:
         """Initialize a ScaledNorm Layer.
 
         Args:
@@ -116,24 +115,22 @@ class ScaledNorm(Layer):
         super().__init__(**kwargs)
         self._begin_axis = begin_axis
         self._epsilon = epsilon
-        self._scale = self.add_weight(name='norm_scale',
-                                      shape=(),
-                                      initializer=tf.constant_initializer(
-                                          value=1.0),
-                                      trainable=True)
+        self._scale = self.add_weight(
+            name="norm_scale",
+            shape=(),
+            initializer=tf.constant_initializer(value=1.0),
+            trainable=True,
+        )
 
     def call(self, inputs: Tensor) -> Tensor:
         x = inputs
-        axes = list(range(len(x.shape)))[self._begin_axis:]
+        axes = list(range(len(x.shape)))[self._begin_axis :]
         mean_square = tf.reduce_mean(tf.math.square(x), axes, keepdims=True)
         x = x * tf.math.rsqrt(mean_square + self._epsilon)
         return x * self._scale
 
     def get_config(self) -> Dict[str, Any]:
-        config = {
-            "begin_axis": self._begin_axis,
-            "epsilon": self._epsilon
-        }
+        config = {"begin_axis": self._begin_axis, "epsilon": self._epsilon}
         base_config = super(ScaledNorm, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
@@ -150,17 +147,19 @@ class ConvNextBlock(Layer):
     https://www.tensorflow.org/js/guide/conversion.
     """
 
-    def __init__(self,
-                 kernel_size: int,
-                 depth: int,
-                 filters: int,
-                 hidden_dim: int,
-                 dropout_rate: float = 0,
-                 epsilon: float = 1e-10,
-                 activation: Union[str, Callable] = 'gelu',
-                 strides: int = 1,
-                 residual: bool = True,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        kernel_size: int,
+        depth: int,
+        filters: int,
+        hidden_dim: int,
+        dropout_rate: float = 0,
+        epsilon: float = 1e-10,
+        activation: Union[str, Callable] = "gelu",
+        strides: int = 1,
+        residual: bool = True,
+        **kwargs,
+    ) -> None:
         """Initialize a ConvNextBlock.
 
         Args:
@@ -192,10 +191,12 @@ class ConvNextBlock(Layer):
         self.activation = activation
         self.strides = strides
         self.residual = residual
-        self.depthconv = layers.DepthwiseConv1D(kernel_size=kernel_size,
-                                                strides=strides,
-                                                depth_multiplier=depth,
-                                                padding="same")
+        self.depthconv = layers.DepthwiseConv1D(
+            kernel_size=kernel_size,
+            strides=strides,
+            depth_multiplier=depth,
+            padding="same",
+        )
         self.norm = layers.LayerNormalization(epsilon=epsilon)
         self.hidden = layers.Dense(hidden_dim)
         self.activation = layers.Activation(activation)
@@ -223,5 +224,5 @@ class ConvNextBlock(Layer):
             "epsilon": self.epsilon,
             "activation": self.activation,
             "strides": self.strides,
-            "residual": self.residual
+            "residual": self.residual,
         }

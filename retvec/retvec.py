@@ -28,27 +28,23 @@ from .embedding import RetVecEmbedding
 class RetVec(tf.keras.layers.Layer):
     """RetVec: Resilient and Efficient Vectorizer layer."""
 
-    def __init__(self,
-                 max_len: int = 128,
-                 sep: str = '',
-                 lowercase: bool = False,
-
-                 # RetVecEmbedding parameters
-                 model: str = None,
-                 trainable: bool = False,
-
-                 # RetVecBinarizer parameters
-                 max_chars: int = 16,
-                 char_encoding_size: int = 32,
-                 char_encoding_type: str = 'UTF-8',
-                 cls_int: Optional[int] = None,
-                 replacement_int: int = 11,
-
-                 # Post-embedding
-                 dropout_rate: float = 0.0,
-                 spatial_dropout_rate: float = 0.0,
-                 norm_type: Optional[str] = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        max_len: int = 128,
+        sep: str = "",
+        lowercase: bool = False,
+        model: str = None,
+        trainable: bool = False,
+        max_chars: int = 16,
+        char_encoding_size: int = 32,
+        char_encoding_type: str = "UTF-8",
+        cls_int: Optional[int] = None,
+        replacement_int: int = 11,
+        dropout_rate: float = 0.0,
+        spatial_dropout_rate: float = 0.0,
+        norm_type: Optional[str] = None,
+        **kwargs,
+    ) -> None:
         """Initialize a RetVec layer.
 
         Args:
@@ -82,7 +78,7 @@ class RetVec(tf.keras.layers.Layer):
             spatial_dropout_rate: Spatial dropout to apply after RetVec
                 embedding.
 
-            norm_type: Norm to apply after RetVec embedding. One of 
+            norm_type: Norm to apply after RetVec embedding. One of
                 [None, 'batch', or 'layer'].
 
         """
@@ -97,7 +93,8 @@ class RetVec(tf.keras.layers.Layer):
         # RetVecEmbedding
         if self.model:
             self._embedding: Optional[RetVecEmbedding] = RetVecEmbedding(
-                model=model, trainable=self.trainable)
+                model=model, trainable=self.trainable
+            )
         else:
             self._embedding = None
 
@@ -112,7 +109,8 @@ class RetVec(tf.keras.layers.Layer):
             encoding_size=self.char_encoding_size,
             encoding_type=self.char_encoding_type,
             cls_int=self.cls_int,
-            replacement_int=self.replacement_int)
+            replacement_int=self.replacement_int,
+        )
 
         # Set to True when 'tokenize()' or 'binarize()' called in eager mode
         self.eager = False
@@ -128,16 +126,15 @@ class RetVec(tf.keras.layers.Layer):
         self.spatial_dropout_rate = spatial_dropout_rate
         self.norm_type = norm_type
 
-        if self.norm_type == 'batch':
+        if self.norm_type == "batch":
             self.norm = layers.BatchNormalization()
-        elif self.norm_type == 'layer':
+        elif self.norm_type == "layer":
             self.norm = layers.LayerNormalization()
         elif self.norm_type:
             raise ValueError(f"Unsupported norm_type {self.norm_type}")
 
         self.dropout = layers.Dropout(self.dropout_rate)
-        self.spatial_drop = layers.SpatialDropout1D(
-            self.spatial_dropout_rate)
+        self.spatial_drop = layers.SpatialDropout1D(self.spatial_dropout_rate)
 
     @property
     def embedding(self):
@@ -158,18 +155,17 @@ class RetVec(tf.keras.layers.Layer):
         if self.lowercase:
             inputs = tf.strings.lower(inputs)
 
-        rtensor = tf.strings.split(inputs, sep=self.sep,
-                                   maxsplit=self.max_len)
+        rtensor = tf.strings.split(inputs, sep=self.sep, maxsplit=self.max_len)
 
         # Handle shape differences between eager and graph mode
         if self.eager:
-            stensor = rtensor.to_tensor(default_value='',
-                                        shape=(rtensor.shape[0],
-                                               self.max_len))
+            stensor = rtensor.to_tensor(
+                default_value="", shape=(rtensor.shape[0], self.max_len)
+            )
         else:
-            stensor = rtensor.to_tensor(default_value='',
-                                        shape=(rtensor.shape[0], 1,
-                                               self.max_len))
+            stensor = rtensor.to_tensor(
+                default_value="", shape=(rtensor.shape[0], 1, self.max_len)
+            )
             stensor = tf.squeeze(stensor, axis=1)
 
         # apply encoding and REW* model, if set
@@ -179,8 +175,9 @@ class RetVec(tf.keras.layers.Layer):
             embeddings = self._embedding(binarized, training=training)
         else:
             embsize = self._binarizer.encoding_size * self._binarizer.max_chars
-            embeddings = tf.reshape(binarized, (tf.shape(
-                inputs)[0], self.max_len, embsize))
+            embeddings = tf.reshape(
+                binarized, (tf.shape(inputs)[0], self.max_len, embsize)
+            )
 
         # apply post-embedding norm and dropout layers
         if self.norm_type:
@@ -236,19 +233,21 @@ class RetVec(tf.keras.layers.Layer):
 
     def get_config(self) -> Dict[str, Any]:
         config: Dict = super(RetVec, self).get_config()
-        config.update({
-            'max_len': self.max_len,
-            'sep': self.sep,
-            'lowercase': self.lowercase,
-            'model': self.model,
-            'trainable': self.trainable,
-            'max_chars': self.max_chars,
-            'char_encoding_size': self.char_encoding_size,
-            'char_encoding_type': self.char_encoding_type,
-            'cls_int': self.cls_int,
-            'replacement_int': self.replacement_int,
-            'dropout_rate': self.dropout_rate,
-            'spatial_dropout_rate': self.spatial_dropout_rate,
-            'norm_type': self.norm_type
-        })
+        config.update(
+            {
+                "max_len": self.max_len,
+                "sep": self.sep,
+                "lowercase": self.lowercase,
+                "model": self.model,
+                "trainable": self.trainable,
+                "max_chars": self.max_chars,
+                "char_encoding_size": self.char_encoding_size,
+                "char_encoding_type": self.char_encoding_type,
+                "cls_int": self.cls_int,
+                "replacement_int": self.replacement_int,
+                "dropout_rate": self.dropout_rate,
+                "spatial_dropout_rate": self.spatial_dropout_rate,
+                "norm_type": self.norm_type,
+            }
+        )
         return config

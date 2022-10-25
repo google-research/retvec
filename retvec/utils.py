@@ -19,7 +19,7 @@ import tensorflow as tf
 
 def tf_cap_memory():
     """Avoid TF to hog memory before needing it"""
-    gpus = tf.config.experimental.list_physical_devices('GPU')
+    gpus = tf.config.experimental.list_physical_devices("GPU")
 
     if gpus:
         for gpu in gpus:

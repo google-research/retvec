@@ -28,13 +28,14 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
     """
 
     def __init__(
-            self,
-            initial_learning_rate: float,
-            decay_steps: int,
-            warmup_steps: int,
-            warmup_learning_rate: float = 0.0,
-            alpha: float = 0.0,
-            name: str = "WarmUpCosine"):
+        self,
+        initial_learning_rate: float,
+        decay_steps: int,
+        warmup_steps: int,
+        warmup_learning_rate: float = 0.0,
+        alpha: float = 0.0,
+        name: str = "WarmUpCosine",
+    ):
         """Applies cosine decay to the learning rate.
 
         Args:
@@ -62,11 +63,11 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
 
         if warmup_learning_rate > initial_learning_rate:
             raise ValueError(
-                "warmup_learning_rate must be smaller than the initial_learning_rate")
+                "warmup_learning_rate must be smaller than the initial_learning_rate"
+            )
 
         if warmup_steps > decay_steps:
-            raise ValueError(
-                "warmup_steps must be smaller than the decay_steps")
+            raise ValueError("warmup_steps must be smaller than the decay_steps")
         self.initial_learning_rate = initial_learning_rate
         self.decay_steps = decay_steps
         self.alpha = alpha
@@ -80,8 +81,9 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
             alpha=alpha,
         )
         # Compute the warmup increment.
-        self.tf_initial_learning_rate = tf.convert_to_tensor(self.initial_learning_rate,
-                                                             name="initial_learning_rate")
+        self.tf_initial_learning_rate = tf.convert_to_tensor(
+            self.initial_learning_rate, name="initial_learning_rate"
+        )
         self.dtype = self.tf_initial_learning_rate.dtype
         self.learning_rate_delta = tf.convert_to_tensor(
             self.warmup_learning_rate / self.initial_learning_rate, self.dtype
@@ -100,9 +102,9 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
     def __call__(self, step: Tensor) -> Tensor:
         global_step_recomp = tf.cast(step, self.dtype)
         warmup_scaler = tf.minimum(
-            1.0, self.warmup_inc * global_step_recomp + self.learning_rate_delta)
-        learning_rate: Tensor = self.cosine_decay(
-            global_step_recomp) * warmup_scaler
+            1.0, self.warmup_inc * global_step_recomp + self.learning_rate_delta
+        )
+        learning_rate: Tensor = self.cosine_decay(global_step_recomp) * warmup_scaler
         return learning_rate
 
     def get_config(self) -> Dict[str, Any]:

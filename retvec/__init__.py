@@ -16,7 +16,7 @@
 
 __version__ = "0.1.0"
 
-from .integerizers import RetVecIntegerizer  # noqa
 from .binarizers import RetVecBinarizer, RetVecIntBinarizer  # noqa
 from .embedding import RetVecEmbedding  # noqa
+from .integerizers import RetVecIntegerizer  # noqa
 from .retvec import RetVec  # noqa

@@ -29,12 +29,14 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
     This layer currently only supports Unicode decodings.
     """
 
-    def __init__(self,
-                 max_chars: int = 16,
-                 encoding_type: str = 'UTF-8',
-                 cls_int: Optional[int] = None,
-                 replacement_int: int = 11,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        max_chars: int = 16,
+        encoding_type: str = "UTF-8",
+        cls_int: Optional[int] = None,
+        replacement_int: int = 11,
+        **kwargs
+    ) -> None:
         """Initialize a RetVec integerizer.
 
         Args:
@@ -82,31 +84,33 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         encodings = tf.strings.unicode_decode(
             inputs,
             self.encoding_type,
-            errors='replace',
-            replacement_char=self.replacement_int)
+            errors="replace",
+            replacement_char=self.replacement_int,
+        )
 
         # Handle shape differences between eager and graph mode
         if self.eager:
             if self.input_rank == 2:
                 encodings = tf.squeeze(encodings, axis=1)
-            encodings = encodings.to_tensor(
-                shape=(encodings.shape[0], self.max_chars))
+            encodings = encodings.to_tensor(shape=(encodings.shape[0], self.max_chars))
         else:
             encodings = encodings.to_tensor(
-                shape=(encodings.shape[0], 1, self.max_chars))
+                shape=(encodings.shape[0], 1, self.max_chars)
+            )
             encodings = tf.squeeze(encodings, axis=1)
 
         # add CLS int and then reshape to max size
         if self.cls_int:
-            encodings = tf.pad(encodings,
-                               self.pad_position,
-                               constant_values=self.pad_value)
-            encodings = encodings[:, :self.max_chars]
+            encodings = tf.pad(
+                encodings, self.pad_position, constant_values=self.pad_value
+            )
+            encodings = encodings[:, : self.max_chars]
 
         # Reshape two dimensional inputs back
         if self.input_rank == 2:
             encodings = tf.reshape(
-                encodings, (batch_size, self.max_words, self.max_chars))
+                encodings, (batch_size, self.max_words, self.max_chars)
+            )
 
         return encodings
 
@@ -139,10 +143,12 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
 
     def get_config(self) -> Dict[str, Any]:
         config: Dict = super(RetVecIntegerizer, self).get_config()
-        config.update({
-            'max_chars': self.max_chars,
-            'encoding_type': self.encoding_type,
-            'cls_int': self.cls_int,
-            'replacement_int': self.replacement_int
-        })
+        config.update(
+            {
+                "max_chars": self.max_chars,
+                "encoding_type": self.encoding_type,
+                "cls_int": self.cls_int,
+                "replacement_int": self.replacement_int,
+            }
+        )
         return config

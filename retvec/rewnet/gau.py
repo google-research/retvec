@@ -35,20 +35,22 @@ class GAU(Layer):
     Paper reference: https://arxiv.org/abs/2202.10447
     """
 
-    def __init__(self,
-                 dim: int,
-                 max_len: int = 128,
-                 shared_dim: int = 128,
-                 expansion_factor: int = 2,
-                 activation: str = 'swish',
-                 attention_activation: str = 'sqrrelu',
-                 norm_type: str = 'scaled',
-                 position_encoding_type: str = 'rope',
-                 dropout_rate: float = 0.0,
-                 attention_dropout_rate: float = 0.0,
-                 spatial_dropout_rate: float = 0.0,
-                 epsilon: float = 1e-6,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        dim: int,
+        max_len: int = 128,
+        shared_dim: int = 128,
+        expansion_factor: int = 2,
+        activation: str = "swish",
+        attention_activation: str = "sqrrelu",
+        norm_type: str = "scaled",
+        position_encoding_type: str = "rope",
+        dropout_rate: float = 0.0,
+        attention_dropout_rate: float = 0.0,
+        spatial_dropout_rate: float = 0.0,
+        epsilon: float = 1e-6,
+        **kwargs
+    ) -> None:
         """
         Initialize a GAU layer.
 
@@ -102,11 +104,11 @@ class GAU(Layer):
         self.proj_dim = 2 * self.expand_dim + self.shared_dim
 
         # define layers
-        self.norm = get_norm_layer(norm=self.norm_type,
-                                   epsilon=self.epsilon)
+        self.norm = get_norm_layer(norm=self.norm_type, epsilon=self.epsilon)
 
-        self.proj1 = layers.Dense(self.proj_dim, use_bias=True,
-                                  activation=self.activation)
+        self.proj1 = layers.Dense(
+            self.proj_dim, use_bias=True, activation=self.activation
+        )
         self.proj2 = layers.Dense(self.dim, use_bias=True)
 
         # dropout layers
@@ -114,42 +116,47 @@ class GAU(Layer):
         self.dropout2 = layers.Dropout(self.dropout_rate)
 
         if self.attention_dropout_rate:
-            self.attention_dropout = layers.Dropout(
-                self.attention_dropout_rate)
+            self.attention_dropout = layers.Dropout(self.attention_dropout_rate)
 
         if self.spatial_dropout_rate:
-            self.spatial_dropout = layers.SpatialDropout1D(
-                self.spatial_dropout_rate)
+            self.spatial_dropout = layers.SpatialDropout1D(self.spatial_dropout_rate)
 
         # attention activation function
-        self.attention_activation_layer = get_activation_layer(
-            attention_activation)
+        self.attention_activation_layer = get_activation_layer(attention_activation)
 
         self.weight_initializer = tf.random_normal_initializer(stddev=0.02)
 
         # setting up position encoding
-        if self.position_encoding_type == 'relative':
-            self.w = tf.Variable(lambda: self.weight_initializer(
-                                 shape=[2 * self.max_len - 1],
-                                 dtype=tf.float32),
-                                 trainable=True)
+        if self.position_encoding_type == "relative":
+            self.w = tf.Variable(
+                lambda: self.weight_initializer(
+                    shape=[2 * self.max_len - 1], dtype=tf.float32
+                ),
+                trainable=True,
+            )
 
-        elif self.position_encoding_type == 'rope':
-            self.a = tf.Variable(lambda: self.weight_initializer(
-                shape=[self.max_len], dtype=tf.float32), trainable=True)
-            self.b = tf.Variable(lambda: self.weight_initializer(
-                shape=[self.max_len], dtype=tf.float32), trainable=True)
+        elif self.position_encoding_type == "rope":
+            self.a = tf.Variable(
+                lambda: self.weight_initializer(shape=[self.max_len], dtype=tf.float32),
+                trainable=True,
+            )
+            self.b = tf.Variable(
+                lambda: self.weight_initializer(shape=[self.max_len], dtype=tf.float32),
+                trainable=True,
+            )
 
         # offset scaling values
         self.gamma = tf.Variable(
             lambda: self.weight_initializer(
-                shape=[2, self.shared_dim], dtype=tf.float32),
-            trainable=True)
+                shape=[2, self.shared_dim], dtype=tf.float32
+            ),
+            trainable=True,
+        )
 
         self.beta = tf.Variable(
-            lambda: ZEROS_INTIALIZER(
-                shape=[2, self.shared_dim], dtype=tf.float32),
-            trainable=True)
+            lambda: ZEROS_INTIALIZER(shape=[2, self.shared_dim], dtype=tf.float32),
+            trainable=True,
+        )
 
     def call(self, x: Tensor, training: bool = False) -> Tensor:
 
@@ -167,22 +174,23 @@ class GAU(Layer):
         uv = self.dropout2(uv, training=training)
 
         u, v, base = tf.split(
-            uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1)
+            uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1
+        )
 
         # generate q, k by scaled offset
-        base = tf.einsum('bnr,hr->bnhr', base, self.gamma) + self.beta
+        base = tf.einsum("bnr,hr->bnhr", base, self.gamma) + self.beta
         q, k = tf.unstack(base, axis=-2)
 
         # compute key-query scores
-        qk = tf.einsum('bnd,bmd->bnm', q, k)
+        qk = tf.einsum("bnd,bmd->bnm", q, k)
         qk = qk / self.max_len
 
         # add relative position bias for attention
-        if self.position_encoding_type == 'relative':
+        if self.position_encoding_type == "relative":
             bias = toeplitz_matrix(self.max_len, self.w)
             qk += bias
 
-        elif self.position_encoding_type == 'rope':
+        elif self.position_encoding_type == "rope":
             bias = toeplitz_matrix_rope(self.max_len, self.a, self.b)
             qk += bias
 
@@ -193,25 +201,27 @@ class GAU(Layer):
             kernel = self.attention_dropout(kernel)
 
         # apply values and project
-        x = u * tf.einsum('bnm,bme->bne', kernel, v)
+        x = u * tf.einsum("bnm,bme->bne", kernel, v)
         x = self.proj2(x)
 
         return x + shortcut
 
     def get_config(self) -> Dict[str, Any]:
         config: Dict = super(GAU, self).get_config()
-        config.update({
-            'dim': self.dim,
-            'max_len': self.max_len,
-            'shared_dim': self.shared_dim,
-            'expansion_factor': self.expansion_factor,
-            'activation': self.activation,
-            'attention_activation': self.attention_activation,
-            'norm_type': self.norm_type,
-            'position_encoding_type': self.position_encoding_type,
-            'dropout_rate': self.dropout_rate,
-            'attention_dropout_rate': self.attention_dropout_rate,
-            'spatial_dropout_rate': self.spatial_dropout_rate,
-            'epsilon': self.epsilon
-        })
+        config.update(
+            {
+                "dim": self.dim,
+                "max_len": self.max_len,
+                "shared_dim": self.shared_dim,
+                "expansion_factor": self.expansion_factor,
+                "activation": self.activation,
+                "attention_activation": self.attention_activation,
+                "norm_type": self.norm_type,
+                "position_encoding_type": self.position_encoding_type,
+                "dropout_rate": self.dropout_rate,
+                "attention_dropout_rate": self.attention_dropout_rate,
+                "spatial_dropout_rate": self.spatial_dropout_rate,
+                "epsilon": self.epsilon,
+            }
+        )
         return config

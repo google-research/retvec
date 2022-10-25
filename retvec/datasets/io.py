@@ -16,20 +16,20 @@
 
 import os
 from time import time
-from typing import Any, Callable, Dict, List, Tuple, Set
+from typing import Any, Callable, Dict, List, Set, Tuple
 
 import tensorflow as tf
 from google.cloud import storage
-from retvec import RetVecBinarizer
 from tensorflow import Tensor
 from tensorflow.keras.losses import Loss
 from tensorflow_similarity.losses import (CircleLoss, MultiSimilarityLoss,
                                           PNLoss, TripletLoss)
 
+from retvec import RetVecBinarizer
+
 
 @tf.function
-def read_tfrecord(tfrecord: Tensor,
-                  binarizer: RetVecBinarizer) -> Dict[str, Tensor]:
+def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Tensor]:
     """Read TF record files for REW* training datasets.
 
     Args:
@@ -38,7 +38,7 @@ def read_tfrecord(tfrecord: Tensor,
     """
     base_features = {
         "original_token": tf.io.FixedLenFeature([], tf.string),
-        "idx": tf.io.FixedLenFeature([], tf.int64)
+        "idx": tf.io.FixedLenFeature([], tf.int64),
     }
 
     features = base_features.copy()
@@ -52,7 +52,8 @@ def read_tfrecord(tfrecord: Tensor,
 
     for i in range(2):
         rec["aug_matrix%s" % i] = tf.io.parse_tensor(
-            rec["aug_matrix%s" % i], out_type=tf.float64)
+            rec["aug_matrix%s" % i], out_type=tf.float64
+        )
 
     # output a single record containing each augmented example
     record = {}
@@ -70,28 +71,33 @@ def read_tfrecord(tfrecord: Tensor,
     reshape_size = (binarizer.max_chars * binarizer.encoding_size,)
 
     aug_token0_encoded = tf.reshape(
-        binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)), reshape_size)
+        binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)), reshape_size
+    )
     aug_token1_encoded = tf.reshape(
-        binarizer.binarize(tf.expand_dims(rec["aug_token1"], axis=0)), reshape_size)
+        binarizer.binarize(tf.expand_dims(rec["aug_token1"], axis=0)), reshape_size
+    )
     original_token_encoded = tf.reshape(
-        binarizer.binarize(tf.expand_dims(rec["original_token"], axis=0)), reshape_size)
+        binarizer.binarize(tf.expand_dims(rec["original_token"], axis=0)), reshape_size
+    )
 
     record["original_encoded"] = tf.stack([original_token_encoded] * 2)
     record["aug_encoded"] = tf.stack([aug_token0_encoded, aug_token1_encoded])
-    record["aug_vector"] = record["aug_vector"][:, :binarizer.max_chars]
-    record["aug_matrix"] = record["aug_matrix"][:, :binarizer.max_chars, :]
+    record["aug_vector"] = record["aug_vector"][:, : binarizer.max_chars]
+    record["aug_matrix"] = record["aug_matrix"][:, : binarizer.max_chars, :]
     return record
 
 
-def Sampler(shards_list: List[str],
-            binarizer: RetVecBinarizer,
-            batch_size: int = 32,
-            process_record: Callable = None,
-            parallelism: int = tf.data.AUTOTUNE,
-            file_parallelism: int = 1,
-            prefetch_size: int = None,
-            buffer_size: int = None,
-            compression_type: str = None) -> tf.data.Dataset:
+def Sampler(
+    shards_list: List[str],
+    binarizer: RetVecBinarizer,
+    batch_size: int = 32,
+    process_record: Callable = None,
+    parallelism: int = tf.data.AUTOTUNE,
+    file_parallelism: int = 1,
+    prefetch_size: int = None,
+    buffer_size: int = None,
+    compression_type: str = None,
+) -> tf.data.Dataset:
     """Dataset sampler for REW* model training.
 
     Args:
@@ -126,15 +132,20 @@ def Sampler(shards_list: List[str],
 
         # interleave so we draw examples from different shards
         ds = ds.interleave(
-            lambda x: tf.data.TFRecordDataset(x, compression_type=compression_type),  # noqa
+            lambda x: tf.data.TFRecordDataset(
+                x, compression_type=compression_type
+            ),  # noqa
             block_length=1,  # problem here is that we have non flat record
             num_parallel_calls=file_parallelism,
             cycle_length=file_parallelism,
-            deterministic=False)
+            deterministic=False,
+        )
 
         # read examples from tfrecord
-        ds = ds.map(lambda x: read_tfrecord(x, binarizer=binarizer),
-                    num_parallel_calls=parallelism)
+        ds = ds.map(
+            lambda x: read_tfrecord(x, binarizer=binarizer),
+            num_parallel_calls=parallelism,
+        )
 
         # ignore corrupted read errors, i.e. corrupted tfrecords
         ds = ds.apply(tf.data.experimental.ignore_errors())
@@ -163,7 +174,7 @@ def get_process_tfrecord_fn(outputs: Set[str]) -> Callable:
             "ori_decoder": e["original_encoded"],
             "aug_decoder": e["aug_encoded"],
             "aug_vector": e["aug_vector"],
-            "aug_matrix": e["aug_matrix"]
+            "aug_matrix": e["aug_matrix"],
         }
 
         y = {output: y[output] for output in outputs}
@@ -174,10 +185,8 @@ def get_process_tfrecord_fn(outputs: Set[str]) -> Callable:
 
 
 def get_dataset_samplers(
-        bucket: str,
-        train_path: str,
-        test_path: str,
-        config: Dict) -> Tuple[tf.data.Dataset, tf.data.Dataset]:
+    bucket: str, train_path: str, test_path: str, config: Dict
+) -> Tuple[tf.data.Dataset, tf.data.Dataset]:
     """Get train and test dataset samplers for training REW* models."""
     core_count = os.cpu_count()
 
@@ -197,7 +206,8 @@ def get_dataset_samplers(
         encoding_size=m["char_encoding_size"],
         encoding_type=m["char_encoding_type"],
         cls_int=m["cls_int"],
-        replacement_int=m["replacement_int"])
+        replacement_int=m["replacement_int"],
+    )
 
     train_files = []
     test_files = []
@@ -217,21 +227,25 @@ def get_dataset_samplers(
     for f in test_files:
         test_shards.append("gs://" + bucket + "/" + f)
 
-    train_ds = Sampler(train_shards,
-                       binarizer=binarizer,
-                       process_record=tfrecord_fn,
-                       batch_size=batch_size,
-                       file_parallelism=core_count * 2,
-                       parallelism=core_count,
-                       buffer_size=buffer_size,
-                       prefetch_size=10)
+    train_ds = Sampler(
+        train_shards,
+        binarizer=binarizer,
+        process_record=tfrecord_fn,
+        batch_size=batch_size,
+        file_parallelism=core_count * 2,
+        parallelism=core_count,
+        buffer_size=buffer_size,
+        prefetch_size=10,
+    )
 
-    test_ds = Sampler(test_shards,
-                      binarizer=binarizer,
-                      process_record=tfrecord_fn,
-                      file_parallelism=1,
-                      batch_size=batch_size,
-                      prefetch_size=1)
+    test_ds = Sampler(
+        test_shards,
+        binarizer=binarizer,
+        process_record=tfrecord_fn,
+        file_parallelism=1,
+        batch_size=batch_size,
+        prefetch_size=1,
+    )
 
     return train_ds, test_ds
 
@@ -247,18 +261,24 @@ def get_outputs_info(config: Dict) -> Tuple[List[Any], List[List[str]], Set[str]
         sim_loss_type = sim_loss_config["type"]
 
         if sim_loss_type == "multisim":
-            loss.append(MultiSimilarityLoss(
-                distance="cosine",
-                alpha=sim_loss_config.get("alpha", 2),
-                beta=sim_loss_config.get("beta", 40),
-                epsilon=sim_loss_config.get("epsilon", 0.1),
-                lmda=sim_loss_config.get("lmda", 0.5)))
+            loss.append(
+                MultiSimilarityLoss(
+                    distance="cosine",
+                    alpha=sim_loss_config.get("alpha", 2),
+                    beta=sim_loss_config.get("beta", 40),
+                    epsilon=sim_loss_config.get("epsilon", 0.1),
+                    lmda=sim_loss_config.get("lmda", 0.5),
+                )
+            )
 
         elif sim_loss_type == "circle":
-            loss.append(CircleLoss(
-                distance="cosine",
-                gamma=sim_loss_config.get("gamma", 256),
-                margin=sim_loss_config.get("margin", 0.)))
+            loss.append(
+                CircleLoss(
+                    distance="cosine",
+                    gamma=sim_loss_config.get("gamma", 256),
+                    margin=sim_loss_config.get("margin", 0.0),
+                )
+            )
 
         elif sim_loss_type == "triplet":
             loss.append(TripletLoss(distance="cosine"))

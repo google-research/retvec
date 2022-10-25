@@ -29,10 +29,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
     and efficient to compute.
     """
 
-    def __init__(self,
-                 model: str = None,
-                 trainable: bool = False,
-                 **kwargs) -> None:
+    def __init__(self, model: str = None, trainable: bool = False, **kwargs) -> None:
         """Build a RetVecEmbedding layer.
 
         Args:
@@ -62,8 +59,9 @@ class RetVecEmbedding(tf.keras.layers.Layer):
             num_words = input_shape[1]
             max_chars = input_shape[2]
             encoding_size = input_shape[-1]
-            inputs = tf.reshape(inputs, (batch_size * num_words,
-                                         max_chars, encoding_size))
+            inputs = tf.reshape(
+                inputs, (batch_size * num_words, max_chars, encoding_size)
+            )
         else:
             batch_size = input_shape[0]
             max_chars = input_shape[1]
@@ -74,8 +72,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
 
         # Reshape inputs back if needed
         if len(input_shape) == 4:
-            output = tf.reshape(output,
-                                (batch_size, num_words, self.embedding_size))
+            output = tf.reshape(output, (batch_size, num_words, self.embedding_size))
 
         return output
 
@@ -90,13 +87,10 @@ class RetVecEmbedding(tf.keras.layers.Layer):
         """
         model = tf.keras.models.load_model(path)
         model.trainable = self.trainable
-        model.compile('adam', 'mse')
+        model.compile("adam", "mse")
         return model
 
     def get_config(self) -> Dict[str, Any]:
         config: Dict = super(RetVecEmbedding, self).get_config()
-        config.update({
-            'model': self.model,
-            'trainable': self.trainable
-        })
+        config.update({"model": self.model, "trainable": self.trainable})
         return config
