@@ -20,16 +20,16 @@ from retvec import RetVec
 from retvec.rewnet import REWCNN, REWformer
 from tensorflow_similarity.losses import MultiSimilarityLoss
 
-tf.config.set_visible_devices([], 'GPU')
+tf.config.set_visible_devices([], "GPU")
 
 architectures = [REWCNN, REWformer]
-architectures_names = ['rewcnn', 'rewformer']
+architectures_names = ["rewcnn", "rewformer"]
 
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_basic_load(NN):
     model = NN()
-    assert (isinstance(model, tf.keras.Model))
+    assert isinstance(model, tf.keras.Model)
 
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
@@ -37,7 +37,7 @@ def test_similarity(NN):
     dim = 5
     model = NN(similarity_dim=dim)
 
-    lyr = model.get_layer('similarity')
+    lyr = model.get_layer("similarity")
     assert lyr.output.shape[1] == dim
 
 
@@ -46,7 +46,7 @@ def test_ori_decoder(NN):
     size = 512
     model = NN(original_decoder_size=size)
 
-    lyr = model.get_layer('ori_decoder')
+    lyr = model.get_layer("ori_decoder")
     assert lyr.output.shape[1] == size
 
 
@@ -55,7 +55,7 @@ def test_aug_decoder(NN):
     size = 512
     model = NN(aug_decoder_size=size)
 
-    lyr = model.get_layer('aug_decoder')
+    lyr = model.get_layer("aug_decoder")
     assert lyr.output.shape[1] == size
 
 
@@ -64,7 +64,7 @@ def test_aug_vector(NN):
     dim = 4
     model = NN(max_chars=16, aug_vector_dim=dim)
 
-    lyr = model.get_layer('aug_vector')
+    lyr = model.get_layer("aug_vector")
 
     assert lyr.output.shape[1] == 16
     assert lyr.output.shape[2] == dim
@@ -75,7 +75,7 @@ def test_aug_matrix(NN):
     dim = 4
     model = NN(max_chars=16, aug_matrix_dim=dim)
 
-    lyr = model.get_layer('aug_matrix')
+    lyr = model.get_layer("aug_matrix")
 
     assert lyr.output.shape[1] == 16
     assert lyr.output.shape[2] == dim
@@ -84,9 +84,9 @@ def test_aug_matrix(NN):
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_save_and_reload(tmpdir, NN):
 
-    path = str(tmpdir / 'test/')
+    path = str(tmpdir / "test/")
     model = NN()
-    model.compile(optimizer='adam', loss=MultiSimilarityLoss())
+    model.compile(optimizer="adam", loss=MultiSimilarityLoss())
     model.save(path)
     reloaded_model = tf.keras.models.load_model(path)
     reloaded_model.summary()
@@ -94,10 +94,9 @@ def test_save_and_reload(tmpdir, NN):
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_extract_tokenizer(tmpdir, NN):
-    path = str(tmpdir / 'test/')
+    path = str(tmpdir / "test/")
     model = NN()
-    tokenizer = tf.keras.Model(
-        model.input, model.get_layer('tokenizer').output)
-    tokenizer.compile('adam', 'mse')
+    tokenizer = tf.keras.Model(model.input, model.get_layer("tokenizer").output)
+    tokenizer.compile("adam", "mse")
     tokenizer.save(path)
     _ = RetVec(model=path)

@@ -23,13 +23,13 @@ def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
     # intentionally *not* adding an encoding option to open, See:
     #   https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
-    with open(os.path.join(here, rel_path), 'r') as fp:
+    with open(os.path.join(here, rel_path), "r") as fp:
         return fp.read()
 
 
 def get_version(rel_path):
     for line in read(rel_path).splitlines():
-        if line.startswith('__version__'):
+        if line.startswith("__version__"):
             delim = '"' if '"' in line else "'"
             return line.split(delim)[1]
     raise RuntimeError("Unable to find version string.")
@@ -37,41 +37,42 @@ def get_version(rel_path):
 
 long_description = read("README.md")
 
-setup(name="retvec",
-      version=get_version('retvec/__init__.py'),
-      description="Resilient and Efficient Text Vectorizer",
-      long_description=long_description,
-      author='Marina Zhang',
-      author_email='marinazh@google.com',
-      url='https://github.com/google-research/tf-retvec',
-      license='Apache License 2.0',
-      install_requires=[
-          "tensorflow>=2.6"
-      ],
-      extras_require={
-          "dev": [
-              "datasets",
-              "tokenizers",
-              "tensorflow_addons",
-              "google-cloud-storage",
-              "wandb",
-              "mypy",
-              "pytest",
-              "flake8",
-              "pytest-cov",
-              "twine",
-              "tabulate",
-              "numpy",
-              "tqdm",
-              "tensorflow_similarity"
-          ]
-      },
-      classifiers=[
-          'Development Status :: 3 - Alpha', 'Environment :: Console',
-          'Framework :: TensorFlow',
-          'License :: OSI Approved :: Apache Software License',
-          'Intended Audience :: Science/Research',
-          'Programming Language :: Python :: 3',
-          'Topic :: Scientific/Engineering :: Artificial Intelligence'
-      ],
-      packages=find_packages())
+setup(
+    name="retvec",
+    version=get_version("retvec/__init__.py"),
+    description="Resilient and Efficient Text Vectorizer",
+    long_description=long_description,
+    author="Marina Zhang",
+    author_email="marinazh@google.com",
+    url="https://github.com/google-research/tf-retvec",
+    license="Apache License 2.0",
+    install_requires=["tensorflow>=2.6"],
+    extras_require={
+        "dev": [
+            "datasets",
+            "tokenizers",
+            "tensorflow_addons",
+            "google-cloud-storage",
+            "wandb",
+            "mypy",
+            "pytest",
+            "flake8",
+            "pytest-cov",
+            "twine",
+            "tabulate",
+            "numpy",
+            "tqdm",
+            "tensorflow_similarity",
+        ]
+    },
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
+        "Framework :: TensorFlow",
+        "License :: OSI Approved :: Apache Software License",
+        "Intended Audience :: Science/Research",
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    ],
+    packages=find_packages(),
+)

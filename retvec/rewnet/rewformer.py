@@ -24,8 +24,10 @@ from retvec import RetVecBinarizer
 from .gau import GAU
 from .layers import BertPooling, dense_block
 from .outputs import build_outputs
-from .positional_embeddings import (PositionalEmbedding,
-                                    ScaledSinusoidalPositionalEmbedding)
+from .positional_embeddings import (
+    PositionalEmbedding,
+    ScaledSinusoidalPositionalEmbedding,
+)
 
 
 def build_rewformer_from_config(config: Dict) -> tf.keras.Model:

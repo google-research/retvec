@@ -26,7 +26,7 @@ def test_graph_mode():
     test_inputs = [
         tf.constant(["Testing😀"]),
         tf.constant(["Testing😀", "Testing😀"]),
-        tf.constant(["Testing a very long string as input"])
+        tf.constant(["Testing a very long string as input"]),
     ]
 
     for test_input in test_inputs:
@@ -49,7 +49,7 @@ def test_2d_inputs():
     x = RetVecIntegerizer(max_chars=16)(i)
     model = tf.keras.models.Model(i, x)
 
-    test_input = tf.constant([['a', 'b'], ['c', 'd']])
+    test_input = tf.constant([["a", "b"], ["c", "d"]])
 
     embeddings = model(test_input)
     assert embeddings.shape == (2, 2, 16)
@@ -115,14 +115,16 @@ def test_common_parameters():
     test_input = tf.constant(["Testing😀", "Testing😀"])
 
     for max_chars in [8, 16, 32]:
-        for encoding_type in ['UTF-8', 'UTF-16-BE']:
+        for encoding_type in ["UTF-8", "UTF-16-BE"]:
             for cls_int in [None, 3]:
                 for replacement_int in [0, 65533]:
                     i = tf.keras.layers.Input((1,), dtype=tf.string)
-                    x = RetVecIntegerizer(max_chars=max_chars,
-                                          encoding_type=encoding_type,
-                                          cls_int=cls_int,
-                                          replacement_int=replacement_int)(i)
+                    x = RetVecIntegerizer(
+                        max_chars=max_chars,
+                        encoding_type=encoding_type,
+                        cls_int=cls_int,
+                        replacement_int=replacement_int,
+                    )(i)
                     model = tf.keras.models.Model(i, x)
 
                     embedding = model(test_input)

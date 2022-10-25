@@ -40,7 +40,7 @@ def test_rewnet_model(tmp_path):
     test_inputs = [
         tf.constant(["Testing😀"]),
         tf.constant(["Testing😀", "Testing😀"]),
-        tf.constant(["Testing a very long string as input"])
+        tf.constant(["Testing a very long string as input"]),
     ]
 
     for test_input in test_inputs:
@@ -59,10 +59,7 @@ def test_2d_inputs(tmp_path):
 
     embedding_model = RetVecEmbedding(str(save_path))
 
-    test_input = tf.random.uniform((2, 3, 16, 32),
-                                   minval=0,
-                                   maxval=2,
-                                   dtype=tf.int32)
+    test_input = tf.random.uniform((2, 3, 16, 32), minval=0, maxval=2, dtype=tf.int32)
     test_input = tf.cast(test_input, dtype=tf.float32)
     embeddings = embedding_model(test_input)
     assert embeddings.shape == (test_input.shape[0], 3, TEST_EMB_SIZE)
@@ -77,7 +74,7 @@ def test_binarizer_embedding_model(tmp_path):
     test_inputs = [
         tf.constant(["Testing😀"]),
         tf.constant(["Testing😀", "Testing😀"]),
-        tf.constant(["Testing a very long string as input"])
+        tf.constant(["Testing a very long string as input"]),
     ]
 
     for test_input in test_inputs:
@@ -91,12 +88,10 @@ def test_binarizer_embedding_model_2d(tmp_path):
     o = create_retvec_embedding(tmp_path)(x)
     model = tf.keras.models.Model(i, o)
 
-    test_input = tf.constant([['a', 'b', 'c'], ['d', 'e', 'f']])
+    test_input = tf.constant([["a", "b", "c"], ["d", "e", "f"]])
 
     embeddings = model(test_input)
-    assert embeddings.shape == (test_input.shape[0],
-                                test_input.shape[1],
-                                TEST_EMB_SIZE)
+    assert embeddings.shape == (test_input.shape[0], test_input.shape[1], TEST_EMB_SIZE)
 
 
 def test_serialization(tmp_path):

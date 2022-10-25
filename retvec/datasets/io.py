@@ -22,8 +22,12 @@ import tensorflow as tf
 from google.cloud import storage
 from tensorflow import Tensor
 from tensorflow.keras.losses import Loss
-from tensorflow_similarity.losses import (CircleLoss, MultiSimilarityLoss,
-                                          PNLoss, TripletLoss)
+from tensorflow_similarity.losses import (
+    CircleLoss,
+    MultiSimilarityLoss,
+    PNLoss,
+    TripletLoss,
+)
 
 from retvec import RetVecBinarizer
 

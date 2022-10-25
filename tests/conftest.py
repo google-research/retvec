@@ -17,5 +17,5 @@
 import tensorflow as tf
 from termcolor import cprint
 
-tf.config.set_visible_devices([], 'GPU')
-cprint('Tensorflow set to CPU', 'green')
+tf.config.set_visible_devices([], "GPU")
+cprint("Tensorflow set to CPU", "green")
