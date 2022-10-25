@@ -169,7 +169,7 @@ def main(args: argparse.Namespace) -> None:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='RetVec Training')
     parser.add_argument('--train_config', '-c', help='train config path',
-                        default='configs/train.json')
+                        default='configs/train_full.json')
     parser.add_argument('--model_config', '-m',
                         help='model config file or folder path')
     parser.add_argument('--output_dir', '-o', help='base output directory',

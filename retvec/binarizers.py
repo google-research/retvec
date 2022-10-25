@@ -38,11 +38,10 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
 
         Args:
             max_chars: Maximum number of characters per word to integerize.
-                Defaults to 16.
 
             max_words: Maximum number of words per example. If max_words > 1,
                 the first two dimensions of the output will be
-                [batch_size//max_words, max_words]. Defaults to 1.
+                [batch_size//max_words, max_words].
 
             encoding_size: Size of output character encoding.
         """
@@ -85,7 +84,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         return out
 
     def get_config(self) -> Dict[str, Any]:
-        config = super(RetVecIntBinarizer, self).get_config()
+        config: Dict = super(RetVecIntBinarizer, self).get_config()
         config.update({
             'max_chars': self.max_chars,
             'max_words': self.max_words,
@@ -124,12 +123,12 @@ class RetVecBinarizer(tf.keras.layers.Layer):
             encoding_size: Size of output character encoding.
 
             encoding_type: String name for the unicode encoding that should
-                be used to decode each string.. Defaults to 'UTF-8'.
+                be used to decode each string.
 
-            cls_int: CLS token to prepend. Defaults to None.
+            cls_int: CLS token to prepend.
 
             replacement_int: The replacement integer to be used in place
-                of invalid characters in input. Defaults to 11.
+                of invalid characters in input.
 
             **kwargs: Keyword args passed to the base Layer class.
         """
@@ -194,7 +193,7 @@ class RetVecBinarizer(tf.keras.layers.Layer):
         return embeddings
 
     def get_config(self) -> Dict[str, Any]:
-        config = super(RetVecBinarizer, self).get_config()
+        config: Dict = super(RetVecBinarizer, self).get_config()
         config.update({
             'max_chars': self.max_chars,
             'encoding_size': self.encoding_size,

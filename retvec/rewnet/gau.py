@@ -122,7 +122,8 @@ class GAU(Layer):
                 self.spatial_dropout_rate)
 
         # attention activation function
-        self.attention_activation = get_activation_layer(attention_activation)
+        self.attention_activation_layer = get_activation_layer(
+            attention_activation)
 
         self.weight_initializer = tf.random_normal_initializer(stddev=0.02)
 
@@ -185,20 +186,20 @@ class GAU(Layer):
             bias = toeplitz_matrix_rope(self.max_len, self.a, self.b)
             qk += bias
 
-        # apply attention activation
-        kernel = self.attention_activation(qk)
+        # apply attention activation and dropout
+        kernel = self.attention_activation_layer(qk)
 
         if self.attention_dropout_rate:
             kernel = self.attention_dropout(kernel)
 
         # apply values and project
         x = u * tf.einsum('bnm,bme->bne', kernel, v)
-
         x = self.proj2(x)
+
         return x + shortcut
 
     def get_config(self) -> Dict[str, Any]:
-        config = super(GAU, self).get_config()
+        config: Dict = super(GAU, self).get_config()
         config.update({
             'dim': self.dim,
             'max_len': self.max_len,

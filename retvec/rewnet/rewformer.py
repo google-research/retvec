@@ -101,8 +101,7 @@ def REWformer(max_chars: int = 16,
               aug_matrix_dim: int = 0,
               outputs_dropout_rate: float = 0.0,
               outputs_norm_type: str = None,
-              similarity_norm_type: str = 'l2',
-              similarity_dense_layers: int = 1) -> tf.keras.Model:
+              similarity_norm_type: str = 'l2') -> tf.keras.Model:
     """REWformer model based on transformer architecture.
 
     The model is based on the FLASH architecture, introduced in the paper
@@ -113,66 +112,60 @@ def REWformer(max_chars: int = 16,
             is 2d, i.e. (batch_size, num_words) this is still the max
             characters per word.
 
-        char_encoding_size: Size of output character encoding. Defaults to 32.
+        char_encoding_size: Size of output character encoding.
 
         char_encoding_type: String name for the unicode encoding that should
-            be used to decode each string. Defaults to 'UTF-8'.
+            be used to decode each string.
 
         cls_int: CLS int token to prepend to each token. Defaults to 3.
 
         replacement_int: The replacement codepoint to be used in place
-            of invalid substrings in input. Defaults to 11.
+            of invalid substrings in input.
 
-        encoder_hidden_dim: Hidden dim of transformer block. Defaults to 32.
+        encoder_hidden_dim: Hidden dim of transformer block.
 
         encoder_abs_pos_encoding_type: Absolute positional encoding type.
-            One of 'scaled_sin', 'absolute' or None. Defaults to 'scaled_sin'.
+            One of 'scaled_sin', 'absolute' or None.
 
-        encoder_blocks: Number of transformer blocks. Defaults to 2.
+        encoder_blocks: Number of transformer blocks.
 
         encoder_shared_dim: Size of shared dim in transformer blocks.
-            Defaults to 32.
 
-        encoder_expansion_factor: Hidden dim expansion factor. Defaults to 2.
+        encoder_expansion_factor: Hidden dim expansion factor.
 
-        encoder_activation: Activation to use in projection layers. Defaults
-                to 'swish'.
+        encoder_activation: Activation to use in projection layers.
 
         encoder_attention_activation: Activation to use on attention scores.
-                Defaults to 'sqrrelu'.
 
         encoder_norm_type: Norm type. One of 'layer', 'scaled', 't5' or None.
-                Defaults to 'scaled'.
 
         encoder_position_encoding_type: Type of positional encoding to use.
-                Either 'rope' or 'relative'. Defaults to 'rope'.
+                Either 'rope' or 'relative'.
 
         encoder_dropout: Feature dropout rate in transformer blocks.
-            Defaults to 0.0.
 
         encoder_attention_dropout: Attention dropout rate in transformer
-            blocks. Defaults to 0.0.
+            blocks.
 
         encoder_spatial_dropout: Spatial dropout rate in transformer blocks.
-            Defaults to 0.0.
 
-        encoder_epsilon: Epsilon value for norm. Defaults to 1e-6.
+        encoder_epsilon: Epsilon value for norm.
 
         encoder_output_dim: Output encoder dimension to project encoder sequence
-            outputs to. 0 to disable.
+            outputs to.
 
         encoder_output_activation: Activation applied onto the encoder sequence
-            outputs. Defaults to None.
+            outputs.
 
         use_bert_pooling: Whether to use Bert Pooling for the tokenizer instead
-            of a flatten layer. Defaults to True.
+            of a flatten layer.
 
         tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
-            If set, expands or compresses the tokenizer to thisdimension before
-            the tokenizer activation is applied. Defaults to 0.
+            If set, expands or compresses the tokenizer to this dimension
+            before the tokenizer activation is applied.
 
         tokenizer_activation: Activation of tokenizer layer, must
-            constrain output between [-1, 1] or [0, 1]. Defaults to "tanh".
+            constrain output between [-1, 1] or [0, 1].
 
         similarity_dim: Dimension of the similarity embedding output.
             0 to disable.
@@ -192,13 +185,13 @@ def REWformer(max_chars: int = 16,
             0 to disable.
 
         outputs_dropout_rate: Dropout rate after tokenizer layer and
-            before outputs. Defaults to 0.0.
+            before outputs.
 
         outputs_norm_type: Norm used in the output heads, other than
             similarity. One of ['layer', 'batch'].
 
         similarity_norm_type: Norm used at the similarity output,
-            one of ['layer', 'batch', 'l2', None]. Defaults to 'l2'.
+            one of ['layer', 'batch', 'l2', None],
 
     Returns:
         A transformer-based REWNet model, ready for pretraining.

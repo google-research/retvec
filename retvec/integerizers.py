@@ -39,15 +39,14 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
 
         Args:
             max_chars: Maximum number of characters per word to integerize.
-                Defaults to 16.
 
             encoding_type: String name for the unicode encoding that should
-                be used to decode each string. Defaults to 'UTF-8'.
+                be used to decode each string.
 
-            cls_int: CLS token to prepend. Defaults to None.
+            cls_int: CLS token to prepend.
 
             replacement_int: The replacement integer to be used in place
-                of invalid characters in input. Defaults to 11.
+                of invalid characters in input.
         """
         super(RetVecIntegerizer, self).__init__(**kwargs)
         self.max_chars = max_chars
@@ -59,7 +58,6 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         if self.cls_int:
             self.pad_position = tf.constant([[0, 0], [1, 0]])
             self.pad_value = tf.constant(cls_int)
-
 
     def build(self, input_shape: Union[TensorShape, List[TensorShape]]):
         self.max_words = input_shape[-1]
@@ -107,7 +105,8 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
 
         # Reshape two dimensional inputs back
         if self.input_rank == 2:
-            encodings = tf.reshape(encodings, (batch_size, self.max_words, self.max_chars))
+            encodings = tf.reshape(
+                encodings, (batch_size, self.max_words, self.max_chars))
 
         return encodings
 
@@ -139,7 +138,7 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         return embeddings
 
     def get_config(self) -> Dict[str, Any]:
-        config = super(RetVecIntegerizer, self).get_config()
+        config: Dict = super(RetVecIntegerizer, self).get_config()
         config.update({
             'max_chars': self.max_chars,
             'encoding_type': self.encoding_type,

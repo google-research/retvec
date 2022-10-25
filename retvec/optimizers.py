@@ -34,7 +34,7 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
             warmup_steps: int,
             warmup_learning_rate: float = 0.0,
             alpha: float = 0.0,
-            name: str = "WarmUpCosine") -> None:
+            name: str = "WarmUpCosine"):
         """Applies cosine decay to the learning rate.
 
         Args:
@@ -50,13 +50,13 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
 
           warmup_learning_rate: A scalar `float32` or `float64` Tensor or a
             Python number. The initial warmup learning rate. Must be smaller than
-            the initial_learning_rate. Defaults to 0.0.
+            the initial_learning_rate.
 
           alpha: A scalar `float32` or `float64` Tensor or a Python number.
             Minimum learning rate value as a fraction of initial_learning_rate.
-            Defaults to 0.0.
 
           name: String. Optional name of the operation. Defaults to 'WarmUpCosine'.
+
         """
         super().__init__()
 
@@ -80,8 +80,8 @@ class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
             alpha=alpha,
         )
         # Compute the warmup increment.
-        self.tf_initial_learning_rate = tf.convert_to_tensor(
-            self.initial_learning_rate, name="initial_learning_rate")
+        self.tf_initial_learning_rate = tf.convert_to_tensor(self.initial_learning_rate,
+                                                             name="initial_learning_rate")
         self.dtype = self.tf_initial_learning_rate.dtype
         self.learning_rate_delta = tf.convert_to_tensor(
             self.warmup_learning_rate / self.initial_learning_rate, self.dtype

@@ -81,7 +81,7 @@ def REWCNN(max_chars: int = 16,
            tokenizer_activation: str = "tanh",
 
            # outputs
-           similarity_dim: int = 200,
+           similarity_dim: int = 128,
            original_decoder_size: int = 0,
            aug_decoder_size: int = 0,
            aug_vector_dim: int = 0,
@@ -89,7 +89,86 @@ def REWCNN(max_chars: int = 16,
            outputs_dropout_rate: float = 0.0,
            outputs_norm_type: str = None,
            similarity_norm_type: str = 'l2') -> tf.keras.Model:
+    """REWCNN model based on ConvNet architecture.
 
+    The model is based on the ConvNet architecture, introduced in the paper
+    A ConvNet for the 2020s (https://arxiv.org/abs/2201.03545).
+
+    Args:
+        max_chars: Maximum number of characters to binarize. If the input
+            is 2d, i.e. (batch_size, num_words) this is still the max
+            characters per word.
+
+        char_encoding_size: Size of output character encoding.
+
+        char_encoding_type: String name for the unicode encoding that should
+            be used to decode each string.
+
+        replacement_int: The replacement codepoint to be used in place
+            of invalid substrings in input.
+
+        encoder_blocks: Number of conv blocks.
+
+        encoder_hidden_dim: Hidden dim of conv block.
+
+        encoder_kernel_sizes: List of kernel sizes, one for each conv block.
+
+        encoder_depth_multiplier: Depth multiplier for depthwise conv.
+
+        encoder_filters: Num filters for each conv block.
+
+        encoder_dropout: Dropout rate in conv blocks.
+
+        encoder_epsilon: Norm epsilon to use.
+
+        encoder_activation: Activation for encoder.
+
+        encoder_strides: List of strides, one for each conv block.
+
+        encoder_norm_type: Norm type. One of 'layer', 'batch', or None.
+
+        encoder_output_dim: Output encoder dimension to project encoder sequence
+            outputs to. 0 to disable.
+
+        encoder_output_activation: Activation applied onto the encoder sequence
+            outputs.
+
+        tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
+            If set, expands or compresses the tokenizer to this dimension
+            before the tokenizer activation is applied.
+
+        tokenizer_activation: Activation of tokenizer layer, must
+            constrain output between [-1, 1] or [0, 1].
+
+        similarity_dim: Dimension of the similarity embedding output.
+            0 to disable.
+
+        original_decoder_size: Dimension of a single char one-hot
+            auto-encoder decoder output for the original token.
+            0 to disable.
+
+        aug_decoder_size: Dimension of a single char one-hot
+            auto-encoder decoder output for the augmented token.
+            0 to disable.
+
+        aug_vector_dim: Dimension of the aug vector prediction output.
+            0 to disable.
+
+        aug_matrix_dim: Dimension of the aug matrix prediction output.
+            0 to disable.
+
+        outputs_dropout_rate: Dropout rate after tokenizer layer and
+            before outputs.
+
+        outputs_norm_type: Norm used in the output heads, other than
+            similarity. One of ['layer', 'batch'].
+
+        similarity_norm_type: Norm used at the similarity output,
+            one of ['layer', 'batch', 'l2', None].
+
+    Returns:
+        A CNN-based REWNet model, ready for pretraining.
+    """
     inputs = layers.Input(shape=(1, ), name="token", dtype=tf.string)
 
     # character embedding

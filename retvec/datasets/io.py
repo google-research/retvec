@@ -16,7 +16,7 @@
 
 import os
 from time import time
-from typing import Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple, Set
 
 import tensorflow as tf
 from google.cloud import storage
@@ -40,7 +40,6 @@ def read_tfrecord(tfrecord: Tensor,
         "original_token": tf.io.FixedLenFeature([], tf.string),
         "idx": tf.io.FixedLenFeature([], tf.int64)
     }
-    record = []
 
     features = base_features.copy()
     for i in range(2):
@@ -84,7 +83,7 @@ def read_tfrecord(tfrecord: Tensor,
     return record
 
 
-def Sampler(shards_list: str,
+def Sampler(shards_list: List[str],
             binarizer: RetVecBinarizer,
             batch_size: int = 32,
             process_record: Callable = None,
@@ -151,7 +150,7 @@ def Sampler(shards_list: str,
         return ds
 
 
-def get_process_tfrecord_fn(outputs: List[str]) -> Callable:
+def get_process_tfrecord_fn(outputs: Set[str]) -> Callable:
     """Return the transform to process the tfrecord
     and extract only the outputs in `outputs`.
     """
@@ -170,7 +169,8 @@ def get_process_tfrecord_fn(outputs: List[str]) -> Callable:
         y = {output: y[output] for output in outputs}
         return x, y
 
-    return process_tfrecord
+    process_tfrecord_fn: Callable = process_tfrecord
+    return process_tfrecord_fn
 
 
 def get_dataset_samplers(
@@ -180,6 +180,11 @@ def get_dataset_samplers(
         config: Dict) -> Tuple[tf.data.Dataset, tf.data.Dataset]:
     """Get train and test dataset samplers for training REW* models."""
     core_count = os.cpu_count()
+
+    # Must have at least one CPU
+    if not core_count:
+        core_count = 1
+
     client = storage.Client()
 
     _, _, outputs = get_outputs_info(config)
@@ -231,10 +236,10 @@ def get_dataset_samplers(
     return train_ds, test_ds
 
 
-def get_outputs_info(config: Dict) -> Tuple[List[Loss], List[str], List[str]]:
+def get_outputs_info(config: Dict) -> Tuple[List[Any], List[List[str]], Set[str]]:
     """Returns the losses, metrics, and output names in the config."""
     loss = []
-    metrics = []
+    metrics: List[List[str]] = []
     outputs = set()
 
     if config["outputs"].get("similarity_dim"):

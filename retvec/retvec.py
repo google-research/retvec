@@ -34,7 +34,7 @@ class RetVec(tf.keras.layers.Layer):
                  lowercase: bool = False,
 
                  # RetVecEmbedding parameters
-                 model: Optional[str] = None,
+                 model: str = None,
                  trainable: bool = False,
 
                  # RetVecBinarizer parameters
@@ -49,6 +49,43 @@ class RetVec(tf.keras.layers.Layer):
                  spatial_dropout_rate: float = 0.0,
                  norm_type: Optional[str] = None,
                  **kwargs) -> None:
+        """Initialize a RetVec layer.
+
+        Args:
+            max_len: Max length of text split by `sep`.
+
+            sep: Separator to split input text on into words. Defaults to '',
+                which splits on all whitespace and stripts whitespace from
+                beginning or end of the text.
+
+            lowercase: Whether to lowercase input text.
+
+            model: Path to saved REW* model. If None, this layer will default
+                to the RetVecBinarizer character encoding.
+
+            trainable: Whether or not this layer should be trainable.
+
+            max_chars: Maximum number of characters per word to integerize.
+
+            char_encoding_size: Size of the character encoding per word.
+
+            char_encoding_type: String name for the unicode encoding that
+                should be used to decode each string.
+
+            cls_int: CLS token to prepend to each word encoding.
+
+            replacement_int: The replacement integer to be used in place
+                of invalid characters in input.
+
+            dropout_rate: Dropout to apply after RetVec embedding.
+
+            spatial_dropout_rate: Spatial dropout to apply after RetVec
+                embedding.
+
+            norm_type: Norm to apply after RetVec embedding. One of 
+                [None, 'batch', or 'layer'].
+
+        """
         super(RetVec, self).__init__(**kwargs)
 
         self.max_len = max_len
@@ -59,8 +96,8 @@ class RetVec(tf.keras.layers.Layer):
 
         # RetVecEmbedding
         if self.model:
-            self._embedding = RetVecEmbedding(model=model,
-                                              trainable=self.trainable)
+            self._embedding: Optional[RetVecEmbedding] = RetVecEmbedding(
+                model=model, trainable=self.trainable)
         else:
             self._embedding = None
 
@@ -138,7 +175,7 @@ class RetVec(tf.keras.layers.Layer):
         # apply encoding and REW* model, if set
         binarized = self._binarizer(stensor, training=training)
 
-        if self.model:
+        if self._embedding:
             embeddings = self._embedding(binarized, training=training)
         else:
             embsize = self._binarizer.encoding_size * self._binarizer.max_chars
@@ -198,7 +235,7 @@ class RetVec(tf.keras.layers.Layer):
         return embeddings
 
     def get_config(self) -> Dict[str, Any]:
-        config = super(RetVec, self).get_config()
+        config: Dict = super(RetVec, self).get_config()
         config.update({
             'max_len': self.max_len,
             'sep': self.sep,

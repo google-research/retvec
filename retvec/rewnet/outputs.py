@@ -31,7 +31,7 @@ def build_outputs(tokenizer_layer: Tensor,
                   aug_vector_dim: int = 1,
                   aug_matrix_dim: int = 4,
                   outputs_dropout_rate: float = 0.0,
-                  outputs_norm_type: str = 'batch',
+                  outputs_norm_type: str = None,
                   similarity_norm_type: str = 'l2') -> List[Tensor]:
     """Create output heads.
 
@@ -67,7 +67,7 @@ def build_outputs(tokenizer_layer: Tensor,
             similarity. One of ['layer', 'batch'].
 
         similarity_norm_type: Norm used at the similarity output,
-            one of ['layer', 'batch', 'l2', None]. Defaults to 'l2'.
+            one of ['layer', 'batch', 'l2', None].
 
     Returns:
         List of outputs for a REWNet model.
@@ -92,7 +92,7 @@ def build_outputs(tokenizer_layer: Tensor,
         # output normalization for similarity head
         if similarity_norm_type:
             similarity_output = get_norm_layer(similarity_norm_type,
-                name='similarity')(similarity_output)
+                                               name='similarity')(similarity_output)
 
         outputs.append(similarity_output)
 

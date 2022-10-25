@@ -30,7 +30,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
     """
 
     def __init__(self,
-                 model: str,
+                 model: str = None,
                  trainable: bool = False,
                  **kwargs) -> None:
         """Build a RetVecEmbedding layer.
@@ -40,6 +40,9 @@ class RetVecEmbedding(tf.keras.layers.Layer):
 
             trainable: Whether to set this model to be trainable.
         """
+        if not model:
+            raise ValueError(f"`model` must be set for RetVecEmbedding layer.")
+
         super(RetVecEmbedding, self).__init__(**kwargs)
         self.model = model
         self.trainable = trainable
@@ -76,7 +79,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
 
         return output
 
-    def _load(self, path: str) -> tf.keras.models.Model:
+    def _load(self, path: str = None) -> tf.keras.models.Model:
         """Load REW* model for embedding.
 
         Args:
@@ -91,7 +94,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
         return model
 
     def get_config(self) -> Dict[str, Any]:
-        config = super(RetVecEmbedding, self).get_config()
+        config: Dict = super(RetVecEmbedding, self).get_config()
         config.update({
             'model': self.model,
             'trainable': self.trainable
