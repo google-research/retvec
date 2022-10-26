@@ -74,6 +74,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    packages=['tensorflow_retvec', 'tensorflow_retvec.rewnet', 'tensorflow_retvec.datasets'],
-    package_dir={'tensorflow_retvec': 'src'}
+    packages=["tensorflow_retvec", "tensorflow_retvec.rewnet", "tensorflow_retvec.datasets"],
+    package_dir={"tensorflow_retvec": "src"},
 )
