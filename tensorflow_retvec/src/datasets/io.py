@@ -29,7 +29,7 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from retvec import RetVecBinarizer
+from tensorflow_retvec import RetVecBinarizer
 
 
 @tf.function
