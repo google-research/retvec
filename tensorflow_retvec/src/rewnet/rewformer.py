@@ -54,7 +54,7 @@ def build_rewformer_from_config(config: Dict) -> tf.keras.Model:
         encoder_epsilon=m["encoder_epsilon"],
         encoder_output_dim=m["encoder_output_dim"],
         encoder_output_activation=m["encoder_output_activation"],
-        use_bert_pooling=m["use_bert_pooling"],
+        tokenizer_pooling=m["tokenizer_pooling"],
         tokenizer_dense_dim=m["tokenizer_dense_dim"],
         tokenizer_activation=m["tokenizer_activation"],
         similarity_dim=o["similarity_dim"],
@@ -90,7 +90,7 @@ def REWformer(
     encoder_epsilon: float = 1e-12,
     encoder_output_dim: int = 0,
     encoder_output_activation: str = None,
-    use_bert_pooling: bool = True,
+    tokenizer_pooling: str = "bert",
     tokenizer_dense_dim: int = 0,
     tokenizer_activation: str = "tanh",
     similarity_dim: int = 128,
@@ -117,7 +117,7 @@ def REWformer(
         char_encoding_type: String name for the unicode encoding that should
             be used to decode each string.
 
-        cls_int: CLS int token to prepend to each token. Defaults to 3.
+        cls_int: CLS int token to prepend to each token.
 
         replacement_int: The replacement codepoint to be used in place
             of invalid substrings in input.
@@ -157,8 +157,8 @@ def REWformer(
         encoder_output_activation: Activation applied onto the encoder sequence
             outputs.
 
-        use_bert_pooling: Whether to use Bert Pooling for the tokenizer instead
-            of a flatten layer.
+        tokenizer_pooling: The type of pooling used for the tokenizer. One of
+            'bert', 'avg', 'mean_token', or 'flatten'.
 
         tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
             If set, expands or compresses the tokenizer to this dimension
@@ -234,10 +234,18 @@ def REWformer(
             epsilon=encoder_epsilon,
         )(encoder)
 
-    if use_bert_pooling:
+    # intermediate layers before tokenizer
+    if tokenizer_pooling == "bert":
         intermediate_layer = BertPooling()(encoder)
 
-    else:
+    elif tokenizer_pooling == "avg":
+        intermediate_layer = tf.keras.layers.GlobalAveragePooling1D()(encoder)
+
+    elif tokenizer_pooling == "mean_token":
+        intermediate_layer = tf.math.reduce_sum(encoder, axis=1)
+        intermediate_layer = intermediate_layer / max_chars
+
+    elif tokenizer_pooling == "flatten":
         intermediate_layer = layers.Flatten()(encoder)
 
     # this is the layer is used to bound the values outputed by the tokenizer

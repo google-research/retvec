@@ -21,7 +21,7 @@ from tensorflow.keras import layers
 
 from tensorflow_retvec import RetVecBinarizer
 
-from .layers import ConvNextBlock
+from .layers import BertPooling, ConvNextBlock
 from .outputs import build_outputs
 
 
@@ -32,6 +32,7 @@ def build_rewcnn_from_config(config: Dict) -> tf.keras.Model:
         max_chars=m["max_chars"],
         char_encoding_size=m["char_encoding_size"],
         char_encoding_type=m["char_encoding_type"],
+        cls_int=m["cls_int"],
         replacement_int=m["replacement_int"],
         encoder_blocks=m["encoder_blocks"],
         encoder_hidden_dim=m["encoder_hidden_dim"],
@@ -45,6 +46,7 @@ def build_rewcnn_from_config(config: Dict) -> tf.keras.Model:
         encoder_norm_type=m["encoder_norm_type"],
         encoder_output_dim=m["encoder_output_dim"],
         encoder_output_activation=m["encoder_output_activation"],
+        tokenizer_pooling=m["tokenizer_pooling"],
         tokenizer_dense_dim=m["tokenizer_dense_dim"],
         tokenizer_activation=m["tokenizer_activation"],
         similarity_dim=o["similarity_dim"],
@@ -63,6 +65,7 @@ def REWCNN(
     max_chars: int = 16,
     char_encoding_size: int = 32,
     char_encoding_type: str = "UTF-8",
+    cls_int: int = None,
     replacement_int: int = 11,
     encoder_blocks: int = 2,
     encoder_hidden_dim: int = 32,
@@ -76,6 +79,7 @@ def REWCNN(
     encoder_norm_type: str = "batch",
     encoder_output_dim: int = 0,
     encoder_output_activation: str = None,
+    tokenizer_pooling: str = "flatten",
     tokenizer_dense_dim: int = 0,
     tokenizer_activation: str = "tanh",
     similarity_dim: int = 128,
@@ -101,6 +105,8 @@ def REWCNN(
 
         char_encoding_type: String name for the unicode encoding that should
             be used to decode each string.
+
+        cls_int: CLS int token to prepend to each token.
 
         replacement_int: The replacement codepoint to be used in place
             of invalid substrings in input.
@@ -130,6 +136,9 @@ def REWCNN(
 
         encoder_output_activation: Activation applied onto the encoder sequence
             outputs.
+
+        tokenizer_pooling: The type of pooling used for the tokenizer. One of
+            'bert', 'avg', 'mean_token', or 'flatten'.
 
         tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
             If set, expands or compresses the tokenizer to this dimension
@@ -174,7 +183,7 @@ def REWCNN(
         max_chars,
         encoding_size=char_encoding_size,
         encoding_type=char_encoding_type,
-        cls_int=None,
+        cls_int=cls_int,
         replacement_int=replacement_int,
         name="binarizer",
     )(inputs)
@@ -198,7 +207,22 @@ def REWCNN(
 
     # intermediate layers before tokenizer
     intermediate_layer = encoder
-    intermediate_layer = layers.Flatten()(intermediate_layer)
+
+    if tokenizer_pooling == "bert":
+        intermediate_layer = BertPooling()(encoder)
+
+    elif tokenizer_pooling == "avg":
+        intermediate_layer = tf.keras.layers.GlobalAveragePooling1D()(encoder)
+
+    elif tokenizer_pooling == "mean_token":
+        intermediate_layer = tf.math.reduce_sum(encoder, axis=1)
+        intermediate_layer = intermediate_layer / max_chars
+
+    elif tokenizer_pooling == "flatten":
+        intermediate_layer = layers.Flatten()(encoder)
+
+    else:
+        raise ValueError(f"Invalid pooling type for tokenizer: {tokenizer_pooling}")
 
     # this is the layer is used to bound the values outputed by the tokenizer
     # between -1 and 1 using tanh, softsign etc. Allows to use activation

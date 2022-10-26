@@ -24,7 +24,7 @@
         "encoder_epsilon": 1e-12,
         "encoder_output_dim": 0,
         "encoder_output_activation": null,
-        "use_bert_pooling": true,
+        "tokenizer_pooling": "bert",
         "tokenizer_dense_dim": 0,
         "tokenizer_activation": "tanh"
     },

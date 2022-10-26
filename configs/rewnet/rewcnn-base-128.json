@@ -27,6 +27,7 @@
         "encoder_norm_type": "batch",
         "encoder_output_dim": 0,
         "encoder_output_activation": null,
+        "tokenizer_pooling": "bert",
         "tokenizer_dense_dim": 128,
         "tokenizer_activation": "tanh"
     },

@@ -194,6 +194,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--wandb_project",
+        "-w",
         default="RetVec-REWNet",
         help="Wandb project to save to, none to disable.",
     )
