@@ -15,6 +15,7 @@
  """
 
 import tensorflow as tf
+
 from retvec import RetVec
 
 MAX_LEN = 128

@@ -59,9 +59,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
             num_words = input_shape[1]
             max_chars = input_shape[2]
             encoding_size = input_shape[-1]
-            inputs = tf.reshape(
-                inputs, (batch_size * num_words, max_chars, encoding_size)
-            )
+            inputs = tf.reshape(inputs, (batch_size * num_words, max_chars, encoding_size))
         else:
             batch_size = input_shape[0]
             max_chars = input_shape[1]

@@ -31,9 +31,7 @@ class PositionalEmbedding(Layer):
     coordinate encoding described in "Universal Transformers".
     """
 
-    def __init__(
-        self, min_timescale: float = 1.0, max_timescale: float = 1.0e4, **kwargs
-    ):
+    def __init__(self, min_timescale: float = 1.0, max_timescale: float = 1.0e4, **kwargs):
         self.min_timescale = min_timescale
         self.max_timescale = max_timescale
         self.signal = None
@@ -47,9 +45,7 @@ class PositionalEmbedding(Layer):
 
     def build(self, input_shape):
         _, length, hidden_size = input_shape
-        self.signal = positional_signal(
-            hidden_size, length, self.min_timescale, self.max_timescale
-        )
+        self.signal = positional_signal(hidden_size, length, self.min_timescale, self.max_timescale)
         return super().build(input_shape)
 
     def call(self, inputs, **kwargs):
@@ -69,19 +65,14 @@ def positional_signal(
     """
 
     if hidden_size % 2 != 0:
-        raise ValueError(
-            f"The hidden dimension of the model must be divisible by 2."
-            f"Currently it is {hidden_size}"
-        )
+        raise ValueError(f"The hidden dimension of the model must be divisible by 2." f"Currently it is {hidden_size}")
     position = K.arange(0, length, dtype=K.floatx())
     num_timescales = hidden_size // 2
     log_timescale_increment = K.constant(
         (np.log(float(max_timescale) / float(min_timescale)) / (num_timescales - 1)),
         dtype=K.floatx(),
     )
-    inv_timescales = min_timescale * K.exp(
-        K.arange(num_timescales, dtype=K.floatx()) * -log_timescale_increment
-    )
+    inv_timescales = min_timescale * K.exp(K.arange(num_timescales, dtype=K.floatx()) * -log_timescale_increment)
     scaled_time = K.expand_dims(position, 1) * K.expand_dims(inv_timescales, 0)
     signal = K.concatenate([K.sin(scaled_time), K.cos(scaled_time)], axis=1)
     return K.expand_dims(signal, axis=0)
@@ -151,16 +142,14 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
         min_timescale, max_timescale = self._min_timescale, self._max_timescale
 
         # compute sinusoidal pos encodings
-        log_timescale_increment = tf.math.log(
-            float(max_timescale) / float(min_timescale)
-        ) / (tf.cast(num_timescales, tf.float32) - 1)
+        log_timescale_increment = tf.math.log(float(max_timescale) / float(min_timescale)) / (
+            tf.cast(num_timescales, tf.float32) - 1
+        )
         inv_timescales = min_timescale * tf.exp(
             tf.cast(tf.range(num_timescales), tf.float32) * -log_timescale_increment
         )
         scaled_time = tf.expand_dims(position, 1) * tf.expand_dims(inv_timescales, 0)
-        position_embeddings = tf.concat(
-            [tf.sin(scaled_time), tf.cos(scaled_time)], axis=1
-        )
+        position_embeddings = tf.concat([tf.sin(scaled_time), tf.cos(scaled_time)], axis=1)
 
         # scale pos encodings with a learnable scalar
         position_embeddings = position_embeddings * self._scale
@@ -192,9 +181,7 @@ def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
         total_len = 1
         for i in spatial_shape:
             total_len *= i
-        position = tf.reshape(
-            tf.cast(tf.range(total_len, delta=1.0), tf.float32), spatial_shape
-        )
+        position = tf.reshape(tf.cast(tf.range(total_len, delta=1.0), tf.float32), spatial_shape)
     else:
         raise ValueError(f"Unsupported shape: {shape}")
 

@@ -72,9 +72,7 @@ def train(args: argparse.Namespace, config: Dict) -> None:
 
     if save_freq_epochs:
         save_freq = save_freq_epochs * steps_per_epoch
-        mcc = ModelCheckpoint(
-            mdl_path + "/epoch_{epoch}", monitor="loss", save_freq=save_freq
-        )
+        mcc = ModelCheckpoint(mdl_path + "/epoch_{epoch}", monitor="loss", save_freq=save_freq)
     else:
         mcc = ModelCheckpoint(mdl_path, monitor="loss", save_best=True)
 
@@ -136,9 +134,7 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         saved_model = tf.keras.models.load_model(mdl_path)
 
     # embedding is always the second layer after Input layer and Binarizer
-    embedding_model = tf.keras.Model(
-        saved_model.layers[2].input, saved_model.get_layer("tokenizer").output
-    )
+    embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
     embedding_model.compile("adam", "mse")
     embedding_model.summary()
     embedding_model.save(rew_path, include_optimizer=False)
@@ -157,9 +153,7 @@ def main(args: argparse.Namespace) -> None:
 
     else:
         c_dir = os.listdir(args.model_config)
-        model_config_paths = [
-            args.model_config + f for f in c_dir if f.endswith(".json")
-        ]
+        model_config_paths = [args.model_config + f for f in c_dir if f.endswith(".json")]
 
     for model_config_path in model_config_paths:
         with open(model_config_path) as f:
@@ -181,9 +175,7 @@ if __name__ == "__main__":
         default="configs/train_full.json",
     )
     parser.add_argument("--model_config", "-m", help="model config file or folder path")
-    parser.add_argument(
-        "--output_dir", "-o", help="base output directory", default="./experiments/"
-    )
+    parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")
     parser.add_argument(
         "--dataset_bucket",
         "-p",

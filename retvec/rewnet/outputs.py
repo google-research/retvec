@@ -78,56 +78,46 @@ def build_outputs(
 
     if outputs_dropout_rate:
         tokenizer_layer = layers.Dropout(outputs_dropout_rate)(tokenizer_layer)
-        encoder_sequence_output = layers.Dropout(outputs_dropout_rate)(
-            encoder_sequence_output
-        )
+        encoder_sequence_output = layers.Dropout(outputs_dropout_rate)(encoder_sequence_output)
 
     # similarity output
     # ! similarity must be the first output always
     if similarity_dim:
         similarity_output = tokenizer_layer
 
-        similarity_dense_name = (
-            "similarity" if not similarity_norm_type else "similarity_dense"
-        )
-        similarity_output = layers.Dense(similarity_dim, name=similarity_dense_name)(
-            similarity_output
-        )
+        similarity_dense_name = "similarity" if not similarity_norm_type else "similarity_dense"
+        similarity_output = layers.Dense(similarity_dim, name=similarity_dense_name)(similarity_output)
 
         # output normalization for similarity head
         if similarity_norm_type:
-            similarity_output = get_norm_layer(similarity_norm_type, name="similarity")(
-                similarity_output
-            )
+            similarity_output = get_norm_layer(similarity_norm_type, name="similarity")(similarity_output)
 
         outputs.append(similarity_output)
 
     # autoencoder output (decode to original token)
     if original_decoder_size:
-        ori_decoder_output = layers.Dense(
-            original_decoder_size, activation="sigmoid", name="ori_decoder"
-        )(tokenizer_layer)
+        ori_decoder_output = layers.Dense(original_decoder_size, activation="sigmoid", name="ori_decoder")(
+            tokenizer_layer
+        )
         outputs.append(ori_decoder_output)
 
     # autoencoder output (decode to input token)
     if aug_decoder_size:
-        aug_decoder_output = layers.Dense(
-            aug_decoder_size, activation="sigmoid", name="aug_decoder"
-        )(tokenizer_layer)
+        aug_decoder_output = layers.Dense(aug_decoder_size, activation="sigmoid", name="aug_decoder")(tokenizer_layer)
         outputs.append(aug_decoder_output)
 
     # aug vector prediction output
     if aug_vector_dim:
-        aug_vector_output = layers.Dense(
-            aug_vector_dim, activation="sigmoid", name="aug_vector"
-        )(encoder_sequence_output)
+        aug_vector_output = layers.Dense(aug_vector_dim, activation="sigmoid", name="aug_vector")(
+            encoder_sequence_output
+        )
         outputs.append(aug_vector_output)
 
     # aug matrix prediction output
     if aug_matrix_dim:
-        aug_matrix_output = layers.Dense(
-            aug_matrix_dim, activation="softmax", name="aug_matrix"
-        )(encoder_sequence_output)
+        aug_matrix_output = layers.Dense(aug_matrix_dim, activation="softmax", name="aug_matrix")(
+            encoder_sequence_output
+        )
         outputs.append(aug_matrix_output)
 
     return outputs

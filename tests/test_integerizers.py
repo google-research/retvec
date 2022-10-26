@@ -15,6 +15,7 @@
  """
 
 import tensorflow as tf
+
 from retvec import RetVecIntegerizer
 
 

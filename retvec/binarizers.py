@@ -29,9 +29,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
     binary encodings.
     """
 
-    def __init__(
-        self, max_chars: int = 16, max_words: int = 1, encoding_size: int = 32, **kwargs
-    ) -> None:
+    def __init__(self, max_chars: int = 16, max_words: int = 1, encoding_size: int = 32, **kwargs) -> None:
         """Initialize a RetVec integer binarizer.
 
         Args:
@@ -73,9 +71,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
                 ),
             )
         else:
-            embeddings = tf.reshape(
-                embeddings, (batch_size, self.max_chars, self.encoding_size)
-            )
+            embeddings = tf.reshape(embeddings, (batch_size, self.max_chars, self.encoding_size))
 
         return embeddings
 

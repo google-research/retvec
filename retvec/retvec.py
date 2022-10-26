@@ -92,9 +92,7 @@ class RetVec(tf.keras.layers.Layer):
 
         # RetVecEmbedding
         if self.model:
-            self._embedding: Optional[RetVecEmbedding] = RetVecEmbedding(
-                model=model, trainable=self.trainable
-            )
+            self._embedding: Optional[RetVecEmbedding] = RetVecEmbedding(model=model, trainable=self.trainable)
         else:
             self._embedding = None
 
@@ -159,13 +157,9 @@ class RetVec(tf.keras.layers.Layer):
 
         # Handle shape differences between eager and graph mode
         if self.eager:
-            stensor = rtensor.to_tensor(
-                default_value="", shape=(rtensor.shape[0], self.max_len)
-            )
+            stensor = rtensor.to_tensor(default_value="", shape=(rtensor.shape[0], self.max_len))
         else:
-            stensor = rtensor.to_tensor(
-                default_value="", shape=(rtensor.shape[0], 1, self.max_len)
-            )
+            stensor = rtensor.to_tensor(default_value="", shape=(rtensor.shape[0], 1, self.max_len))
             stensor = tf.squeeze(stensor, axis=1)
 
         # apply encoding and REW* model, if set
@@ -175,9 +169,7 @@ class RetVec(tf.keras.layers.Layer):
             embeddings = self._embedding(binarized, training=training)
         else:
             embsize = self._binarizer.encoding_size * self._binarizer.max_chars
-            embeddings = tf.reshape(
-                binarized, (tf.shape(inputs)[0], self.max_len, embsize)
-            )
+            embeddings = tf.reshape(binarized, (tf.shape(inputs)[0], self.max_len, embsize))
 
         # apply post-embedding norm and dropout layers
         if self.norm_type:

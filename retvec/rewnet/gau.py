@@ -106,9 +106,7 @@ class GAU(Layer):
         # define layers
         self.norm = get_norm_layer(norm=self.norm_type, epsilon=self.epsilon)
 
-        self.proj1 = layers.Dense(
-            self.proj_dim, use_bias=True, activation=self.activation
-        )
+        self.proj1 = layers.Dense(self.proj_dim, use_bias=True, activation=self.activation)
         self.proj2 = layers.Dense(self.dim, use_bias=True)
 
         # dropout layers
@@ -129,9 +127,7 @@ class GAU(Layer):
         # setting up position encoding
         if self.position_encoding_type == "relative":
             self.w = tf.Variable(
-                lambda: self.weight_initializer(
-                    shape=[2 * self.max_len - 1], dtype=tf.float32
-                ),
+                lambda: self.weight_initializer(shape=[2 * self.max_len - 1], dtype=tf.float32),
                 trainable=True,
             )
 
@@ -147,9 +143,7 @@ class GAU(Layer):
 
         # offset scaling values
         self.gamma = tf.Variable(
-            lambda: self.weight_initializer(
-                shape=[2, self.shared_dim], dtype=tf.float32
-            ),
+            lambda: self.weight_initializer(shape=[2, self.shared_dim], dtype=tf.float32),
             trainable=True,
         )
 
@@ -173,9 +167,7 @@ class GAU(Layer):
         uv = self.proj1(x)
         uv = self.dropout2(uv, training=training)
 
-        u, v, base = tf.split(
-            uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1
-        )
+        u, v, base = tf.split(uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1)
 
         # generate q, k by scaled offset
         base = tf.einsum("bnr,hr->bnhr", base, self.gamma) + self.beta

@@ -206,27 +206,23 @@ def REWCNN(
     # this is the layers used as output for the retvec sentence tokenizer
     # ! do not change it or the sentence tokenizer will break
     if tokenizer_dense_dim:
-        tokenizer_layer = layers.Dense(
-            tokenizer_dense_dim, activation=tokenizer_activation, name="tokenizer"
-        )(intermediate_layer)
+        tokenizer_layer = layers.Dense(tokenizer_dense_dim, activation=tokenizer_activation, name="tokenizer")(
+            intermediate_layer
+        )
     else:
-        tokenizer_layer = layers.Activation(
-            activation=tokenizer_activation, name="tokenizer"
-        )(intermediate_layer)
+        tokenizer_layer = layers.Activation(activation=tokenizer_activation, name="tokenizer")(intermediate_layer)
 
     # set up encoder sequence output for sequence prediction tasks
     encoder_sequence_output = encoder
 
     # project encoder dim if needed
     if encoder_output_dim:
-        encoder_sequence_output = layers.Dense(encoder_output_dim)(
-            encoder_sequence_output
-        )
+        encoder_sequence_output = layers.Dense(encoder_output_dim)(encoder_sequence_output)
 
     if encoder_output_activation:
-        encoder_sequence_output = layers.Activation(
-            activation=tokenizer_activation, name="encoder_tokenizer"
-        )(encoder_sequence_output)
+        encoder_sequence_output = layers.Activation(activation=tokenizer_activation, name="encoder_tokenizer")(
+            encoder_sequence_output
+        )
 
     outputs = build_outputs(
         tokenizer_layer=tokenizer_layer,
