@@ -22,7 +22,7 @@ from tensorflow import Tensor, TensorShape
 from .integerizers import RetVecIntegerizer
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class RetVecIntBinarizer(tf.keras.layers.Layer):
     """RetVec integer integerizer layer. This layer transforms integer
     representations of strings (i.e. Unicode code points) into compact
@@ -93,7 +93,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         return config
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class RetVecBinarizer(tf.keras.layers.Layer):
     """RetVec binarizer which encodes all characters in the input
     into a compact binary representations.

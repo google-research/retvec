@@ -27,11 +27,11 @@ from tensorflow_addons.optimizers import LAMB
 from termcolor import cprint
 from wandb.keras import WandbCallback
 
-from retvec.datasets.io import get_dataset_samplers, get_outputs_info
-from retvec.optimizers import WarmUpCosine
-from retvec.rewnet.rewcnn import build_rewcnn_from_config
-from retvec.rewnet.rewformer import build_rewformer_from_config
-from retvec.utils import tf_cap_memory
+from tensorflow_retvec.datasets.io import get_dataset_samplers, get_outputs_info
+from tensorflow_retvec.optimizers import WarmUpCosine
+from tensorflow_retvec.rewnet.rewcnn import build_rewcnn_from_config
+from tensorflow_retvec.rewnet.rewformer import build_rewformer_from_config
+from tensorflow_retvec.utils import tf_cap_memory
 
 
 def train(args: argparse.Namespace, config: Dict) -> None:
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         "--train_config",
         "-c",
         help="train config path",
-        default="configs/train_full.json",
+        default="../configs/train_full.json",
     )
     parser.add_argument("--model_config", "-m", help="model config file or folder path")
     parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")

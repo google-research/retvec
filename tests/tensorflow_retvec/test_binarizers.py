@@ -16,12 +16,12 @@
 
 import tensorflow as tf
 
-from retvec import RetVecIntegerizer
+from tensorflow_retvec import RetVecBinarizer
 
 
 def test_graph_mode():
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecIntegerizer(max_chars=16)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
     model = tf.keras.models.Model(i, x)
 
     test_inputs = [
@@ -32,56 +32,58 @@ def test_graph_mode():
 
     for test_input in test_inputs:
         embeddings = model(test_input)
-        assert embeddings.shape == (test_input.shape[0], 16)
+        assert embeddings.shape == (test_input.shape[0], 16, 32)
 
 
 def test_eager_mode():
-    intergerizer = RetVecIntegerizer(max_chars=16)
+    binarizer = RetVecBinarizer(max_chars=16, encoding_size=32)
 
-    embeddings = intergerizer.integerize(tf.constant("Testing😀"))
-    assert embeddings.shape == [16]
+    s = "Testing😀"
 
-    embeddings = intergerizer.integerize(tf.constant(["Testing😀", "Testing😀"]))
-    assert embeddings.shape == [2, 16]
+    embeddings = binarizer.binarize(tf.constant(s))
+    assert embeddings.shape == [16, 32]
+
+    embeddings = binarizer.binarize(tf.constant([s, s, s]))
+    assert embeddings.shape == [3, 16, 32]
 
 
 def test_2d_inputs():
     i = tf.keras.layers.Input((2,), dtype=tf.string)
-    x = RetVecIntegerizer(max_chars=16)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
     model = tf.keras.models.Model(i, x)
 
     test_input = tf.constant([["a", "b"], ["c", "d"]])
 
     embeddings = model(test_input)
-    assert embeddings.shape == (2, 2, 16)
+    assert embeddings.shape == (2, 2, 16, 32)
 
 
 def test_tfds_map():
-    intergerizer = RetVecIntegerizer(max_chars=16)
+    binarizer = RetVecBinarizer(max_chars=16, encoding_size=32)
 
     dataset = tf.data.Dataset.from_tensor_slices(["Testing😀", "Testing😀"])
-    dataset = dataset.map(intergerizer.integerize)
+    dataset = dataset.map(binarizer.binarize)
 
     for ex in dataset.take(1):
-        assert ex.shape == [16]
+        assert ex.shape == [16, 32]
 
     dataset = tf.data.Dataset.from_tensor_slices(["Testing😀", "Testing😀"])
     dataset = dataset.repeat()
     dataset = dataset.batch(2)
-    dataset = dataset.map(intergerizer.integerize)
+    dataset = dataset.map(binarizer.binarize)
 
     for ex in dataset.take(1):
-        assert ex.shape == [2, 16]
+        assert ex.shape == [2, 16, 32]
 
 
 def test_determinism_eager_mode():
-    intergerizer = RetVecIntegerizer(max_chars=16)
+    binarizer = RetVecBinarizer(max_chars=16, encoding_size=32)
 
     s = "Testing😀"
     test_input = tf.constant([s, s])
 
-    embeddings = intergerizer.integerize(test_input)
-    embeddings2 = intergerizer.integerize(test_input)
+    embeddings = binarizer.binarize(test_input)
+    embeddings2 = binarizer.binarize(test_input)
 
     assert tf.reduce_all(tf.equal(embeddings[0], embeddings[1]))
     assert tf.reduce_all(tf.equal(embeddings[0], embeddings2[1]))
@@ -89,7 +91,7 @@ def test_determinism_eager_mode():
 
 def test_determinism_graph_mode():
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecIntegerizer(max_chars=16)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
     model = tf.keras.models.Model(i, x)
 
     s = "Testing😀"
@@ -104,10 +106,10 @@ def test_determinism_graph_mode():
 
 def test_serialization(tmp_path):
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecIntegerizer(max_chars=16)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
     model = tf.keras.models.Model(i, x)
 
-    save_path = tmp_path / "test_serialization_integerizer"
+    save_path = tmp_path / "test_serialization_binarizer"
     model.save(save_path)
     tf.keras.models.load_model(save_path)
 
@@ -116,33 +118,19 @@ def test_common_parameters():
     test_input = tf.constant(["Testing😀", "Testing😀"])
 
     for max_chars in [8, 16, 32]:
-        for encoding_type in ["UTF-8", "UTF-16-BE"]:
-            for cls_int in [None, 3]:
-                for replacement_int in [0, 65533]:
-                    i = tf.keras.layers.Input((1,), dtype=tf.string)
-                    x = RetVecIntegerizer(
-                        max_chars=max_chars,
-                        encoding_type=encoding_type,
-                        cls_int=cls_int,
-                        replacement_int=replacement_int,
-                    )(i)
-                    model = tf.keras.models.Model(i, x)
+        for encoding_size in [16, 32]:
+            for encoding_type in ["UTF-8", "UTF-16-BE"]:
+                for cls_int in [None, 3]:
+                    for replacement_int in [0, 65533]:
+                        i = tf.keras.layers.Input((1,), dtype=tf.string)
+                        x = RetVecBinarizer(
+                            max_chars=max_chars,
+                            encoding_size=encoding_size,
+                            encoding_type=encoding_type,
+                            cls_int=cls_int,
+                            replacement_int=replacement_int,
+                        )(i)
+                        model = tf.keras.models.Model(i, x)
 
-                    embedding = model(test_input)
-                    assert embedding.shape == (2, max_chars)
-
-
-def test_cls_token():
-    cls_int = 3
-
-    i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecIntegerizer(max_chars=16, cls_int=cls_int)(i)
-    model = tf.keras.models.Model(i, x)
-
-    s = "Testing😀"
-    test_input = tf.constant([s, s])
-
-    embeddings = model(test_input)
-
-    assert embeddings[0][0] == cls_int
-    assert embeddings[1][0] == cls_int
+                        embedding = model(test_input)
+                        assert embedding.shape == (2, max_chars, encoding_size)

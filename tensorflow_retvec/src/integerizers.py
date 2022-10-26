@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import Tensor, TensorShape
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class RetVecIntegerizer(tf.keras.layers.Layer):
     """RetVec integerizer layer. This layer transforms string inputs
     into an integer representation (i.e. UTF-8 code points), which will

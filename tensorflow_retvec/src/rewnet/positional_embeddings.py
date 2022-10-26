@@ -23,7 +23,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class PositionalEmbedding(Layer):
     """
     Injects positional encoding signal described in section 3.5 of the original
@@ -78,7 +78,7 @@ def positional_signal(
     return K.expand_dims(signal, axis=0)
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class ScaledSinusoidalPositionalEmbedding(Layer):
     """Creates a positional embedding with a learnable scalar for stability.
 
@@ -157,7 +157,7 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
         return inputs + position_embeddings
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
     """RoPE positional encoding.
 
@@ -201,7 +201,7 @@ def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
     return tf.concat([x1 * cos - x2 * sin, x2 * cos + x1 * sin], axis=-1)
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 def toeplitz_matrix_rope(n: int, a: Tensor, b: Tensor) -> Tensor:
     """Obtain Toeplitz matrix using rope."""
     a = rope(tf.tile(a[None, :], [n, 1]), axis=0)
@@ -209,7 +209,7 @@ def toeplitz_matrix_rope(n: int, a: Tensor, b: Tensor) -> Tensor:
     return tf.einsum("mk,nk->mn", a, b)
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 def toeplitz_matrix(n: int, w: Tensor) -> Tensor:
     """Toeplitz matrix of shape [num_heads, n, n] or [n, n]."""
     paddings = [[0, n]]

@@ -68,7 +68,7 @@ def get_norm_layer(norm: str, **kwargs):
         raise ValueError(f"Unsupported norm type {norm}")
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class L2Norm(layers.Layer):
     """L2 Normalization layer usually used as output layer."""
 
@@ -80,7 +80,7 @@ class L2Norm(layers.Layer):
         return normed_x
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 def sqrrelu(x: Tensor) -> Tensor:
     """Squared ReLU (ReLU(x) ** 2).
 
@@ -93,7 +93,7 @@ def sqrrelu(x: Tensor) -> Tensor:
     return tf.math.square(tf.nn.relu(x))
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class BertPooling(Layer):
     """Bert pooling layer."""
 
@@ -101,7 +101,7 @@ class BertPooling(Layer):
         return x[:, 0]
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class ScaledNorm(Layer):
     """ScaledNorm layer."""
 
@@ -135,7 +135,7 @@ class ScaledNorm(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class ConvNextBlock(Layer):
     """ConvNeXt block.
 

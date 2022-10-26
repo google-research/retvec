@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import Tensor
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class WarmUpCosine(tf.keras.optimizers.schedules.LearningRateSchedule):
     """A LearningRateSchedule that uses a cosine decay schedule with a warmup period.
     This learning rate schedule is useful for training when using the Barlow Twin Loss.

@@ -27,7 +27,7 @@ jobs:
     
     - name: Install package
       run: |
-        pip install ".[dev]"
+        pip install "./tensorflow_retvec[dev]"
         
     - name: Lint with flake8
       run: |
@@ -38,11 +38,11 @@ jobs:
     
     - name: Static analysis
       run: |
-        mypy  retvec/ --raise-exceptions
+        mypy  tensorflow_retvec/src/ --raise-exceptions
     
     - name: Test with pytest
       run: |
-        coverage run -m pytest tests/
+        coverage run -m pytest tests/tensorflow_retvec/
     - name: Upload coverage to Coveralls
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |

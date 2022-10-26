@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import Tensor
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class RetVecEmbedding(tf.keras.layers.Layer):
     """RetVec embedding layer leverages a pre-trained word embedding model
     (REW* model) to generate word embeddings.

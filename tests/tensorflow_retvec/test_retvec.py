@@ -16,7 +16,7 @@
 
 import tensorflow as tf
 
-from retvec import RetVec
+from tensorflow_retvec import RetVec
 
 MAX_LEN = 128
 MAX_CHARS = 16

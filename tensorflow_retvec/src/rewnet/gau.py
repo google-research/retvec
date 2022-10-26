@@ -27,7 +27,7 @@ from .positional_embeddings import toeplitz_matrix, toeplitz_matrix_rope
 ZEROS_INTIALIZER = tf.initializers.zeros()
 
 
-@tf.keras.utils.register_keras_serializable(package="retvec")
+@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
 class GAU(Layer):
     """Gated Attention Unit layer introduced in Transformer
     Quality in Linear Time.

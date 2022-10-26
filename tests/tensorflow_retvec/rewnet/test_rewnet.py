@@ -18,8 +18,8 @@ import pytest
 import tensorflow as tf
 from tensorflow_similarity.losses import MultiSimilarityLoss
 
-from retvec import RetVec
-from retvec.rewnet import REWCNN, REWformer
+from tensorflow_retvec import RetVec
+from tensorflow_retvec.rewnet import REWCNN, REWformer
 
 tf.config.set_visible_devices([], "GPU")
 
