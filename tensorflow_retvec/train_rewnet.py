@@ -185,12 +185,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--train_dataset_path",
         help="gcs path to training dataset",
-        default="training/retvec_fasttext_deduplicated_v2/",
+        default="full/retvec_fasttext_deduplicated_v2/",
     )
     parser.add_argument(
         "--test_dataset_path",
         help="gcs path to testing dataset",
-        default="training/retvec_fasttext_deduplicated_v2/",
+        default="full/retvec_fasttext_deduplicated_v2/",
     )
     parser.add_argument(
         "--wandb_project",
