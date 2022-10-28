@@ -1,0 +1,48 @@
+{
+    "name": "rewformer-base-128-outputs-similarity",
+    "version": "1",
+    "embedding_size": 128,
+    "model": {
+        "type": "rewformer",
+        "max_chars": 16,
+        "char_encoding_size": 32,
+        "char_encoding_type": "UTF-8",
+        "cls_int": 3,
+        "replacement_int": 11,
+        "encoder_hidden_dim": 128,
+        "encoder_abs_pos_encoding_type": "scaled_sin",
+        "encoder_blocks": 2,
+        "encoder_shared_dim": 32,
+        "encoder_expansion_factor": 2,
+        "encoder_activation": "swish",
+        "encoder_attention_activation": "sqrrelu",
+        "encoder_norm_type": "scaled",
+        "encoder_position_encoding_type": "rope",
+        "encoder_dropout": 0.1,
+        "encoder_attention_dropout": 0.1,
+        "encoder_spatial_dropout": 0.0,
+        "encoder_epsilon": 1e-12,
+        "encoder_output_dim": 0,
+        "encoder_output_activation": null,
+        "tokenizer_pooling": "bert",
+        "tokenizer_dense_dim": 0,
+        "tokenizer_activation": "tanh"
+    },
+    "outputs": {
+        "similarity_dim": 128,
+        "original_decoder_size": 0,
+        "aug_decoder_size": 0,
+        "aug_vector_dim": 0,
+        "aug_matrix_dim": 0,
+        "outputs_dropout_rate": 0.0,
+        "outputs_norm_type": null,
+        "similarity_norm_type": "l2",
+        "similarity_loss": {
+            "type": "multisim",
+            "alpha": 2,
+            "beta": 40,
+            "lmda": 0.5,
+            "epsilon": 0.1
+        }
+    }
+}
