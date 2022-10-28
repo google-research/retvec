@@ -50,7 +50,7 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
             replacement_int: The replacement integer to be used in place
                 of invalid characters in input.
         """
-        super(RetVecIntegerizer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.max_chars = max_chars
         self.encoding_type = encoding_type
         self.cls_int = cls_int
@@ -118,7 +118,7 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         Returns:
             Retvec integerizer encodings for the input words(s).
         """
-        if words.shape == []:
+        if words.shape == tf.TensorShape([]):
             inputs = tf.expand_dims(words, 0)
         else:
             inputs = words
@@ -130,13 +130,13 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         embeddings = self(inputs)
 
         # remove extra dim if input was a single word
-        if words.shape == []:
+        if words.shape == tf.TensorShape([]):
             embeddings = tf.reshape(embeddings[0], (self.max_chars,))
 
         return embeddings
 
     def get_config(self) -> Dict[str, Any]:
-        config: Dict = super(RetVecIntegerizer, self).get_config()
+        config: Dict = super().get_config()
         config.update(
             {
                 "max_chars": self.max_chars,

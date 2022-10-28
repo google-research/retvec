@@ -82,7 +82,7 @@ class RetVec(tf.keras.layers.Layer):
                 [None, 'batch', or 'layer'].
 
         """
-        super(RetVec, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.max_len = max_len
         self.sep = sep
@@ -205,7 +205,7 @@ class RetVec(tf.keras.layers.Layer):
         Returns:
             Retvec embeddings for the input words(s).
         """
-        if words.shape == []:
+        if words.shape == tf.TensorShape([]):
             inputs = tf.expand_dims(words, 0)
         else:
             inputs = words
@@ -218,13 +218,13 @@ class RetVec(tf.keras.layers.Layer):
         embeddings = self(inputs, training=False)
 
         # Remove extra dim if input was a single word
-        if words.shape == []:
+        if words.shape == tf.TensorShape([]):
             embeddings = tf.squeeze(embeddings)
 
         return embeddings
 
     def get_config(self) -> Dict[str, Any]:
-        config: Dict = super(RetVec, self).get_config()
+        config: Dict = super().get_config()
         config.update(
             {
                 "max_len": self.max_len,

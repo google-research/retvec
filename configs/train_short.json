@@ -5,9 +5,8 @@
     "save_freq_epochs": 5,
     "validation_steps": 10,
     "optimizer": "lamb",
-    "init_lr": 0.001,
+    "max_learning_rate": 0.001,
     "warmup_steps": 10000,
-    "warmup_learning_rate": 0.0,
     "end_lr": 0.00001,
     "shuffle_buffer": 100000
 }

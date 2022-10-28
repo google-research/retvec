@@ -28,7 +28,7 @@ from termcolor import cprint
 from wandb.keras import WandbCallback
 
 from tensorflow_retvec.datasets.io import get_dataset_samplers, get_outputs_info
-from tensorflow_retvec.optimizers import WarmUpCosine
+from tensorflow_retvec.optimizers import WarmupCosineDecay
 from tensorflow_retvec.rewnet.rewcnn import build_rewcnn_from_config
 from tensorflow_retvec.rewnet.rewformer import build_rewformer_from_config
 from tensorflow_retvec.utils import tf_cap_memory
@@ -97,12 +97,11 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         else:
             raise ValueError("Unknown model %s" % model_type)
 
-        lr_schedule = WarmUpCosine(
-            initial_learning_rate=config["train"]["init_lr"],
-            decay_steps=total_steps,
+        lr_schedule = WarmupCosineDecay(
+            max_learning_rate=config["train"]["max_learning_rate"],
+            total_steps=total_steps,
             warmup_steps=config["train"]["warmup_steps"],
-            warmup_learning_rate=config["train"]["warmup_learning_rate"],
-            alpha=config["train"]["end_lr"] / config["train"]["init_lr"],
+            alpha=config["train"]["end_lr"] / config["train"]["max_learning_rate"],
         )
 
         if config["train"]["optimizer"] == "adam":

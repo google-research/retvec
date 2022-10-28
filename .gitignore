@@ -1,5 +1,4 @@
 tmp/
-tensorflow_similarity.egg-info/
 logs/
 .vscode/
 site/

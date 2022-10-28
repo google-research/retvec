@@ -122,7 +122,7 @@ def Sampler(
         tf.data.Dataset containing the data, processed, shuffle and batched.
     """
     total_shards = len(shards_list)
-    print("found ", len(shards_list), "shards", time())
+    print(f"found {total_shards} shards in {time()}.")
 
     with tf.device("/cpu:0"):
         ds = tf.data.Dataset.from_tensor_slices(shards_list)

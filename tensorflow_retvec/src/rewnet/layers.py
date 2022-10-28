@@ -131,7 +131,7 @@ class ScaledNorm(Layer):
 
     def get_config(self) -> Dict[str, Any]:
         config = {"begin_axis": self._begin_axis, "epsilon": self._epsilon}
-        base_config = super(ScaledNorm, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 

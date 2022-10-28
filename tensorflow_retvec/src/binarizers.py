@@ -41,7 +41,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
 
             encoding_size: Size of output character encoding.
         """
-        super(RetVecIntBinarizer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.max_chars = max_chars
         self.max_words = max_words
         self.encoding_size = encoding_size
@@ -82,7 +82,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         return out
 
     def get_config(self) -> Dict[str, Any]:
-        config: Dict = super(RetVecIntBinarizer, self).get_config()
+        config: Dict = super().get_config()
         config.update(
             {
                 "max_chars": self.max_chars,
@@ -134,7 +134,7 @@ class RetVecBinarizer(tf.keras.layers.Layer):
 
             **kwargs: Keyword args passed to the base Layer class.
         """
-        super(RetVecBinarizer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.max_chars = max_chars
         self.encoding_size = encoding_size
@@ -177,7 +177,7 @@ class RetVecBinarizer(tf.keras.layers.Layer):
         Returns:
             Retvec binarizer encodings for the input words(s).
         """
-        if words.shape == []:
+        if words.shape == tf.TensorShape([]):
             inputs = tf.expand_dims(words, 0)
         else:
             inputs = words
@@ -190,13 +190,13 @@ class RetVecBinarizer(tf.keras.layers.Layer):
         embeddings = self(inputs)
 
         # Remove extra dim if input was a single word
-        if words.shape == []:
+        if words.shape == tf.TensorShape([]):
             embeddings = tf.reshape(embeddings[0], (self.max_chars, self.encoding_size))
 
         return embeddings
 
     def get_config(self) -> Dict[str, Any]:
-        config: Dict = super(RetVecBinarizer, self).get_config()
+        config: Dict = super().get_config()
         config.update(
             {
                 "max_chars": self.max_chars,

@@ -199,7 +199,7 @@ class GAU(Layer):
         return x + shortcut
 
     def get_config(self) -> Dict[str, Any]:
-        config: Dict = super(GAU, self).get_config()
+        config: Dict = super().get_config()
         config.update(
             {
                 "dim": self.dim,
