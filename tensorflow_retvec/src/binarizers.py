@@ -37,7 +37,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
 
             max_words: Maximum number of words per example. If max_words > 1,
                 the first two dimensions of the output will be
-                [batch_size//max_words, max_words].
+                [batch_size, max_words].
 
             encoding_size: Size of output character encoding.
         """
@@ -64,7 +64,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
             embeddings = tf.reshape(
                 embeddings,
                 (
-                    batch_size // self.max_words,
+                    batch_size,
                     self.max_words,
                     self.max_chars,
                     self.encoding_size,

@@ -80,7 +80,7 @@ def REWCNN(
     encoder_output_dim: int = 0,
     encoder_output_activation: str = None,
     tokenizer_pooling: str = "flatten",
-    tokenizer_dense_dim: int = 0,
+    tokenizer_dense_dim: int = 128,
     tokenizer_activation: str = "tanh",
     similarity_dim: int = 128,
     original_decoder_size: int = 0,
@@ -138,7 +138,7 @@ def REWCNN(
             outputs.
 
         tokenizer_pooling: The type of pooling used for the tokenizer. One of
-            'bert', 'avg', 'mean_token', or 'flatten'.
+            'bert', 'avg', or 'flatten'.
 
         tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
             If set, expands or compresses the tokenizer to this dimension
@@ -213,10 +213,6 @@ def REWCNN(
 
     elif tokenizer_pooling == "avg":
         intermediate_layer = tf.keras.layers.GlobalAveragePooling1D()(encoder)
-
-    elif tokenizer_pooling == "mean_token":
-        intermediate_layer = tf.math.reduce_sum(encoder, axis=1)
-        intermediate_layer = intermediate_layer / max_chars
 
     elif tokenizer_pooling == "flatten":
         intermediate_layer = layers.Flatten()(encoder)

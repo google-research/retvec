@@ -17,6 +17,7 @@
 import argparse
 import json
 import os
+from pathlib import Path
 from time import time
 from typing import Dict
 
@@ -37,14 +38,19 @@ from tensorflow_retvec.utils import tf_cap_memory
 def train(args: argparse.Namespace, config: Dict) -> None:
 
     # save paths
-    model_name = "%s-v%s" % (config["name"], config["version"])
+    if args.experiment_name:
+        model_name = args.experiment_name
+    else:
+        model_name = "%s-v%s" % (config["name"], config["version"])
     cprint("[Model: %s]" % (model_name), "yellow")
     cprint("|-epochs: %s" % config["train"]["epochs"], "blue")
     cprint("|-steps_per_epoch: %s" % config["train"]["steps_per_epoch"], "green")
     cprint("|-batch_size: %s" % config["train"]["batch_size"], "blue")
     stub = "%s_%s" % (model_name, int(time()))
-    mdl_path = "%s/rewnet/%s" % (args.output_dir, stub)
-    log_dir = "%s/logs/%s" % (args.output_dir, stub)
+
+    output_dir = Path(args.output_dir)
+    mdl_path = output_dir / "mdl_ckpts" / stub
+    log_dir = output_dir / "logs" / stub
 
     if args.wandb_project:
         wandb.init(
@@ -72,7 +78,7 @@ def train(args: argparse.Namespace, config: Dict) -> None:
 
     if save_freq_epochs:
         save_freq = save_freq_epochs * steps_per_epoch
-        mcc = ModelCheckpoint(mdl_path + "/epoch_{epoch}", monitor="loss", save_freq=save_freq)
+        mcc = ModelCheckpoint(mdl_path / "epoch_{epoch}", monitor="loss", save_freq=save_freq)
     else:
         mcc = ModelCheckpoint(mdl_path, monitor="loss", save_best=True)
 
@@ -124,20 +130,25 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     )
 
     # extract and save tokenizer
-    rew_path = "%s/embeddings/%s" % (args.output_dir, stub)
+    rewnet_path = Path(args.output_dir) / "rewnet" / stub
+    embedding_path = Path(args.output_dir) / "embeddings" / stub
 
     # check that model can be reloaded
     if save_freq_epochs:
-        saved_model = tf.keras.models.load_model(mdl_path + "/epoch_%s" % epochs)
+        saved_model = tf.keras.models.load_model(mdl_path / f"epoch_{epochs}")
     else:
         saved_model = tf.keras.models.load_model(mdl_path)
 
-    # embedding is always the second layer after Input layer and Binarizer
-    embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
-    embedding_model.compile("adam", "mse")
-    embedding_model.summary()
-    embedding_model.save(rew_path, include_optimizer=False)
-    cprint(f"Saving RetVec embedding model to {rew_path}", "blue")
+    # save model without optimizer so it can be loaded with only tensorflow
+    saved_model.save(rewnet_path, include_optimizer=False)
+
+    # if tokenizer layer is already defined in the model, save just the embedding model
+    if "tokenizer" in [l.name for l in model.layers]:
+        embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
+        embedding_model.compile("adam", "mse")
+        embedding_model.summary()
+        embedding_model.save(embedding_path, include_optimizer=False)
+        cprint(f"Saving RetVec embedding model to {embedding_path}", "blue")
 
     wandb.finish()
 
@@ -151,8 +162,13 @@ def main(args: argparse.Namespace) -> None:
         model_config_paths = [args.model_config]
 
     else:
-        c_dir = os.listdir(args.model_config)
-        model_config_paths = [args.model_config + f for f in c_dir if f.endswith(".json")]
+        model_dir = Path(args.model_config)
+        c_dir = sorted(os.listdir(model_dir))
+        model_config_paths = [str(model_dir / f) for f in c_dir if f.endswith(".json")]
+
+        start_idx = args.start_idx
+        end_idx = args.end_idx if args.end_idx else len(model_config_paths)
+        model_config_paths = model_config_paths[start_idx:end_idx]
 
     for model_config_path in model_config_paths:
         with open(model_config_path) as f:
@@ -176,6 +192,16 @@ if __name__ == "__main__":
     parser.add_argument("--model_config", "-m", help="model config file or folder path")
     parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")
     parser.add_argument(
+        "--start_idx",
+        "-s",
+        type=int,
+        help="start idx in alphabetically sorted experiment dir (zero-indexed, inclusive)",
+        default=0,
+    )
+    parser.add_argument(
+        "--end_idx", "-e", type=int, help="end idx in alphabetically sorted experiment dir (zero-indexed, exclusive)"
+    )
+    parser.add_argument(
         "--dataset_bucket",
         "-p",
         help="gcs bucket of dataset",
@@ -194,8 +220,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--wandb_project",
         "-w",
-        default="RetVec-REWNet",
+        default="RetVec-REWNet-Pretraining",
         help="Wandb project to save to, none to disable.",
+    )
+    parser.add_argument(
+        "--experiment_name",
+        "-n",
+        help="Experiment name. If none, uses default of [model_name]-[version]",
     )
     args = parser.parse_args()
 

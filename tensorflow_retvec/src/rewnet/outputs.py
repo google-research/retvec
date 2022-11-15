@@ -29,8 +29,8 @@ def build_outputs(
     similarity_dim: int = 128,
     original_decoder_size: int = 0,
     aug_decoder_size: int = 0,
-    aug_vector_dim: int = 1,
-    aug_matrix_dim: int = 4,
+    aug_vector_dim: int = 0,
+    aug_matrix_dim: int = 0,
     outputs_dropout_rate: float = 0.0,
     outputs_norm_type: str = None,
     similarity_norm_type: str = "l2",
@@ -97,13 +97,13 @@ def build_outputs(
     # autoencoder output (decode to original token)
     if original_decoder_size:
         ori_decoder_output = layers.Dense(original_decoder_size, activation="sigmoid", name="ori_decoder")(
-            tokenizer_layer
+            encoder_sequence_output
         )
         outputs.append(ori_decoder_output)
 
     # autoencoder output (decode to input token)
     if aug_decoder_size:
-        aug_decoder_output = layers.Dense(aug_decoder_size, activation="sigmoid", name="aug_decoder")(tokenizer_layer)
+        aug_decoder_output = layers.Dense(aug_decoder_size, activation="sigmoid", name="aug_decoder")(encoder_sequence_output)
         outputs.append(aug_decoder_output)
 
     # aug vector prediction output
@@ -115,7 +115,7 @@ def build_outputs(
 
     # aug matrix prediction output
     if aug_matrix_dim:
-        aug_matrix_output = layers.Dense(aug_matrix_dim, activation="softmax", name="aug_matrix")(
+        aug_matrix_output = layers.Dense(aug_matrix_dim, activation="sigmoid", name="aug_matrix")(
             encoder_sequence_output
         )
         outputs.append(aug_matrix_output)

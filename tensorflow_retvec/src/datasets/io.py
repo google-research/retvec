@@ -82,6 +82,9 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     record["aug_encoded"] = tf.stack([aug_token0_encoded, aug_token1_encoded])
     record["aug_vector"] = record["aug_vector"][:, : binarizer.max_chars]
     record["aug_matrix"] = record["aug_matrix"][:, : binarizer.max_chars, :]
+
+    flatten = tf.keras.layers.Flatten()
+    record["aug_matrix"] = flatten(record["aug_matrix"])
     return record
 
 
@@ -301,8 +304,8 @@ def get_outputs_info(config: Dict) -> Tuple[List[Any], List[List[str]], Set[str]
         outputs.add("aug_vector")
 
     if config["outputs"].get("aug_matrix_dim"):
-        loss.append("categorical_crossentropy")
-        metrics.append(["categorical_accuracy"])
+        loss.append("binary_crossentropy")
+        metrics.append(["acc", "binary_accuracy"])
         outputs.add("aug_matrix")
 
     return loss, metrics, outputs
