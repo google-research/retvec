@@ -55,7 +55,7 @@ jobs:
     - name: Check black formatting 
       uses: psf/black@stable
       with:
-        options: "--check --verbose"
+        options: "--check --verbose --diff"
         version: "22.10.0"
     - name: Check isort 
       uses: isort/isort-action@master
