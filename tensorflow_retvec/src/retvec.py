@@ -33,7 +33,7 @@ class RetVec(tf.keras.layers.Layer):
         max_len: int = 128,
         sep: str = "",
         lowercase: bool = False,
-        model: str = None,
+        model: Optional[str] = None,
         trainable: bool = False,
         max_chars: int = 16,
         char_encoding_size: int = 32,

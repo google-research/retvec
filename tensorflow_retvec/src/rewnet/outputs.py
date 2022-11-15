@@ -32,7 +32,6 @@ def build_outputs(
     aug_vector_dim: int = 0,
     aug_matrix_dim: int = 0,
     outputs_dropout_rate: float = 0.0,
-    outputs_norm_type: str = None,
     similarity_norm_type: str = "l2",
 ) -> List[Tensor]:
     """Create output heads.
@@ -64,9 +63,6 @@ def build_outputs(
             0 to disable.
 
         outputs_dropout_rate: Dropout rate to apply before output heads.
-
-        outputs_norm_type: Norm used in the output heads, other than
-            similarity. One of ['layer', 'batch'].
 
         similarity_norm_type: Norm used at the similarity output,
             one of ['layer', 'batch', 'l2', None].

@@ -23,6 +23,7 @@
         "encoder_spatial_dropout": 0.0,
         "encoder_epsilon": 1e-12,
         "encoder_sequence_pooling": null,
+        "encoder_output_activation": null,
         "encoder_output_dim": 0,
         "tokenizer_pooling": "flatten",
         "tokenizer_dense_dim": 128,
@@ -35,7 +36,6 @@
         "aug_vector_dim": 0,
         "aug_matrix_dim": 0,
         "outputs_dropout_rate": 0.0,
-        "outputs_norm_type": null,
         "similarity_norm_type": "l2",
         "similarity_loss": {
             "type": "multisim",

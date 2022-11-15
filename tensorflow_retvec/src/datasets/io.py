@@ -16,7 +16,7 @@
 
 import os
 from time import time
-from typing import Any, Callable, Dict, List, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import tensorflow as tf
 from google.cloud import storage
@@ -29,7 +29,7 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from tensorflow_retvec import RetVecBinarizer
+from ..binarizers import RetVecBinarizer
 
 
 @tf.function
@@ -92,12 +92,12 @@ def Sampler(
     shards_list: List[str],
     binarizer: RetVecBinarizer,
     batch_size: int = 32,
-    process_record: Callable = None,
+    process_record: Optional[Callable] = None,
     parallelism: int = tf.data.AUTOTUNE,
-    file_parallelism: int = 1,
-    prefetch_size: int = None,
-    buffer_size: int = None,
-    compression_type: str = None,
+    file_parallelism: Optional[int] = 1,
+    prefetch_size: Optional[int] = None,
+    buffer_size: Optional[int] = None,
+    compression_type: Optional[str] = None,
 ) -> tf.data.Dataset:
     """Dataset sampler for REW* model training.
 
