@@ -56,7 +56,7 @@ jobs:
       uses: psf/black@stable
       with:
         options: "--check --verbose"
-        version: "22.6.0"
+        version: "22.10.0"
     - name: Check isort 
       uses: isort/isort-action@master
 
