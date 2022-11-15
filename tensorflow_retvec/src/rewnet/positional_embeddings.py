@@ -117,7 +117,7 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
         self._hidden_size = hidden_size
         self._min_timescale = min_timescale
         self._max_timescale = max_timescale
-        self._init_scale = 1 / self._hidden_size ** 0.5
+        self._init_scale = 1 / self._hidden_size**0.5
 
         self._scale = self.add_weight(
             name="sin_scale",
@@ -193,7 +193,7 @@ def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
 
     half_size = shape[-1] // 2
     freq_seq = tf.cast(tf.range(half_size), tf.float32) / float(half_size)
-    inv_freq = 10000 ** -freq_seq
+    inv_freq = 10000**-freq_seq
     sinusoid = tf.einsum("...,d->...d", position, inv_freq)
     sin = tf.cast(tf.sin(sinusoid), dtype=x.dtype)
     cos = tf.cast(tf.cos(sinusoid), dtype=x.dtype)
