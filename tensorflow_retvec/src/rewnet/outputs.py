@@ -103,7 +103,9 @@ def build_outputs(
 
     # autoencoder output (decode to input token)
     if aug_decoder_size:
-        aug_decoder_output = layers.Dense(aug_decoder_size, activation="sigmoid", name="aug_decoder")(encoder_sequence_output)
+        aug_decoder_output = layers.Dense(aug_decoder_size, activation="sigmoid", name="aug_decoder")(
+            encoder_sequence_output
+        )
         outputs.append(aug_decoder_output)
 
     # aug vector prediction output
