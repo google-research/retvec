@@ -14,7 +14,7 @@
  limitations under the License.
  """
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import tensorflow as tf
 from tensorflow import Tensor
@@ -29,7 +29,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
     and efficient to compute.
     """
 
-    def __init__(self, model: str = None, trainable: bool = False, **kwargs) -> None:
+    def __init__(self, model: Optional[str] = None, trainable: bool = False, **kwargs) -> None:
         """Build a RetVecEmbedding layer.
 
         Args:
@@ -74,7 +74,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
 
         return output
 
-    def _load(self, path: str = None) -> tf.keras.models.Model:
+    def _load(self, path: Optional[str] = None) -> tf.keras.models.Model:
         """Load REW* model for embedding.
 
         Args:

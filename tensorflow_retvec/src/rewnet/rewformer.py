@@ -14,13 +14,12 @@
  limitations under the License.
  """
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from tensorflow_retvec import RetVecBinarizer
-
+from ..binarizers import RetVecBinarizer
 from .gau import GAU
 from .layers import BertPooling, dense_block
 from .outputs import build_outputs
@@ -52,6 +51,7 @@ def build_rewformer_from_config(config: Dict) -> tf.keras.Model:
         encoder_attention_dropout=m["encoder_attention_dropout"],
         encoder_spatial_dropout=m["encoder_spatial_dropout"],
         encoder_epsilon=m["encoder_epsilon"],
+        encoder_sequence_pooling=m["encoder_sequence_pooling"],
         encoder_output_dim=m["encoder_output_dim"],
         encoder_output_activation=m["encoder_output_activation"],
         tokenizer_pooling=m["tokenizer_pooling"],
@@ -63,7 +63,6 @@ def build_rewformer_from_config(config: Dict) -> tf.keras.Model:
         aug_vector_dim=o["aug_vector_dim"],
         aug_matrix_dim=o["aug_matrix_dim"],
         outputs_dropout_rate=o["outputs_dropout_rate"],
-        outputs_norm_type=o["outputs_norm_type"],
         similarity_norm_type=o["similarity_norm_type"],
     )
 
@@ -73,7 +72,7 @@ def REWformer(
     max_chars: int = 16,
     char_encoding_size: int = 32,
     char_encoding_type: str = "UTF-8",
-    cls_int: int = 3,
+    cls_int: Optional[int] = None,
     replacement_int: int = 11,
     encoder_hidden_dim: int = 128,
     encoder_abs_pos_encoding_type: str = "scaled_sin",
@@ -88,10 +87,11 @@ def REWformer(
     encoder_attention_dropout: float = 0.1,
     encoder_spatial_dropout: float = 0.0,
     encoder_epsilon: float = 1e-12,
+    encoder_sequence_pooling: str = "flatten",
     encoder_output_dim: int = 0,
-    encoder_output_activation: str = None,
-    tokenizer_pooling: str = "bert",
-    tokenizer_dense_dim: int = 0,
+    encoder_output_activation: Optional[str] = None,
+    tokenizer_pooling: str = "flatten",
+    tokenizer_dense_dim: int = 128,
     tokenizer_activation: str = "tanh",
     similarity_dim: int = 128,
     original_decoder_size: int = 0,
@@ -99,7 +99,6 @@ def REWformer(
     aug_vector_dim: int = 0,
     aug_matrix_dim: int = 0,
     outputs_dropout_rate: float = 0.0,
-    outputs_norm_type: str = None,
     similarity_norm_type: str = "l2",
 ) -> tf.keras.Model:
     """REWformer model based on transformer architecture.
@@ -151,14 +150,17 @@ def REWformer(
 
         encoder_epsilon: Epsilon value for norm.
 
+        encoder_sequence_pooling: The type of pooling used for the encoder seq. One of
+            'bert', 'avg', or 'flatten' or None.
+
         encoder_output_dim: Output encoder dimension to project encoder sequence
-            outputs to.
+            outputs to if `encoder_sequence_pooling` is 'dense'.
 
         encoder_output_activation: Activation applied onto the encoder sequence
-            outputs.
+            outputs (after projection, if `encoder_output_dim` is set).
 
         tokenizer_pooling: The type of pooling used for the tokenizer. One of
-            'bert', 'avg', 'mean_token', or 'flatten'.
+            'bert', 'avg', or 'flatten'.
 
         tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
             If set, expands or compresses the tokenizer to this dimension
@@ -187,9 +189,6 @@ def REWformer(
         outputs_dropout_rate: Dropout rate after tokenizer layer and
             before outputs.
 
-        outputs_norm_type: Norm used in the output heads, other than
-            similarity. One of ['layer', 'batch'].
-
         similarity_norm_type: Norm used at the similarity output,
             one of ['layer', 'batch', 'l2', None],
 
@@ -198,6 +197,9 @@ def REWformer(
     """
 
     inputs = layers.Input(shape=(1,), name="token", dtype=tf.string)
+
+    if not cls_int and (tokenizer_pooling == "bert" or encoder_sequence_pooling == "bert"):
+        cls_int = 3
 
     # character embedding
     encoder = RetVecBinarizer(
@@ -234,19 +236,25 @@ def REWformer(
             epsilon=encoder_epsilon,
         )(encoder)
 
+    if cls_int:
+        bert_pool = BertPooling()(encoder)
+        seq_output = encoder[:, 1:]
+    else:
+        bert_pool = None
+        seq_output = encoder
+
     # intermediate layers before tokenizer
     if tokenizer_pooling == "bert":
-        intermediate_layer = BertPooling()(encoder)
+        intermediate_layer = bert_pool
 
     elif tokenizer_pooling == "avg":
-        intermediate_layer = tf.keras.layers.GlobalAveragePooling1D()(encoder)
-
-    elif tokenizer_pooling == "mean_token":
-        intermediate_layer = tf.math.reduce_sum(encoder, axis=1)
-        intermediate_layer = intermediate_layer / max_chars
+        intermediate_layer = tf.keras.layers.GlobalAveragePooling1D()(seq_output)
 
     elif tokenizer_pooling == "flatten":
-        intermediate_layer = layers.Flatten()(encoder)
+        intermediate_layer = layers.Flatten()(seq_output)
+
+    else:
+        intermediate_layer = seq_output
 
     # this is the layer is used to bound the values outputed by the tokenizer
     # between -1 and 1 using tanh, softsign etc. Allows to use activation
@@ -261,14 +269,25 @@ def REWformer(
         tokenizer_layer = layers.Activation(activation=tokenizer_activation, name="tokenizer")(intermediate_layer)
 
     # set up encoder sequence output for sequence prediction tasks
-    encoder_sequence_output = encoder
+    if encoder_sequence_pooling == "bert":
+        encoder_sequence_output = bert_pool
+
+    elif encoder_sequence_pooling == "avg":
+        encoder_sequence_output = tf.keras.layers.GlobalAveragePooling1D()(seq_output)
+
+    elif encoder_sequence_pooling == "flatten":
+        encoder_sequence_output = layers.Flatten()(seq_output)
+
+    else:
+        encoder_sequence_output = seq_output
 
     # project encoder dim if needed
     if encoder_output_dim:
-        encoder_sequence_output = layers.Dense(encoder_output_dim)(encoder_sequence_output)
-
-    if encoder_output_activation:
-        encoder_sequence_output = layers.Activation(activation=tokenizer_activation, name="encoder_tokenizer")(
+        encoder_sequence_output = layers.Dense(
+            encoder_output_dim, activation=encoder_output_activation, name="encoder_tokenizer"
+        )(encoder_sequence_output)
+    else:
+        encoder_sequence_output = layers.Activation(activation=encoder_output_activation, name="encoder_tokenizer")(
             encoder_sequence_output
         )
 
@@ -282,7 +301,6 @@ def REWformer(
         aug_vector_dim=aug_vector_dim,
         aug_matrix_dim=aug_matrix_dim,
         outputs_dropout_rate=outputs_dropout_rate,
-        outputs_norm_type=outputs_norm_type,
         similarity_norm_type=similarity_norm_type,
     )
 
