@@ -1,5 +1,6 @@
 tmp/
 logs/
+.env/
 .vscode/
 site/
 release.sh

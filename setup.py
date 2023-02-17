@@ -15,7 +15,6 @@
  """
 
 import os
-
 from setuptools import find_packages, setup
 
 
@@ -38,16 +37,18 @@ def get_version(rel_path):
 long_description = read("README.md")
 
 setup(
-    name="tensorflow_retvec",
-    version=get_version("src/__init__.py"),
+    name="retvec",
+    version=get_version("retvec/__init__.py"),
     description="Resilient and Efficient Text Vectorizer",
     long_description=long_description,
-    author="Marina Zhang",
-    author_email="marinazh@google.com",
+    author="Google",
+    author_email="retvec@google.com",
     url="https://github.com/google-research/retvec",
     license="Apache License 2.0",
-    install_requires=["tensorflow>=2.6"],
     extras_require={
+        "tensorflow": {
+            "tensorflow>=2.6"
+        },
         "dev": [
             "datasets",
             "tokenizers",
@@ -69,11 +70,11 @@ setup(
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Framework :: TensorFlow",
+        "Framework :: Torch",
         "License :: OSI Approved :: Apache Software License",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    packages=["tensorflow_retvec", "tensorflow_retvec.rewnet", "tensorflow_retvec.datasets"],
-    package_dir={"tensorflow_retvec": "src"},
+    packages=find_packages()
 )

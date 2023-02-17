@@ -29,7 +29,8 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
     binary encodings.
     """
 
-    def __init__(self, max_chars: int = 16, max_words: int = 1, encoding_size: int = 32, **kwargs) -> None:
+    def __init__(self, max_chars: int = 16, max_words: int = 1,
+                 encoding_size: int = 32, **kwargs) -> None:
         """Initialize a RetVec integer binarizer.
 
         Args:
@@ -46,10 +47,10 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         self.max_words = max_words
         self.encoding_size = encoding_size
         self.bits_masks = tf.bitwise.left_shift(
-            tf.ones([], dtype="int32"), tf.range(self.encoding_size, dtype="int32")
+            tf.ones([], dtype="int32"), tf.range(self.encoding_size,
+                                                 dtype="int32")
         )
 
-    @tf.function()
     def call(self, inputs: Tensor) -> Tensor:
         batch_size = tf.shape(inputs)[0]
 
@@ -71,7 +72,8 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
                 ),
             )
         else:
-            embeddings = tf.reshape(embeddings, (batch_size, self.max_chars, self.encoding_size))
+            embeddings = tf.reshape(embeddings, (batch_size, self.max_chars,
+                                                 self.encoding_size))
 
         return embeddings
 
@@ -161,13 +163,11 @@ class RetVecBinarizer(tf.keras.layers.Layer):
             encoding_size=self.encoding_size,
         )
 
-    @tf.function()
     def call(self, inputs: Tensor) -> Tensor:
         char_encodings = self._integerizer(inputs)
         embeddings = self._int_binarizer(char_encodings)
         return embeddings
 
-    @tf.function()
     def binarize(self, words: Tensor) -> Tensor:
         """Return RetVec binarizer encodings for a word or a list of words.
 
@@ -191,7 +191,8 @@ class RetVecBinarizer(tf.keras.layers.Layer):
 
         # Remove extra dim if input was a single word
         if words.shape == tf.TensorShape([]):
-            embeddings = tf.reshape(embeddings[0], (self.max_chars, self.encoding_size))
+            embeddings = tf.reshape(embeddings[0], (self.max_chars,
+                                                    self.encoding_size))
 
         return embeddings
 

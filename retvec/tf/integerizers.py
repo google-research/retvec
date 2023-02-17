@@ -73,16 +73,16 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
             self.input_rank = len(input_shape)
 
     @tf.function()
-    def call(self, inputs: Tensor) -> Tensor:
-        batch_size = tf.shape(inputs)[0]
+    def call(self, chars: Tensor) -> Tensor:
+        batch_size = tf.shape(chars)[0]
 
         # Reshape (and reshape back at the end) two dimensional inputs
         if self.input_rank == 2:
-            inputs = tf.reshape(inputs, (batch_size * self.max_words, 1))
+            chars = tf.reshape(chars, (batch_size * self.max_words, 1))
 
         # Apply unicode encoding to convert into integers
-        encodings = tf.strings.unicode_decode(
-            inputs,
+        char_codepoints = tf.strings.unicode_decode(
+            chars,
             self.encoding_type,
             errors="replace",
             replacement_char=self.replacement_int,
@@ -91,22 +91,22 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         # Handle shape differences between eager and graph mode
         if self.eager:
             if self.input_rank == 2:
-                encodings = tf.squeeze(encodings, axis=1)
-            encodings = encodings.to_tensor(shape=(encodings.shape[0], self.max_chars))
+                char_codepoints = tf.squeeze(char_codepoints, axis=1)
+            char_codepoints = char_codepoints.to_tensor(shape=(char_codepoints.shape[0], self.max_chars))
         else:
-            encodings = encodings.to_tensor(shape=(encodings.shape[0], 1, self.max_chars))
-            encodings = tf.squeeze(encodings, axis=1)
+            char_codepoints = char_codepoints.to_tensor(shape=(char_codepoints.shape[0], 1, self.max_chars))
+            char_codepoints = tf.squeeze(char_codepoints, axis=1)
 
         # add CLS int and then reshape to max size
         if self.cls_int:
-            encodings = tf.pad(encodings, self.pad_position, constant_values=self.pad_value)
-            encodings = encodings[:, : self.max_chars]
+            char_codepoints = tf.pad(char_codepoints, self.pad_position, constant_values=self.pad_value)
+            char_codepoints = char_codepoints[:, : self.max_chars]
 
         # Reshape two dimensional inputs back
         if self.input_rank == 2:
-            encodings = tf.reshape(encodings, (batch_size, self.max_words, self.max_chars))
+            char_codepoints = tf.reshape(char_codepoints, (batch_size, self.max_words, self.max_chars))
 
-        return encodings
+        return char_codepoints
 
     @tf.function()
     def integerize(self, words: Tensor) -> Tensor:

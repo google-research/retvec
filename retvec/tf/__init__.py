@@ -14,8 +14,6 @@
  limitations under the License.
  """
 
-__version__ = "0.1.0"
-
 from .binarizers import RetVecBinarizer, RetVecIntBinarizer  # noqa
 from .embedding import RetVecEmbedding  # noqa
 from .integerizers import RetVecIntegerizer  # noqa
