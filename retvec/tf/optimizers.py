@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import Tensor
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class WarmupCosineDecay(tf.keras.optimizers.schedules.LearningRateSchedule):
     """A cosine decay LearningRateSchedule with a linear warmup period.
     See [Loshchilov & Hutter, ICLR2016](https://arxiv.org/abs/1608.03983),

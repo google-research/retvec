@@ -16,7 +16,7 @@
 
 import tensorflow as tf
 
-from tensorflow_retvec import RetVecBinarizer
+from retvec.tf import RetVecBinarizer
 
 
 def test_graph_mode():

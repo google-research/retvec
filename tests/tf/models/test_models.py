@@ -18,13 +18,13 @@ import pytest
 import tensorflow as tf
 from tensorflow_similarity.losses import MultiSimilarityLoss
 
-from tensorflow_retvec import RetVec
-from tensorflow_retvec.rewnet import REWCNN, REWformer
+from retvec.tf import RetVec
+from retvec.tf.models import REWMLP, REWformer
 
 tf.config.set_visible_devices([], "GPU")
 
-architectures = [REWCNN, REWformer]
-architectures_names = ["rewcnn", "rewformer"]
+architectures = [REWMLP, REWformer]
+architectures_names = ["rewmlp", "rewformer"]
 
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)

@@ -14,21 +14,20 @@
  limitations under the License.
  """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import tensorflow as tf
-from tensorflow import Tensor
+from tensorflow import Tensor, TensorShape
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class RetVecEmbedding(tf.keras.layers.Layer):
     """RetVec embedding layer leverages pre-trained word embedding models
     to generate word embeddings. Those models are trained to be resilient
     against adversarial attack and efficient to compute.
     """
 
-    def __init__(self, model: Optional[str] = None, trainable: bool = False,
-                 **kwargs) -> None:
+    def __init__(self, model: Optional[str] = None, trainable: bool = False, **kwargs) -> None:
         """Build a RetVecEmbedding layer.
 
         Args:
@@ -47,17 +46,19 @@ class RetVecEmbedding(tf.keras.layers.Layer):
         self.rewnet = self._load(model)
         self.embedding_size = self.rewnet.layers[-1].output_shape[-1]
 
+    def build(self, input_shape: Union[TensorShape, List[TensorShape]]) -> None:
+        self.input_rank = len(input_shape)
+
     def call(self, inputs: Tensor, training: bool = False) -> Tensor:
         input_shape = tf.shape(inputs)
 
         # Reshape inputs like (batch_size, max_words, max_chars, encoding_size)
-        if len(input_shape) == 4:
+        if self.input_rank == 4:
             batch_size = input_shape[0]
             num_words = input_shape[1]
             max_chars = input_shape[2]
             encoding_size = input_shape[-1]
-            inputs = tf.reshape(inputs, (batch_size * num_words, max_chars,
-                                         encoding_size))
+            inputs = tf.reshape(inputs, (batch_size * num_words, max_chars, encoding_size))
         else:
             batch_size = input_shape[0]
             max_chars = input_shape[1]
@@ -67,9 +68,8 @@ class RetVecEmbedding(tf.keras.layers.Layer):
         output = self.rewnet(inputs, training=training)
 
         # Reshape inputs back if needed
-        if len(input_shape) == 4:
-            output = tf.reshape(output, (batch_size, num_words,
-                                         self.embedding_size))
+        if self.input_rank == 4:
+            output = tf.reshape(output, (batch_size, num_words, self.embedding_size))
 
         return output
 

@@ -46,9 +46,7 @@ setup(
     url="https://github.com/google-research/retvec",
     license="Apache License 2.0",
     extras_require={
-        "tensorflow": {
-            "tensorflow>=2.6"
-        },
+        "tensorflow": {"tensorflow>=2.6"},
         "dev": [
             "datasets",
             "tokenizers",
@@ -64,7 +62,8 @@ setup(
             "numpy",
             "tqdm",
             "tensorflow_similarity",
-        ]
+            "black",
+        ],
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -76,5 +75,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    packages=find_packages()
+    packages=find_packages(),
 )

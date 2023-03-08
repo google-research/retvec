@@ -1,12 +1,9 @@
 """
  Copyright 2021 Google LLC
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
       https://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,11 +25,11 @@ from tensorflow_addons.optimizers import LAMB
 from termcolor import cprint
 from wandb.keras import WandbCallback
 
-from tensorflow_retvec.datasets.io import get_dataset_samplers, get_outputs_info
-from tensorflow_retvec.optimizers import WarmupCosineDecay
-from tensorflow_retvec.rewnet.rewcnn import build_rewcnn_from_config
-from tensorflow_retvec.rewnet.rewformer import build_rewformer_from_config
-from tensorflow_retvec.utils import tf_cap_memory
+from retvec.tf.io import get_dataset_samplers, get_outputs_info
+from retvec.tf.optimizers import WarmupCosineDecay
+from retvec.tf.models.rewformer import build_rewformer_from_config
+from retvec.tf.models.rewmlp import build_rewmlp_from_config
+from retvec.tf.utils import tf_cap_memory
 
 
 def train(args: argparse.Namespace, config: Dict) -> None:
@@ -100,6 +97,8 @@ def train(args: argparse.Namespace, config: Dict) -> None:
             model = build_rewcnn_from_config(config)
         elif model_type == "rewformer":
             model = build_rewformer_from_config(config)
+        elif model_type == "rewmlp":
+            model = build_rewmlp_from_config(config)
         else:
             raise ValueError("Unknown model %s" % model_type)
 
@@ -120,7 +119,7 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         model.compile(optimizer, loss=loss, metrics=metrics)
 
     # train
-    _ = model.fit(
+    history = model.fit(
         train_ds,
         validation_data=test_ds,
         epochs=epochs,
@@ -132,23 +131,37 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     # extract and save tokenizer
     rewnet_path = Path(args.output_dir) / "rewnet" / stub
     embedding_path = Path(args.output_dir) / "embeddings" / stub
+    results_path = Path(args.output_dir) / "results" / stub
+
+    os.makedirs(rewnet_path, exist_ok=True)
+    os.makedirs(embedding_path, exist_ok=True)
+    os.makedirs(results_path, exist_ok=True)
 
     # check that model can be reloaded
     if save_freq_epochs:
-        saved_model = tf.keras.models.load_model(mdl_path / f"epoch_{epochs}")
+        saved_model_path = mdl_path / f"epoch_{epochs}"
     else:
-        saved_model = tf.keras.models.load_model(mdl_path)
+        saved_model_path = mdl_path
 
-    # save model without optimizer so it can be loaded with only tensorflow
-    saved_model.save(rewnet_path, include_optimizer=False)
+    if saved_model_path.exists():
+        saved_model = tf.keras.models.load_model(saved_model_path)
 
-    # if tokenizer layer is already defined in the model, save just the embedding model
-    if "tokenizer" in [l.name for l in model.layers]:
-        embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
-        embedding_model.compile("adam", "mse")
-        embedding_model.summary()
-        embedding_model.save(embedding_path, include_optimizer=False)
-        cprint(f"Saving RetVec embedding model to {embedding_path}", "blue")
+        # save model without optimizer so it can be loaded with only tensorflow
+        saved_model.save(rewnet_path, include_optimizer=False)
+
+        # if tokenizer layer is already defined in the model, save just the embedding model
+        if "tokenizer" in [l.name for l in model.layers]:
+            embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
+            embedding_model.compile("adam", "mse")
+            embedding_model.summary()
+            embedding_model.save(embedding_path, include_optimizer=False)
+            cprint(f"Saving RetVec embedding model to {embedding_path}", "blue")
+
+    with open(results_path / 'train_history.json', 'w') as f:
+        json.dump(history.history, f)
+
+    with open(results_path / 'train_config.json', 'w') as f:
+        json.dump(config, f)
 
     wandb.finish()
 
@@ -187,9 +200,10 @@ if __name__ == "__main__":
         "--train_config",
         "-c",
         help="train config path",
-        default="../configs/train_full.json",
+        default="./configs/train_full.json",
     )
-    parser.add_argument("--model_config", "-m", help="model config file or folder path")
+    parser.add_argument("--model_config",
+        "-m", help="model config file or folder path", default='./configs/models/rewmlp-256.json')
     parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")
     parser.add_argument(
         "--start_idx",
@@ -220,7 +234,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--wandb_project",
         "-w",
-        default="RetVec-REWNet-Pretraining",
+        default="REWNet-Pretraining",
         help="Wandb project to save to, none to disable.",
     )
     parser.add_argument(

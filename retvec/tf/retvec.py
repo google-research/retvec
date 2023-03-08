@@ -24,7 +24,7 @@ from .binarizers import RetVecBinarizer
 from .embedding import RetVecEmbedding
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class RetVec(tf.keras.layers.Layer):
     """RetVec: Resilient and Efficient Vectorizer layer."""
 

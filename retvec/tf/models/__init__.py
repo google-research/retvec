@@ -14,5 +14,5 @@
  limitations under the License.
  """
 
-from .rewcnn import REWCNN  # noqa
+from .rewmlp import REWMLP  # noqa
 from .rewformer import REWformer  # noqa

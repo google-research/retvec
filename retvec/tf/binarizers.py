@@ -22,15 +22,14 @@ from tensorflow import Tensor, TensorShape
 from .integerizers import RetVecIntegerizer
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class RetVecIntBinarizer(tf.keras.layers.Layer):
     """RetVec integer integerizer layer. This layer transforms integer
     representations of strings (i.e. Unicode code points) into compact
     binary encodings.
     """
 
-    def __init__(self, max_chars: int = 16, max_words: int = 1,
-                 encoding_size: int = 32, **kwargs) -> None:
+    def __init__(self, max_chars: int = 16, max_words: int = 1, encoding_size: int = 32, **kwargs) -> None:
         """Initialize a RetVec integer binarizer.
 
         Args:
@@ -46,10 +45,11 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         self.max_chars = max_chars
         self.max_words = max_words
         self.encoding_size = encoding_size
-        self.bits_masks = tf.bitwise.left_shift(
-            tf.ones([], dtype="int32"), tf.range(self.encoding_size,
-                                                 dtype="int32")
-        )
+
+        max_int32 = tf.constant([2**31], dtype="int64")
+        bits_masks = tf.bitwise.right_shift(max_int32, tf.range(self.encoding_size, dtype="int64"))
+        bits_masks = tf.cast(bits_masks, dtype="int32")
+        self.bits_masks = bits_masks
 
     def call(self, inputs: Tensor) -> Tensor:
         batch_size = tf.shape(inputs)[0]
@@ -72,15 +72,14 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
                 ),
             )
         else:
-            embeddings = tf.reshape(embeddings, (batch_size, self.max_chars,
-                                                 self.encoding_size))
+            embeddings = tf.reshape(embeddings, (batch_size, self.max_chars, self.encoding_size))
 
         return embeddings
 
     def _project(self, chars: Tensor, masks: Tensor) -> Tensor:
         """Project chars in subspace"""
-        masked = tf.bitwise.bitwise_and(tf.expand_dims(chars, -1), masks)
-        out = tf.cast(tf.not_equal(masked, 0), "int32")
+        out = tf.bitwise.bitwise_and(tf.expand_dims(chars, -1), masks)
+        out = tf.minimum(out, 1)
         return out
 
     def get_config(self) -> Dict[str, Any]:
@@ -95,7 +94,7 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         return config
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class RetVecBinarizer(tf.keras.layers.Layer):
     """RetVec binarizer which encodes all characters in the input
     into a compact binary representations.
@@ -153,7 +152,7 @@ class RetVecBinarizer(tf.keras.layers.Layer):
             replacement_int=self.replacement_int,
         )
 
-    def build(self, input_shape: Union[TensorShape, List[TensorShape]]):
+    def build(self, input_shape: Union[TensorShape, List[TensorShape]]) -> None:
         self.max_words = input_shape[-1] if len(input_shape) > 1 else 1
 
         # Initialize int binarizer layer here since we know max_words
@@ -191,8 +190,7 @@ class RetVecBinarizer(tf.keras.layers.Layer):
 
         # Remove extra dim if input was a single word
         if words.shape == tf.TensorShape([]):
-            embeddings = tf.reshape(embeddings[0], (self.max_chars,
-                                                    self.encoding_size))
+            embeddings = tf.reshape(embeddings[0], (self.max_chars, self.encoding_size))
 
         return embeddings
 

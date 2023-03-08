@@ -14,6 +14,7 @@
  limitations under the License.
  """
 
+
 import tensorflow as tf
 
 
@@ -28,3 +29,12 @@ def tf_cap_memory():
             except RuntimeError as e:
                 # Memory growth must be set before GPUs have been initialized
                 print(e)
+
+
+def clone_initializer(initializer: tf.keras.initializers.Initializer):
+    if isinstance(
+        initializer,
+        tf.keras.initializers.Initializer,
+    ):
+        return initializer.__class__.from_config(initializer.get_config())
+    return initializer

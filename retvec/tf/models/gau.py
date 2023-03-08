@@ -24,10 +24,12 @@ from tensorflow.keras.layers import Layer
 from .layers import get_activation_layer, get_norm_layer
 from .positional_embeddings import toeplitz_matrix, toeplitz_matrix_rope
 
+from ..utils import clone_initializer
+
 ZEROS_INTIALIZER = tf.initializers.zeros()
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class GAU(Layer):
     """Gated Attention Unit layer introduced in Transformer
     Quality in Linear Time.
@@ -102,12 +104,24 @@ class GAU(Layer):
         # compute projection dimension
         self.expand_dim = self.dim * self.expansion_factor
         self.proj_dim = 2 * self.expand_dim + self.shared_dim
+        self.weight_initializer = tf.random_normal_initializer(stddev=0.02)
 
         # define layers
         self.norm = get_norm_layer(norm=self.norm_type, epsilon=self.epsilon)
 
-        self.proj1 = layers.Dense(self.proj_dim, use_bias=True, activation=self.activation)
-        self.proj2 = layers.Dense(self.dim, use_bias=True)
+        self.proj1 = layers.Dense(
+            self.proj_dim,
+            use_bias=True,
+            activation=self.activation,
+            kernel_initializer=clone_initializer(self.weight_initializer),
+            bias_initializer="zeros",
+        )
+        self.proj2 = layers.Dense(
+            self.dim,
+            use_bias=True,
+            kernel_initializer=clone_initializer(self.weight_initializer),
+            bias_initializer="zeros",
+        )
 
         # dropout layers
         self.dropout1 = layers.Dropout(self.dropout_rate)
@@ -122,28 +136,26 @@ class GAU(Layer):
         # attention activation function
         self.attention_activation_layer = get_activation_layer(attention_activation)
 
-        self.weight_initializer = tf.random_normal_initializer(stddev=0.02)
-
         # setting up position encoding
         if self.position_encoding_type == "relative":
             self.w = tf.Variable(
-                lambda: self.weight_initializer(shape=[2 * self.max_len - 1], dtype=tf.float32),
+                lambda: clone_initializer(self.weight_initializer(shape=[2 * self.max_len - 1], dtype=tf.float32)),
                 trainable=True,
             )
 
         elif self.position_encoding_type == "rope":
             self.a = tf.Variable(
-                lambda: self.weight_initializer(shape=[self.max_len], dtype=tf.float32),
+                lambda: clone_initializer(self.weight_initializer)(shape=[self.max_len], dtype=tf.float32),
                 trainable=True,
             )
             self.b = tf.Variable(
-                lambda: self.weight_initializer(shape=[self.max_len], dtype=tf.float32),
+                lambda: clone_initializer(self.weight_initializer)(shape=[self.max_len], dtype=tf.float32),
                 trainable=True,
             )
 
         # offset scaling values
         self.gamma = tf.Variable(
-            lambda: self.weight_initializer(shape=[2, self.shared_dim], dtype=tf.float32),
+            lambda: clone_initializer(self.weight_initializer)(shape=[2, self.shared_dim], dtype=tf.float32),
             trainable=True,
         )
 
@@ -153,7 +165,6 @@ class GAU(Layer):
         )
 
     def call(self, x: Tensor, training: bool = False) -> Tensor:
-
         shortcut = x
         x = self.norm(x)
 

@@ -21,7 +21,6 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 import tensorflow as tf
 from google.cloud import storage
 from tensorflow import Tensor
-from tensorflow.keras.losses import Loss
 from tensorflow_similarity.losses import (
     CircleLoss,
     MultiSimilarityLoss,
@@ -29,15 +28,15 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from ..binarizers import RetVecBinarizer
+from .binarizers import RetVecBinarizer
 
 
-@tf.function
 def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Tensor]:
     """Read TF record files for REW* training datasets.
 
     Args:
         tfrecord: TF record input.
+
         binarizer: RetVecBinarizer used to encode words.
     """
     base_features = {
@@ -46,6 +45,7 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     }
 
     features = base_features.copy()
+
     for i in range(2):
         features["aug_token%s" % i] = tf.io.FixedLenFeature([], tf.string)
         features["aug_matrix%s" % i] = tf.io.FixedLenFeature([], tf.string)
@@ -211,11 +211,18 @@ def get_dataset_samplers(
     train_files = []
     test_files = []
 
-    for blob in client.list_blobs(bucket, prefix=train_path):
-        train_files.append(blob.name)
+    train_paths = train_path.split(",")
+    test_paths = test_path.split(",")
 
-    for blob in client.list_blobs(bucket, prefix=test_path):
-        test_files.append(blob.name)
+    for path in train_paths:
+        for blob in client.list_blobs(bucket, prefix=path):
+            if blob.name.endswith(".tfrecord"):
+                train_files.append(blob.name)
+
+    for path in test_paths:
+        for blob in client.list_blobs(bucket, prefix=path):
+            if blob.name.endswith(".tfrecord"):
+                test_files.append(blob.name)
 
     train_shards = []
     test_shards = []
@@ -234,7 +241,7 @@ def get_dataset_samplers(
         file_parallelism=core_count * 2,
         parallelism=core_count,
         buffer_size=buffer_size,
-        prefetch_size=10,
+        prefetch_size=1000,
     )
 
     test_ds = Sampler(

@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import Tensor, TensorShape
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class RetVecIntegerizer(tf.keras.layers.Layer):
     """RetVec integerizer layer. This layer transforms string inputs
     into an integer representation (i.e. UTF-8 code points), which will
@@ -61,7 +61,7 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
             self.pad_position = tf.constant([[0, 0], [1, 0]])
             self.pad_value = tf.constant(cls_int)
 
-    def build(self, input_shape: Union[TensorShape, List[TensorShape]]):
+    def build(self, input_shape: Union[TensorShape, List[TensorShape]]) -> None:
         self.max_words = input_shape[-1]
 
         # We compute input rank here because rank must be statically known
@@ -72,7 +72,6 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         else:
             self.input_rank = len(input_shape)
 
-    @tf.function()
     def call(self, chars: Tensor) -> Tensor:
         batch_size = tf.shape(chars)[0]
 
@@ -108,7 +107,6 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
 
         return char_codepoints
 
-    @tf.function()
     def integerize(self, words: Tensor) -> Tensor:
         """Return RetVec integerizer encodings for a word or a list of words.
 

@@ -16,7 +16,7 @@
 
 import tensorflow as tf
 
-from tensorflow_retvec import RetVecBinarizer, RetVecEmbedding
+from retvec.tf import RetVecBinarizer, RetVecEmbedding
 
 TEST_EMB_SIZE = 16
 
