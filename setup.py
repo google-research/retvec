@@ -15,6 +15,7 @@
  """
 
 import os
+
 from setuptools import find_packages, setup
 
 
@@ -45,6 +46,7 @@ setup(
     author_email="retvec@google.com",
     url="https://github.com/google-research/retvec",
     license="Apache License 2.0",
+    install_requires=[],
     extras_require={
         "tensorflow": ["tensorflow>=2.6"],
         "dev": [

@@ -5,12 +5,15 @@ datasets               Apache 2.0    notice              https://github.com/hugg
 tokenizers             Apache 2.0    notice              https://github.com/huggingface/tokenizers
 tensorflow_addons      Apache 2.0    notice              UNKNOWN
 google-cloud-storage   Apache 2.0    notice              https://github.com/googleapis/python-storage
-tensorflow_similarity  Apache 2.0    notice              https://github.com/tensorflow/similarity
-numpy                  BSD           notice              https://www.numpy.org
+wandb                  MIT license                       https://github.com/wandb/wandb
 mypy                   MIT           notice              http://www.mypy-lang.org/
 pytest                 MIT           notice              https://docs.pytest.org/en/latest/
 flake8                 MIT           notice              https://github.com/pycqa/flake8
 pytest-cov             MIT           notice              https://github.com/pytest-dev/pytest-cov
-wandb                  MIT license                       https://github.com/wandb/wandb
-tqdm                   MPLv2.0, MIT  reciprocal, notice  https://tqdm.github.io
 twine                  Apache 2.0    notice              https://github.com/pypa/twine
+tabulate               MIT           notice              https://github.com/astanin/python-tabulate
+numpy                  BSD           notice              https://www.numpy.org
+tqdm                   MPLv2.0, MIT  reciprocal, notice  https://tqdm.github.io
+tensorflow_similarity  Apache 2.0    notice              https://github.com/tensorflow/similarity
+black                  MIT           notice              https://github.com/psf/black
+isort                  MIT           notice              https://github.com/pycqa/isort
