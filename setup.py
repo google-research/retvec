@@ -63,7 +63,7 @@ setup(
             "tqdm",
             "tensorflow_similarity",
             "black",
-            "isort"
+            "isort",
         ],
     },
     classifiers=[
