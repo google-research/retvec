@@ -148,7 +148,7 @@ class ScaledNorm(Layer):
 
     def call(self, inputs: Tensor) -> Tensor:
         x = inputs
-        axes = list(range(len(x.shape)))[self._begin_axis:]
+        axes = list(range(len(x.shape)))[self._begin_axis :]
         mean_square = tf.reduce_mean(tf.math.square(x), axes, keepdims=True)
         x = x * tf.math.rsqrt(mean_square + self._epsilon)
         return x * self._scale
@@ -157,5 +157,3 @@ class ScaledNorm(Layer):
         config = {"begin_axis": self._begin_axis, "epsilon": self._epsilon}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
-
-

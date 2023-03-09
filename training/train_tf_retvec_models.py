@@ -33,7 +33,6 @@ from retvec.tf.utils import tf_cap_memory
 
 
 def train(args: argparse.Namespace, config: Dict) -> None:
-
     # save paths
     if args.experiment_name:
         model_name = args.experiment_name
@@ -155,10 +154,10 @@ def train(args: argparse.Namespace, config: Dict) -> None:
             embedding_model.save(embedding_path, include_optimizer=False)
             cprint(f"Saving RetVec embedding model to {embedding_path}", "blue")
 
-    with open(results_path / 'train_history.json', 'w') as f:
+    with open(results_path / "train_history.json", "w") as f:
         json.dump(history.history, f)
 
-    with open(results_path / 'train_config.json', 'w') as f:
+    with open(results_path / "train_config.json", "w") as f:
         json.dump(config, f)
 
     wandb.finish()
@@ -200,8 +199,9 @@ if __name__ == "__main__":
         help="train config path",
         default="./configs/train_full.json",
     )
-    parser.add_argument("--model_config",
-        "-m", help="model config file or folder path", default='./configs/models/rewmlp-256.json')
+    parser.add_argument(
+        "--model_config", "-m", help="model config file or folder path", default="./configs/models/rewmlp-256.json"
+    )
     parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")
     parser.add_argument(
         "--start_idx",
