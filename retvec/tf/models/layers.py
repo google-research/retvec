@@ -50,7 +50,7 @@ def dense_block(
     return x
 
 
-def get_activation_layer(activation: str, **kwargs):
+def get_activation_layer(activation: Optional[str] = None, **kwargs):
     """Get activation layer or function for TF model."""
     if activation == "sqrrelu":
         return SqrReLU(**kwargs)
@@ -157,3 +157,5 @@ class ScaledNorm(Layer):
         config = {"begin_axis": self._begin_axis, "epsilon": self._epsilon}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+
