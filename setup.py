@@ -46,7 +46,7 @@ setup(
     url="https://github.com/google-research/retvec",
     license="Apache License 2.0",
     extras_require={
-        "tensorflow": {"tensorflow>=2.6"},
+        "tensorflow": ["tensorflow>=2.6"],
         "dev": [
             "datasets",
             "tokenizers",
