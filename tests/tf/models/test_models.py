@@ -83,7 +83,6 @@ def test_aug_matrix(NN):
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_save_and_reload(tmpdir, NN):
-
     path = str(tmpdir / "test/")
     model = NN()
     model.compile(optimizer="adam", loss=MultiSimilarityLoss())

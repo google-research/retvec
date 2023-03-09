@@ -21,10 +21,9 @@ from tensorflow import Tensor
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Layer
 
+from ..utils import clone_initializer
 from .layers import get_activation_layer, get_norm_layer
 from .positional_embeddings import toeplitz_matrix, toeplitz_matrix_rope
-
-from ..utils import clone_initializer
 
 ZEROS_INTIALIZER = tf.initializers.zeros()
 

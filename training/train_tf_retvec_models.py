@@ -26,9 +26,9 @@ from termcolor import cprint
 from wandb.keras import WandbCallback
 
 from retvec.tf.io import get_dataset_samplers, get_outputs_info
-from retvec.tf.optimizers import WarmupCosineDecay
 from retvec.tf.models.rewformer import build_rewformer_from_config
 from retvec.tf.models.rewmlp import build_rewmlp_from_config
+from retvec.tf.optimizers import WarmupCosineDecay
 from retvec.tf.utils import tf_cap_memory
 
 

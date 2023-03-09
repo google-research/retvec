@@ -14,7 +14,7 @@
  limitations under the License.
  """
 
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
 import tensorflow as tf
 from tensorflow.keras import layers

@@ -14,7 +14,7 @@
  limitations under the License.
  """
 
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 import tensorflow as tf
 from tensorflow import Tensor
