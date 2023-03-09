@@ -27,7 +27,7 @@ jobs:
     
     - name: Install package
       run: |
-        pip install "./retvec[dev]"
+        pip install ".[dev]"
         
     - name: Lint with flake8
       run: |
