@@ -27,7 +27,7 @@ jobs:
     
     - name: Install package
       run: |
-        pip install "./tensorflow_retvec[dev]"
+        pip install "./retvec[dev]"
         
     - name: Lint with flake8
       run: |
