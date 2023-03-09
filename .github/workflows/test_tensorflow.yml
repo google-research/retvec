@@ -38,11 +38,11 @@ jobs:
     
     - name: Static analysis
       run: |
-        mypy  tensorflow_retvec/src/ --raise-exceptions
+        mypy  retvec/ --raise-exceptions
     
     - name: Test with pytest
       run: |
-        coverage run -m pytest tests/tensorflow_retvec/
+        coverage run -m pytest tests/
     - name: Upload coverage to Coveralls
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |
