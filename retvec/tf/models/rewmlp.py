@@ -14,7 +14,7 @@
  limitations under the License.
  """
 
-from typing import Dict, List
+from typing import Optional, Dict, List
 
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -62,7 +62,7 @@ def REWMLP(
     max_chars: int = 16,
     char_encoding_size: int = 32,
     char_encoding_type: str = "UTF-8",
-    cls_int: int = None,
+    cls_int: Optional[int] = None,
     replacement_int: int = 11,
     initial_spatial_dropout_rate: float = 0.0625,
     projection_dims: List[int] = [32, 32],
@@ -70,11 +70,11 @@ def REWMLP(
     encoder_dropout: float = 0.0,
     encoder_spatial_dropout_rate: float = 0.0,
     encoder_initializer: str = "glorot_uniform",
-    encoder_norm_type: str = None,
+    encoder_norm_type: Optional[str] = None,
     encoder_norm_epsilon: float = 1e-6,
     encoder_activation: str = "gelu",
     encoder_seq_output_dim: int = 0,
-    encoder_seq_output_activation: str = None,
+    encoder_seq_output_activation: Optional[str] = None,
     encoder_seq_output_dropout: float = 0.0,
     tokenizer_dense_dim: int = 256,
     tokenizer_activation: str = "tanh",

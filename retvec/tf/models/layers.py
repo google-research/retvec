@@ -14,7 +14,7 @@
  limitations under the License.
  """
 
-from typing import Any, Dict
+from typing import Optional, Any, Dict
 
 import tensorflow as tf
 from tensorflow import Tensor
@@ -26,12 +26,12 @@ from tensorflow_similarity.layers import GeneralizedMeanPooling1D
 def dense_block(
     x: Tensor,
     units: int,
-    activation: str = None,
-    norm_type: str = None,
+    activation: Optional[str] = None,
+    norm_type: Optional[str] = None,
     norm_epsilon: float = 1e-6,
     dropout_rate: float = 0.0,
     spatial_dropout_rate: float = 0.0,
-    name: str = None,
+    name: Optional[str] = None,
     **dense_kwargs,
 ) -> Tensor:
     """Build a dense block for a TF model."""

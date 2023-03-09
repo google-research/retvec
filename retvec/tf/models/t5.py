@@ -15,7 +15,7 @@
  """
 
 import math
-from typing import Any, Dict, List
+from typing import Optional, Any, Dict, List
 
 import tensorflow as tf
 from tensorflow import Tensor
@@ -354,7 +354,7 @@ class T5Block(Layer):
         dim: int,
         hidden_dim: int,
         num_heads: int,
-        out_dim: int = None,
+        out_dim: Optional[int] = None,
         head_dim: int = 64,
         dropout_rate: float = 0.05,
         spatial_dropout_rate: float = 0.0,
