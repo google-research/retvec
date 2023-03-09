@@ -93,9 +93,7 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     # model
     with mirrored_strategy.scope():
         model_type = config["model"]["type"]
-        if model_type == "rewcnn":
-            model = build_rewcnn_from_config(config)
-        elif model_type == "rewformer":
+        if model_type == "rewformer":
             model = build_rewformer_from_config(config)
         elif model_type == "rewmlp":
             model = build_rewmlp_from_config(config)
