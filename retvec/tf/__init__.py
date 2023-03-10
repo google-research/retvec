@@ -14,7 +14,7 @@
  limitations under the License.
  """
 
-from .binarizers import RetVecBinarizer, RetVecIntBinarizer  # noqa
-from .embedding import RetVecEmbedding  # noqa
-from .integerizers import RetVecIntegerizer  # noqa
-from .retvec import RetVec  # noqa
+from .layers.binarizers import RetVecBinarizer, RetVecIntBinarizer  # noqa
+from .layers.embedding import RetVecEmbedding  # noqa
+from .layers.integerizers import RetVecIntegerizer  # noqa
+from .layers.retvec import RetVec  # noqa

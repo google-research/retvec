@@ -25,11 +25,11 @@ from tensorflow_addons.optimizers import LAMB
 from termcolor import cprint
 from wandb.keras import WandbCallback
 
-from retvec.tf.io import get_dataset_samplers, get_outputs_info
+from retvec.tf.dataset.io import get_dataset_samplers, get_outputs_info
 from retvec.tf.models.rewformer import build_rewformer_from_config
 from retvec.tf.models.rewmlp import build_rewmlp_from_config
-from retvec.tf.optimizers import WarmupCosineDecay
-from retvec.tf.utils import tf_cap_memory
+from retvec.tf.optimizers.optimizers import WarmupCosineDecay
+from retvec.tf.utils.utils import tf_cap_memory
 
 
 def train(args: argparse.Namespace, config: Dict) -> None:

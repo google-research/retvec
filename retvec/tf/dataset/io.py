@@ -28,7 +28,7 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from .binarizers import RetVecBinarizer
+from ..layers.binarizers import RetVecBinarizer
 
 
 def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Tensor]:

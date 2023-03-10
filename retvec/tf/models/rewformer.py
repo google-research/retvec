@@ -19,7 +19,7 @@ from typing import Dict, Optional
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from ..binarizers import RetVecBinarizer
+from ..layers.binarizers import RetVecBinarizer
 from .gau import GAU
 from .layers import dense_block, get_pooling_layer
 from .outputs import build_outputs

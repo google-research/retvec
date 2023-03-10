@@ -23,31 +23,41 @@ from .integerizers import RetVecIntegerizer
 
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
-class RetVecIntBinarizer(tf.keras.layers.Layer):
-    """RetVec integer integerizer layer. This layer transforms integer
-    representations of strings (i.e. Unicode code points) into compact
-    binary encodings.
+class RetVecIntToBinary(tf.keras.layers.Layer):
+    """Convert UTF-8 code points tensor into their float binary representation.
     """
 
-    def __init__(self, max_chars: int = 16, max_words: int = 1, encoding_size: int = 32, **kwargs) -> None:
+    def __init__(self, sequence_length: int = 1, word_length: int = 16,
+                 encoding_size: int = 32, **kwargs) -> None:
         """Initialize a RetVec integer binarizer.
 
         Args:
-            max_chars: Maximum number of characters per word to integerize.
-
-            max_words: Maximum number of words per example. If max_words > 1,
-                the first two dimensions of the output will be
+            #FIXME: refactor
+            sequence_length: Maximum number of words per sequence.
+            If max_words > 1 the first two dimensions of the output will be
                 [batch_size, max_words].
 
-            encoding_size: Size of output character encoding.
+            word_length: Number of characters per word to binarize. If
+            the number of characters is above word_length it will be truncated.
+            if word_length is below the number it will be padded. Defaults to
+            16 which works well. . Note: if you are using
+            a pretrained model you can't change this as it will break it.
+
+            encoding_size: Size of output character encoding. Defaults to 32
+            which ensure all printable code points can be perfectly
+            represented. Can be lowered if needed but doesn't
+            yield meaningful performance improvement. Note: if you are using
+            a pretrained model you can't change this as it will break it.
         """
         super().__init__(**kwargs)
-        self.max_chars = max_chars
-        self.max_words = max_words
+        self.word_length = word_length
+        self.sequence_length = sequence_length
         self.encoding_size = encoding_size
 
         max_int32 = tf.constant([2**31], dtype="int64")
-        bits_masks = tf.bitwise.right_shift(max_int32, tf.range(self.encoding_size, dtype="int64"))
+        bits_masks = tf.bitwise.right_shift(max_int32,
+                                            tf.range(self.encoding_size,
+                                                     dtype="int64"))
         bits_masks = tf.cast(bits_masks, dtype="int32")
         self.bits_masks = bits_masks
 
@@ -61,18 +71,18 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         embeddings = tf.cast(embeddings, dtype="float32")
 
         # reshape back to correct shape
-        if self.max_words > 1:
+        if self.sequence_length > 1:
             embeddings = tf.reshape(
                 embeddings,
                 (
                     batch_size,
-                    self.max_words,
-                    self.max_chars,
+                    self.sequence_length,
+                    self.word_length,
                     self.encoding_size,
                 ),
             )
         else:
-            embeddings = tf.reshape(embeddings, (batch_size, self.max_chars, self.encoding_size))
+            embeddings = tf.reshape(embeddings, (batch_size, self.word_length, self.encoding_size))
 
         return embeddings
 
@@ -86,8 +96,8 @@ class RetVecIntBinarizer(tf.keras.layers.Layer):
         config: Dict = super().get_config()
         config.update(
             {
-                "max_chars": self.max_chars,
-                "max_words": self.max_words,
+                "max_chars": self.word_length,
+                "max_words": self.sequence_length,
                 "encoding_size": self.encoding_size,
             }
         )
@@ -156,9 +166,9 @@ class RetVecBinarizer(tf.keras.layers.Layer):
         self.max_words = input_shape[-1] if len(input_shape) > 1 else 1
 
         # Initialize int binarizer layer here since we know max_words
-        self._int_binarizer = RetVecIntBinarizer(
-            max_chars=self.max_chars,
-            max_words=self.max_words,
+        self._int_binarizer = RetVecIntToBinary(
+            word_length=self.max_chars,
+            sequence_length=self.max_words,
             encoding_size=self.encoding_size,
         )
 
