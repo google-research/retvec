@@ -16,7 +16,7 @@
 
 import tensorflow as tf
 
-from tensorflow_retvec import RetVecIntegerizer
+from retvec.tf.integerizers import RetVecIntegerizer
 
 
 def test_graph_mode():
