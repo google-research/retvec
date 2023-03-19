@@ -1,6 +1,7 @@
 from typing import Any, List
 
 
+# TODO: Fill in the implementation. Stubbed for `mypy`.
 class RetVecTokenizer():
     def __init__(self) -> None:
         pass
@@ -8,18 +9,18 @@ class RetVecTokenizer():
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         pass
 
-    def tokenize():
+    def tokenize(self):
         "Convert a sequence of tokens/words into RetVec embeddings"
         pass
 
-    def detokenize() -> List[str]:
+    def detokenize(self) -> List[str]:
         "Convert a sequence of RetVec embeddings to tokens/words"
+        return []
+
+    def token_to_embedding(self):
         pass
 
-    def token_to_embedding():
-        pass
-
-    def embedding_to_token():
+    def embedding_to_token(self):
         pass
 
     def vocabulary_size(self) -> int:
