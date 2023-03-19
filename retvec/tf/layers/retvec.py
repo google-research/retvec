@@ -40,6 +40,7 @@ class RetVec(tf.keras.layers.Layer):
         char_encoding_type: str = "UTF-8",
         cls_int: Optional[int] = None,
         replacement_int: int = 11,
+        allow_native_binarizer: bool = False,
         dropout_rate: float = 0.0,
         spatial_dropout_rate: float = 0.0,
         norm_type: Optional[str] = None,
@@ -72,6 +73,9 @@ class RetVec(tf.keras.layers.Layer):
 
             replacement_int: The replacement integer to be used in place
                 of invalid characters in input.
+
+            allow_native_binarizer: Allow using the TF Text binarizer
+                implementation if available.
 
             dropout_rate: Dropout to apply after RetVec embedding.
 
@@ -108,6 +112,7 @@ class RetVec(tf.keras.layers.Layer):
             encoding_type=self.char_encoding_type,
             cls_int=self.cls_int,
             replacement_int=self.replacement_int,
+            allow_native=allow_native_binarizer,
         )
 
         # Set to True when 'tokenize()' or 'binarize()' called in eager mode

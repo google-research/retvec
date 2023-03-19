@@ -14,6 +14,7 @@
  limitations under the License.
  """
 
+import pytest
 import tensorflow as tf
 
 from retvec.tf import RetVecBinarizer
@@ -21,7 +22,7 @@ from retvec.tf import RetVecBinarizer
 
 def test_graph_mode():
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32, allow_native=True)(i)
     model = tf.keras.models.Model(i, x)
 
     test_inputs = [
@@ -36,7 +37,8 @@ def test_graph_mode():
 
 
 def test_eager_mode():
-    binarizer = RetVecBinarizer(max_chars=16, encoding_size=32)
+    binarizer = RetVecBinarizer(
+            max_chars=16, encoding_size=32, allow_native=True)
 
     s = "Testing😀"
 
@@ -49,7 +51,7 @@ def test_eager_mode():
 
 def test_2d_inputs():
     i = tf.keras.layers.Input((2,), dtype=tf.string)
-    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32, allow_native=True)(i)
     model = tf.keras.models.Model(i, x)
 
     test_input = tf.constant([["a", "b"], ["c", "d"]])
@@ -77,7 +79,8 @@ def test_tfds_map():
 
 
 def test_determinism_eager_mode():
-    binarizer = RetVecBinarizer(max_chars=16, encoding_size=32)
+    binarizer = RetVecBinarizer(
+            max_chars=16, encoding_size=32, allow_native=True)
 
     s = "Testing😀"
     test_input = tf.constant([s, s])
@@ -91,7 +94,7 @@ def test_determinism_eager_mode():
 
 def test_determinism_graph_mode():
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32, allow_native=True)(i)
     model = tf.keras.models.Model(i, x)
 
     s = "Testing😀"
@@ -106,7 +109,7 @@ def test_determinism_graph_mode():
 
 def test_serialization(tmp_path):
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVecBinarizer(max_chars=16, encoding_size=32)(i)
+    x = RetVecBinarizer(max_chars=16, encoding_size=32, allow_native=True)(i)
     model = tf.keras.models.Model(i, x)
 
     save_path = tmp_path / "test_serialization_binarizer"
@@ -129,8 +132,49 @@ def test_common_parameters():
                             encoding_type=encoding_type,
                             cls_int=cls_int,
                             replacement_int=replacement_int,
+                            allow_native=False,
                         )(i)
                         model = tf.keras.models.Model(i, x)
 
                         embedding = model(test_input)
                         assert embedding.shape == (2, max_chars, encoding_size)
+
+
+def test_common_parameters_native():
+    try:
+        from tensorflow_text import utf8_binarize
+    except ImportError:
+        pytest.skip("No `utf8_binarize` implementation available")
+
+    test_input = tf.constant(["Testing😀", "Testing😀"])
+
+    for max_chars in [8, 16, 32]:
+        for encoding_size in [16, 32]:
+            for replacement_int in [0, 65533]:
+                i = tf.keras.layers.Input((1,), dtype=tf.string)
+                x = RetVecBinarizer(
+                    max_chars=max_chars,
+                    encoding_size=encoding_size,
+                    encoding_type="UTF-8",
+                    cls_int=None,
+                    replacement_int=replacement_int,
+                    allow_native=False,
+                )(i)
+                model = tf.keras.models.Model(i, x)
+
+                embedding = model(test_input)
+                assert embedding.shape == (2, max_chars, encoding_size)
+
+                x = RetVecBinarizer(
+                    max_chars=max_chars,
+                    encoding_size=encoding_size,
+                    encoding_type="UTF-8",
+                    cls_int=None,
+                    replacement_int=replacement_int,
+                    allow_native=True,
+                )(i)
+                model = tf.keras.models.Model(i, x)
+
+                embedding_native = model(test_input)
+                assert (embedding.numpy().tolist() ==
+                        embedding_native.numpy().tolist())
