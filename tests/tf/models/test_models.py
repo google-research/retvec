@@ -19,9 +19,8 @@ import tensorflow as tf
 from tensorflow_similarity.losses import MultiSimilarityLoss
 
 from retvec.tf.layers import RETVecTokenizer
-from retvec.tf.models.retvec_large import build_retvec_large
 from retvec.tf.models.retvec_base import build_retvec_base
-
+from retvec.tf.models.retvec_large import build_retvec_large
 
 tf.config.set_visible_devices([], "GPU")
 
