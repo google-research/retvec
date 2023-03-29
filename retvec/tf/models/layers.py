@@ -128,7 +128,9 @@ class BertPooling(Layer):
 class ScaledNorm(Layer):
     """ScaledNorm layer."""
 
-    def __init__(self, begin_axis: int = -1, epsilon: float = 1e-5, **kwargs) -> None:
+    def __init__(
+        self, begin_axis: int = -1, epsilon: float = 1e-5, **kwargs
+    ) -> None:
         """Initialize a ScaledNorm Layer.
 
         Args:

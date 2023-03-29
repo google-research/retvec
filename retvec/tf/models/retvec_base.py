@@ -19,19 +19,18 @@ from typing import Dict, List, Optional
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from ..layers.binarizers import RetVecBinarizer
+from ..layers.binarizer import RETVecBinarizer
 from .layers import dense_block
 from .outputs import build_outputs
 
 
-def build_rewmlp_from_config(config: Dict) -> tf.keras.Model:
+def build_retvec_base_from_config(config: Dict) -> tf.keras.Model:
     m = config["model"]
     o = config["outputs"]
-    return REWMLP(
+    return build_retvec_base(
         max_chars=m["max_chars"],
         char_encoding_size=m["char_encoding_size"],
         char_encoding_type=m["char_encoding_type"],
-        cls_int=m["cls_int"],
         replacement_int=m["replacement_int"],
         initial_spatial_dropout_rate=m["initial_spatial_dropout_rate"],
         projection_dims=m["projection_dims"],
@@ -58,11 +57,10 @@ def build_rewmlp_from_config(config: Dict) -> tf.keras.Model:
     )
 
 
-def REWMLP(
+def build_retvec_base(
     max_chars: int = 16,
     char_encoding_size: int = 32,
     char_encoding_type: str = "UTF-8",
-    cls_int: Optional[int] = None,
     replacement_int: int = 11,
     initial_spatial_dropout_rate: float = 0.0625,
     projection_dims: List[int] = [32, 32],
@@ -97,12 +95,11 @@ def REWMLP(
         char_encoding_type: String name for the unicode encoding that should
             be used to decode each string.
 
-        cls_int: CLS int token to prepend to each token.
-
         replacement_int: The replacement codepoint to be used in place
             of invalid substrings in input.
 
-        initial_spatial_dropout_rate: Spatial dropout rate on character encoding.
+        initial_spatial_dropout_rate: Spatial dropout rate on character
+            encoding.
 
         projection_dims: Dense dimensions before flatten layer.
 
@@ -120,13 +117,13 @@ def REWMLP(
 
         encoder_activation: Activation to use in encoder layers.
 
-        encoder_seq_output_dim: Output encoder dimension to project encoder sequence
-            outputs to if `encoder_sequence_pooling` is 'dense'.
+        encoder_seq_output_dim: Output encoder dimension to project encoder
+            sequence outputs to if `encoder_sequence_pooling` is 'dense'.
 
-        encoder_seq_output_activation: Activation applied onto the encoder sequence
-            outputs (after projection, if `encoder_output_dim` is set).
+        encoder_seq_output_activation: Activation applied onto the encoder
+            sequence outputs.
 
-        encoder_seq_output_dropout: Dropout on encoder seq dense layer, if applicable.
+        encoder_seq_output_dropout: Dropout on encoder seq dense layer.
 
         tokenizer_dense_dim: Dimension of tokenizer, applied after flattening.
             If set, expands or compresses the tokenizer to this dimension
@@ -166,17 +163,18 @@ def REWMLP(
     inputs = layers.Input(shape=(1,), name="token", dtype=tf.string)
 
     # character embedding
-    char_encoding = RetVecBinarizer(
+    char_encoding = RETVecBinarizer(
         max_chars,
         encoding_size=char_encoding_size,
         encoding_type=char_encoding_type,
-        cls_int=cls_int,
         replacement_int=replacement_int,
         name="binarizer",
     )(inputs)
 
     if initial_spatial_dropout_rate:
-        encoder = layers.SpatialDropout1D(initial_spatial_dropout_rate)(char_encoding)
+        encoder = layers.SpatialDropout1D(initial_spatial_dropout_rate)(
+            char_encoding
+        )
 
     for projection_dim in projection_dims:
         encoder = dense_block(
@@ -189,7 +187,9 @@ def REWMLP(
         )
 
         if encoder_spatial_dropout_rate:
-            encoder = layers.SpatialDropout1D(encoder_spatial_dropout_rate)(encoder)
+            encoder = layers.SpatialDropout1D(encoder_spatial_dropout_rate)(
+                encoder
+            )
 
     # intermediate layers before tokenizer
     encoder = layers.Flatten()(encoder)

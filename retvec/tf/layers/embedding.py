@@ -21,14 +21,16 @@ from tensorflow import Tensor, TensorShape
 
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
-class RetVecEmbedding(tf.keras.layers.Layer):
+class RETVecEmbedding(tf.keras.layers.Layer):
     """RetVec embedding layer leverages pre-trained word embedding models
     to generate word embeddings. Those models are trained to be resilient
     against adversarial attack and efficient to compute.
     """
 
-    def __init__(self, model: Optional[str] = None, trainable: bool = False, **kwargs) -> None:
-        """Build a RetVecEmbedding layer.
+    def __init__(
+        self, model: Optional[str] = None, trainable: bool = False, **kwargs
+    ) -> None:
+        """Build a RETVecEmbedding layer.
 
         Args:
             model: Path to saved REW* model.
@@ -36,7 +38,7 @@ class RetVecEmbedding(tf.keras.layers.Layer):
             trainable: Whether to set this model to be trainable.
         """
         if not model:
-            raise ValueError("`model` must be set for RetVecEmbedding layer.")
+            raise ValueError("`model` must be set for RETVecEmbedding layer.")
 
         super().__init__(**kwargs)
         self.model = model
@@ -46,7 +48,9 @@ class RetVecEmbedding(tf.keras.layers.Layer):
         self.rewnet = self._load(model)
         self.embedding_size = self.rewnet.layers[-1].output_shape[-1]
 
-    def build(self, input_shape: Union[TensorShape, List[TensorShape]]) -> None:
+    def build(
+        self, input_shape: Union[TensorShape, List[TensorShape]]
+    ) -> None:
         self.input_rank = len(input_shape)
 
     def call(self, inputs: Tensor, training: bool = False) -> Tensor:
@@ -58,7 +62,9 @@ class RetVecEmbedding(tf.keras.layers.Layer):
             num_words = input_shape[1]
             max_chars = input_shape[2]
             encoding_size = input_shape[-1]
-            inputs = tf.reshape(inputs, (batch_size * num_words, max_chars, encoding_size))
+            inputs = tf.reshape(
+                inputs, (batch_size * num_words, max_chars, encoding_size)
+            )
         else:
             batch_size = input_shape[0]
             max_chars = input_shape[1]
@@ -69,7 +75,9 @@ class RetVecEmbedding(tf.keras.layers.Layer):
 
         # Reshape inputs back if needed
         if self.input_rank == 4:
-            output = tf.reshape(output, (batch_size, num_words, self.embedding_size))
+            output = tf.reshape(
+                output, (batch_size, num_words, self.embedding_size)
+            )
 
         return output
 

@@ -26,10 +26,10 @@ from termcolor import cprint
 from wandb.keras import WandbCallback
 
 from retvec.tf.dataset.io import get_dataset_samplers, get_outputs_info
-from retvec.tf.models.rewformer import build_rewformer_from_config
-from retvec.tf.models.rewmlp import build_rewmlp_from_config
-from retvec.tf.optimizers.optimizers import WarmupCosineDecay
-from retvec.tf.utils.utils import tf_cap_memory
+from retvec.tf.models.retvec_large import build_retvec_large_from_config
+from retvec.tf.models.retvec_base import build_retvec_base_from_config
+from retvec.tf.optimizers.warmup_cosine_decay import WarmupCosineDecay
+from retvec.tf.utils import tf_cap_memory
 
 
 def train(args: argparse.Namespace, config: Dict) -> None:
@@ -40,7 +40,9 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         model_name = "%s-v%s" % (config["name"], config["version"])
     cprint("[Model: %s]" % (model_name), "yellow")
     cprint("|-epochs: %s" % config["train"]["epochs"], "blue")
-    cprint("|-steps_per_epoch: %s" % config["train"]["steps_per_epoch"], "green")
+    cprint(
+        "|-steps_per_epoch: %s" % config["train"]["steps_per_epoch"], "green"
+    )
     cprint("|-batch_size: %s" % config["train"]["batch_size"], "blue")
     stub = "%s_%s" % (model_name, int(time()))
 
@@ -74,7 +76,9 @@ def train(args: argparse.Namespace, config: Dict) -> None:
 
     if save_freq_epochs:
         save_freq = save_freq_epochs * steps_per_epoch
-        mcc = ModelCheckpoint(mdl_path / "epoch_{epoch}", monitor="loss", save_freq=save_freq)
+        mcc = ModelCheckpoint(
+            mdl_path / "epoch_{epoch}", monitor="loss", save_freq=save_freq
+        )
     else:
         mcc = ModelCheckpoint(mdl_path, monitor="loss", save_best=True)
 
@@ -92,10 +96,10 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     # model
     with mirrored_strategy.scope():
         model_type = config["model"]["type"]
-        if model_type == "rewformer":
-            model = build_rewformer_from_config(config)
-        elif model_type == "rewmlp":
-            model = build_rewmlp_from_config(config)
+        if model_type == "large":
+            model = build_retvec_large_from_config(config)
+        elif model_type == "base":
+            model = build_retvec_base_from_config(config)
         else:
             raise ValueError("Unknown model %s" % model_type)
 
@@ -103,7 +107,8 @@ def train(args: argparse.Namespace, config: Dict) -> None:
             max_learning_rate=config["train"]["max_learning_rate"],
             total_steps=total_steps,
             warmup_steps=config["train"]["warmup_steps"],
-            alpha=config["train"]["end_lr"] / config["train"]["max_learning_rate"],
+            alpha=config["train"]["end_lr"]
+            / config["train"]["max_learning_rate"],
         )
 
         if config["train"]["optimizer"] == "adam":
@@ -146,14 +151,21 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         # save model without optimizer so it can be loaded with only tensorflow
         saved_model.save(rewnet_path, include_optimizer=False)
 
-        # if tokenizer layer is already defined in the model, save just the embedding model
-        if "tokenizer" in [l.name for l in model.layers]:
-            embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
+        # if tokenizer layer is already defined in the model,
+        # save the embedding model directly
+        if "tokenizer" in [layer.name for layer in model.layers]:
+            embedding_model = tf.keras.Model(
+                saved_model.layers[2].input,
+                saved_model.get_layer("tokenizer").output,
+            )
             embedding_model.compile("adam", "mse")
             embedding_model.summary()
             embedding_model.save(embedding_path, include_optimizer=False)
-            cprint(f"Saving RetVec embedding model to {embedding_path}", "blue")
+            cprint(
+                f"Saving RetVec embedding model to {embedding_path}", "blue"
+            )
 
+    # save training history and config
     with open(results_path / "train_history.json", "w") as f:
         json.dump(history.history, f)
 
@@ -174,7 +186,9 @@ def main(args: argparse.Namespace) -> None:
     else:
         model_dir = Path(args.model_config)
         c_dir = sorted(os.listdir(model_dir))
-        model_config_paths = [str(model_dir / f) for f in c_dir if f.endswith(".json")]
+        model_config_paths = [
+            str(model_dir / f) for f in c_dir if f.endswith(".json")
+        ]
 
         start_idx = args.start_idx
         end_idx = args.end_idx if args.end_idx else len(model_config_paths)
@@ -200,18 +214,29 @@ if __name__ == "__main__":
         default="./configs/train_full.json",
     )
     parser.add_argument(
-        "--model_config", "-m", help="model config file or folder path", default="./configs/models/rewmlp-256.json"
+        "--model_config",
+        "-m",
+        help="model config file or folder path",
+        default="./configs/models/retvec-base.json",
     )
-    parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")
+    parser.add_argument(
+        "--output_dir",
+        "-o",
+        help="base output directory",
+        default="./experiments/",
+    )
     parser.add_argument(
         "--start_idx",
         "-s",
         type=int,
-        help="start idx in alphabetically sorted experiment dir (zero-indexed, inclusive)",
+        help="start idx in alphabetically sorted experiment dir (inclusive)",
         default=0,
     )
     parser.add_argument(
-        "--end_idx", "-e", type=int, help="end idx in alphabetically sorted experiment dir (zero-indexed, exclusive)"
+        "--end_idx",
+        "-e",
+        type=int,
+        help="end idx in alphabetically sorted experiment dir (exclusive)",
     )
     parser.add_argument(
         "--dataset_bucket",
@@ -238,7 +263,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--experiment_name",
         "-n",
-        help="Experiment name. If none, uses default of [model_name]-[version]",
+        help="Experiment name, defaults to [model_name]-[version]",
     )
     args = parser.parse_args()
 

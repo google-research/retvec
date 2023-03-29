@@ -19,7 +19,7 @@ from typing import Dict, Optional
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from ..layers.binarizers import RetVecBinarizer
+from ..layers.binarizer import RETVecBinarizer
 from .gau import GAU
 from .layers import dense_block, get_pooling_layer
 from .outputs import build_outputs
@@ -29,14 +29,13 @@ from .positional_embeddings import (
 )
 
 
-def build_rewformer_from_config(config: Dict) -> tf.keras.Model:
+def build_retvec_large_from_config(config: Dict) -> tf.keras.Model:
     m = config["model"]
     o = config["outputs"]
-    return REWformer(
+    return build_retvec_large(
         max_chars=m["max_chars"],
         char_encoding_size=m["char_encoding_size"],
         char_encoding_type=m["char_encoding_type"],
-        cls_int=m["cls_int"],
         replacement_int=m["replacement_int"],
         initial_spatial_dropout_rate=m["initial_spatial_dropout_rate"],
         encoder_hidden_dim=m["encoder_hidden_dim"],
@@ -70,11 +69,10 @@ def build_rewformer_from_config(config: Dict) -> tf.keras.Model:
     )
 
 
-def REWformer(
+def build_retvec_large(
     max_chars: int = 16,
     char_encoding_size: int = 32,
     char_encoding_type: str = "UTF-8",
-    cls_int: Optional[int] = None,
     replacement_int: int = 11,
     initial_spatial_dropout_rate: float = 0.0625,
     encoder_hidden_dim: int = 128,
@@ -119,12 +117,11 @@ def REWformer(
         char_encoding_type: String name for the unicode encoding that should
             be used to decode each string.
 
-        cls_int: CLS int token to prepend to each token.
-
         replacement_int: The replacement codepoint to be used in place
             of invalid substrings in input.
 
-        initial_spatial_dropout_rate: Spatial dropout rate on character encoding.
+        initial_spatial_dropout_rate: Spatial dropout rate on character
+            encoding.
 
         encoder_hidden_dim: Hidden dim of transformer block.
 
@@ -155,16 +152,16 @@ def REWformer(
 
         encoder_epsilon: Epsilon value for norm.
 
-        encoder_seq_pooling_type: The type of pooling used for the encoder seq. One of
-            'bert', 'avg', or 'flatten' or None.
+        encoder_seq_pooling_type: The type of pooling used for the encoder seq.
+             One of 'bert', 'avg', or 'flatten' or None.
 
-        encoder_seq_output_dim: Output encoder dimension to project encoder sequence
-            outputs to if `encoder_sequence_pooling` is 'dense'.
+        encoder_seq_output_dim: Output encoder dimension to project encoder
+            sequence outputs to if `encoder_sequence_pooling` is 'dense'.
 
-        encoder_seq_output_activation: Activation applied onto the encoder sequence
-            outputs (after projection, if `encoder_output_dim` is set).
+        encoder_seq_output_activation: Activation applied onto the encoder
+            sequence outputs.
 
-        encoder_seq_output_dropout: Dropout on encoder seq dense layer, if applicable.
+        encoder_seq_output_dropout: Dropout on encoder seq dense layer.
 
         tokenizer_pooling: The type of pooling used for the tokenizer. One of
             'bert', 'avg', or 'flatten'.
@@ -206,27 +203,27 @@ def REWformer(
     """
     inputs = layers.Input(shape=(1,), name="token", dtype=tf.string)
 
-    if not cls_int and (tokenizer_pooling_type == "bert" or encoder_seq_pooling_type == "bert"):
-        cls_int = 3
-
     # character embedding
-    encoder = RetVecBinarizer(
+    encoder = RETVecBinarizer(
         max_chars,
         encoding_size=char_encoding_size,
         encoding_type=char_encoding_type,
-        cls_int=cls_int,
         replacement_int=replacement_int,
         name="binarizer",
     )(inputs)
 
     if encoder_abs_pos_encoding_type == "scaled_sin":
-        encoder = ScaledSinusoidalPositionalEmbedding(hidden_size=char_encoding_size)(encoder)
+        encoder = ScaledSinusoidalPositionalEmbedding(
+            hidden_size=char_encoding_size
+        )(encoder)
 
     elif encoder_abs_pos_encoding_type == "absolute":
         encoder = PositionalEmbedding()(encoder)
 
     if initial_spatial_dropout_rate:
-        encoder = layers.SpatialDropout1D(initial_spatial_dropout_rate)(encoder)
+        encoder = layers.SpatialDropout1D(initial_spatial_dropout_rate)(
+            encoder
+        )
 
     # compress or expand char_encoding_size to encoder_hidden_dim
     encoder = layers.Dense(encoder_hidden_dim)(encoder)
@@ -247,14 +244,15 @@ def REWformer(
             epsilon=encoder_epsilon,
         )(encoder)
 
-    if cls_int:
-        seq_output = encoder[:, 1:]
-    else:
-        seq_output = encoder
+    seq_output = encoder
 
     # intermediate layers before tokenizer
-    tokenizer_layer = get_pooling_layer(encoder, pooling_type=tokenizer_pooling_type)
-    encoder_seq_output = get_pooling_layer(seq_output, pooling_type=encoder_seq_pooling_type)
+    tokenizer_layer = get_pooling_layer(
+        encoder, pooling_type=tokenizer_pooling_type
+    )
+    encoder_seq_output = get_pooling_layer(
+        seq_output, pooling_type=encoder_seq_pooling_type
+    )
 
     # this is the layer is used to bound the values outputed by the tokenizer
     # between -1 and 1 using tanh, softsign etc. Allows to use activation

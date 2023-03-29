@@ -20,13 +20,13 @@ import tensorflow as tf
 from tensorflow import Tensor
 from tensorflow.keras import layers
 
-from .binarizers import RetVecBinarizer
-from .embedding import RetVecEmbedding
+from .binarizer import RETVecBinarizer
+from .embedding import RETVecEmbedding
 
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
-class RetVec(tf.keras.layers.Layer):
-    """RetVec: Resilient and Efficient Vectorizer layer."""
+class RETVecTokenizer(tf.keras.layers.Layer):
+    """RETVec: Resilient and Efficient Text Vectorizer layer"""
 
     def __init__(
         self,
@@ -36,10 +36,9 @@ class RetVec(tf.keras.layers.Layer):
         model: Optional[str] = None,
         trainable: bool = False,
         max_chars: int = 16,
-        char_encoding_size: int = 32,
+        char_encoding_size: int = 24,
         char_encoding_type: str = "UTF-8",
-        cls_int: Optional[int] = None,
-        replacement_int: int = 11,
+        replacement_int: int = 65533,
         dropout_rate: float = 0.0,
         spatial_dropout_rate: float = 0.0,
         norm_type: Optional[str] = None,
@@ -68,8 +67,6 @@ class RetVec(tf.keras.layers.Layer):
             char_encoding_type: String name for the unicode encoding that
                 should be used to decode each string.
 
-            cls_int: CLS token to prepend to each word encoding.
-
             replacement_int: The replacement integer to be used in place
                 of invalid characters in input.
 
@@ -92,7 +89,9 @@ class RetVec(tf.keras.layers.Layer):
 
         # RetVecEmbedding
         if self.model:
-            self._embedding: Optional[RetVecEmbedding] = RetVecEmbedding(model=model, trainable=self.trainable)
+            self._embedding: Optional[RETVecEmbedding] = RETVecEmbedding(
+                model=model, trainable=self.trainable
+            )
         else:
             self._embedding = None
 
@@ -100,13 +99,11 @@ class RetVec(tf.keras.layers.Layer):
         self.max_chars = max_chars
         self.char_encoding_size = char_encoding_size
         self.char_encoding_type = char_encoding_type
-        self.cls_int = cls_int
         self.replacement_int = replacement_int
-        self._binarizer = RetVecBinarizer(
+        self._binarizer = RETVecBinarizer(
             max_chars=self.max_chars,
             encoding_size=self.char_encoding_size,
             encoding_type=self.char_encoding_type,
-            cls_int=self.cls_int,
             replacement_int=self.replacement_int,
         )
 
@@ -146,7 +143,6 @@ class RetVec(tf.keras.layers.Layer):
     def embedding_size(self):
         return self._embedding_size
 
-    @tf.function()
     def call(self, inputs: Tensor, training: bool = False) -> Tensor:
         inputs = tf.stop_gradient(inputs)
 
@@ -157,9 +153,13 @@ class RetVec(tf.keras.layers.Layer):
 
         # Handle shape differences between eager and graph mode
         if self.eager:
-            stensor = rtensor.to_tensor(default_value="", shape=(rtensor.shape[0], self.max_len))
+            stensor = rtensor.to_tensor(
+                default_value="", shape=(rtensor.shape[0], self.max_len)
+            )
         else:
-            stensor = rtensor.to_tensor(default_value="", shape=(rtensor.shape[0], 1, self.max_len))
+            stensor = rtensor.to_tensor(
+                default_value="", shape=(rtensor.shape[0], 1, self.max_len)
+            )
             stensor = tf.squeeze(stensor, axis=1)
 
         # apply encoding and REW* model, if set
@@ -169,7 +169,9 @@ class RetVec(tf.keras.layers.Layer):
             embeddings = self._embedding(binarized, training=training)
         else:
             embsize = self._binarizer.encoding_size * self._binarizer.max_chars
-            embeddings = tf.reshape(binarized, (tf.shape(inputs)[0], self.max_len, embsize))
+            embeddings = tf.reshape(
+                binarized, (tf.shape(inputs)[0], self.max_len, embsize)
+            )
 
         # apply post-embedding norm and dropout layers
         if self.norm_type:
@@ -183,32 +185,18 @@ class RetVec(tf.keras.layers.Layer):
 
         return embeddings
 
-    @tf.function()
-    def binarize(self, words: Tensor) -> Tensor:
-        """Return RetVec binarizer encodings for a word or a list of words.
-
-        Args:
-            words: A single word or list of words to encode.
-
-        Returns:
-            Retvec binarizer encodings for the input words(s).
-        """
-        return self._binarizer.binarize(words)
-
-    @tf.function()
-    def tokenize(self, words: Tensor) -> Tensor:
+    def tokenize(self, inputs: Tensor) -> Tensor:
         """Return RetVec embeddings for a word or a list of words.
 
         Args:
-            words: A single word or list of words to encode.
+            inputs: A single word or list of words to encode.
 
         Returns:
             Retvec embeddings for the input words(s).
         """
-        if words.shape == tf.TensorShape([]):
-            inputs = tf.expand_dims(words, 0)
-        else:
-            inputs = words
+        inputs_shape = inputs.shape
+        if inputs_shape == tf.TensorShape([]):
+            inputs = tf.expand_dims(inputs, 0)
 
         # set layers to eager mode
         self.eager = True
@@ -218,10 +206,13 @@ class RetVec(tf.keras.layers.Layer):
         embeddings = self(inputs, training=False)
 
         # Remove extra dim if input was a single word
-        if words.shape == tf.TensorShape([]):
+        if inputs_shape == tf.TensorShape([]):
             embeddings = tf.squeeze(embeddings)
 
         return embeddings
+
+    def detokenize(self, inputs: Tensor):
+        raise NotImplementedError()
 
     def get_config(self) -> Dict[str, Any]:
         config: Dict = super().get_config()
@@ -235,7 +226,6 @@ class RetVec(tf.keras.layers.Layer):
                 "max_chars": self.max_chars,
                 "char_encoding_size": self.char_encoding_size,
                 "char_encoding_type": self.char_encoding_type,
-                "cls_int": self.cls_int,
                 "replacement_int": self.replacement_int,
                 "dropout_rate": self.dropout_rate,
                 "spatial_dropout_rate": self.spatial_dropout_rate,

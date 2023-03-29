@@ -14,14 +14,14 @@
  limitations under the License.
  """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 import tensorflow as tf
 from tensorflow import Tensor, TensorShape
 
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
-class RetVecIntegerizer(tf.keras.layers.Layer):
+class RETVecIntegerizer(tf.keras.layers.Layer):
     """RetVec integerizer layer. This layer transforms string inputs
     into an integer representation (i.e. UTF-8 code points), which will
     then be passed into a binarizer.
@@ -33,11 +33,10 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         self,
         max_chars: int = 16,
         encoding_type: str = "UTF-8",
-        cls_int: Optional[int] = None,
-        replacement_int: int = 11,
+        replacement_int: int = 65533,
         **kwargs
     ) -> None:
-        """Initialize a RetVec integerizer.
+        """Initialize a RetVec integerißßzer.
 
         Args:
             max_chars: Maximum number of characters per word to integerize.
@@ -45,23 +44,18 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
             encoding_type: String name for the unicode encoding that should
                 be used to decode each string.
 
-            cls_int: CLS token to prepend.
-
             replacement_int: The replacement integer to be used in place
                 of invalid characters in input.
         """
         super().__init__(**kwargs)
         self.max_chars = max_chars
         self.encoding_type = encoding_type
-        self.cls_int = cls_int
         self.replacement_int = replacement_int
         self.eager = False  # Set to True if `binarize()` is called
 
-        if self.cls_int:
-            self.pad_position = tf.constant([[0, 0], [1, 0]])
-            self.pad_value = tf.constant(cls_int)
-
-    def build(self, input_shape: Union[TensorShape, List[TensorShape]]) -> None:
+    def build(
+        self, input_shape: Union[TensorShape, List[TensorShape]]
+    ) -> None:
         self.max_words = input_shape[-1]
 
         # We compute input rank here because rank must be statically known
@@ -91,19 +85,20 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
         if self.eager:
             if self.input_rank == 2:
                 char_codepoints = tf.squeeze(char_codepoints, axis=1)
-            char_codepoints = char_codepoints.to_tensor(shape=(char_codepoints.shape[0], self.max_chars))
+            char_codepoints = char_codepoints.to_tensor(
+                shape=(char_codepoints.shape[0], self.max_chars)
+            )
         else:
-            char_codepoints = char_codepoints.to_tensor(shape=(char_codepoints.shape[0], 1, self.max_chars))
+            char_codepoints = char_codepoints.to_tensor(
+                shape=(char_codepoints.shape[0], 1, self.max_chars)
+            )
             char_codepoints = tf.squeeze(char_codepoints, axis=1)
-
-        # add CLS int and then reshape to max size
-        if self.cls_int:
-            char_codepoints = tf.pad(char_codepoints, self.pad_position, constant_values=self.pad_value)
-            char_codepoints = char_codepoints[:, : self.max_chars]
 
         # Reshape two dimensional inputs back
         if self.input_rank == 2:
-            char_codepoints = tf.reshape(char_codepoints, (batch_size, self.max_words, self.max_chars))
+            char_codepoints = tf.reshape(
+                char_codepoints, (batch_size, self.max_words, self.max_chars)
+            )
 
         return char_codepoints
 
@@ -139,7 +134,6 @@ class RetVecIntegerizer(tf.keras.layers.Layer):
             {
                 "max_chars": self.max_chars,
                 "encoding_type": self.encoding_type,
-                "cls_int": self.cls_int,
                 "replacement_int": self.replacement_int,
             }
         )

@@ -28,10 +28,12 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from ..layers.binarizers import RetVecBinarizer
+from ..layers.binarizer import RetVecBinarizer
 
 
-def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Tensor]:
+def read_tfrecord(
+    tfrecord: Tensor, binarizer: RetVecBinarizer
+) -> Dict[str, Tensor]:
     """Read TF record files for REW* training datasets.
 
     Args:
@@ -55,7 +57,9 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     rec = tf.io.parse_single_example(tfrecord, features)
 
     for i in range(2):
-        rec["aug_matrix%s" % i] = tf.io.parse_tensor(rec["aug_matrix%s" % i], out_type=tf.float64)
+        rec["aug_matrix%s" % i] = tf.io.parse_tensor(
+            rec["aug_matrix%s" % i], out_type=tf.float64
+        )
 
     # output a single record containing each augmented example
     record = {}
@@ -72,10 +76,17 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     # encode using binarizer
     reshape_size = (binarizer.max_chars * binarizer.encoding_size,)
 
-    aug_token0_encoded = tf.reshape(binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)), reshape_size)
-    aug_token1_encoded = tf.reshape(binarizer.binarize(tf.expand_dims(rec["aug_token1"], axis=0)), reshape_size)
+    aug_token0_encoded = tf.reshape(
+        binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)),
+        reshape_size,
+    )
+    aug_token1_encoded = tf.reshape(
+        binarizer.binarize(tf.expand_dims(rec["aug_token1"], axis=0)),
+        reshape_size,
+    )
     original_token_encoded = tf.reshape(
-        binarizer.binarize(tf.expand_dims(rec["original_token"], axis=0)), reshape_size
+        binarizer.binarize(tf.expand_dims(rec["original_token"], axis=0)),
+        reshape_size,
     )
 
     record["original_encoded"] = tf.stack([original_token_encoded] * 2)
@@ -133,7 +144,9 @@ def Sampler(
 
         # interleave so we draw examples from different shards
         ds = ds.interleave(
-            lambda x: tf.data.TFRecordDataset(x, compression_type=compression_type),  # noqa
+            lambda x: tf.data.TFRecordDataset(
+                x, compression_type=compression_type
+            ),  # noqa
             block_length=1,  # problem here is that we have non flat record
             num_parallel_calls=file_parallelism,
             cycle_length=file_parallelism,
@@ -256,7 +269,9 @@ def get_dataset_samplers(
     return train_ds, test_ds
 
 
-def get_outputs_info(config: Dict) -> Tuple[List[Any], List[List[str]], Set[str]]:
+def get_outputs_info(
+    config: Dict,
+) -> Tuple[List[Any], List[List[str]], Set[str]]:
     """Returns the losses, metrics, and output names in the config."""
     loss = []
     metrics: List[List[str]] = []

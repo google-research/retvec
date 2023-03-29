@@ -18,13 +18,15 @@ import pytest
 import tensorflow as tf
 from tensorflow_similarity.losses import MultiSimilarityLoss
 
-from retvec.tf import RetVec
-from retvec.tf.models import REWMLP, REWformer
+from retvec.tf.layers import RETVecTokenizer
+from retvec.tf.models.retvec_large import build_retvec_large
+from retvec.tf.models.retvec_base import build_retvec_base
+
 
 tf.config.set_visible_devices([], "GPU")
 
-architectures = [REWMLP, REWformer]
-architectures_names = ["rewmlp", "rewformer"]
+architectures = [build_retvec_base, build_retvec_large]
+architectures_names = ["base", "large"]
 
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
@@ -95,7 +97,9 @@ def test_save_and_reload(tmpdir, NN):
 def test_extract_tokenizer(tmpdir, NN):
     path = str(tmpdir / "test/")
     model = NN()
-    tokenizer = tf.keras.Model(model.input, model.get_layer("tokenizer").output)
+    tokenizer = tf.keras.Model(
+        model.input, model.get_layer("tokenizer").output
+    )
     tokenizer.compile("adam", "mse")
     tokenizer.save(path)
-    _ = RetVec(model=path)
+    _ = RETVecTokenizer(model=path)

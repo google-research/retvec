@@ -21,7 +21,7 @@ from tensorflow import Tensor
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Layer
 
-from ..utils.utils import clone_initializer
+from ..utils import clone_initializer
 from .layers import get_activation_layer, get_norm_layer
 from .positional_embeddings import toeplitz_matrix, toeplitz_matrix_rope
 
@@ -127,39 +127,57 @@ class GAU(Layer):
         self.dropout2 = layers.Dropout(self.dropout_rate)
 
         if self.attention_dropout_rate:
-            self.attention_dropout = layers.Dropout(self.attention_dropout_rate)
+            self.attention_dropout = layers.Dropout(
+                self.attention_dropout_rate
+            )
 
         if self.spatial_dropout_rate:
-            self.spatial_dropout = layers.SpatialDropout1D(self.spatial_dropout_rate)
+            self.spatial_dropout = layers.SpatialDropout1D(
+                self.spatial_dropout_rate
+            )
 
         # attention activation function
-        self.attention_activation_layer = get_activation_layer(attention_activation)
+        self.attention_activation_layer = get_activation_layer(
+            attention_activation
+        )
 
         # setting up position encoding
         if self.position_encoding_type == "relative":
             self.w = tf.Variable(
-                lambda: clone_initializer(self.weight_initializer(shape=[2 * self.max_len - 1], dtype=tf.float32)),
+                lambda: clone_initializer(
+                    self.weight_initializer(
+                        shape=[2 * self.max_len - 1], dtype=tf.float32
+                    )
+                ),
                 trainable=True,
             )
 
         elif self.position_encoding_type == "rope":
             self.a = tf.Variable(
-                lambda: clone_initializer(self.weight_initializer)(shape=[self.max_len], dtype=tf.float32),
+                lambda: clone_initializer(self.weight_initializer)(
+                    shape=[self.max_len], dtype=tf.float32
+                ),
                 trainable=True,
             )
             self.b = tf.Variable(
-                lambda: clone_initializer(self.weight_initializer)(shape=[self.max_len], dtype=tf.float32),
+                lambda: clone_initializer(self.weight_initializer)(
+                    shape=[self.max_len], dtype=tf.float32
+                ),
                 trainable=True,
             )
 
         # offset scaling values
         self.gamma = tf.Variable(
-            lambda: clone_initializer(self.weight_initializer)(shape=[2, self.shared_dim], dtype=tf.float32),
+            lambda: clone_initializer(self.weight_initializer)(
+                shape=[2, self.shared_dim], dtype=tf.float32
+            ),
             trainable=True,
         )
 
         self.beta = tf.Variable(
-            lambda: ZEROS_INTIALIZER(shape=[2, self.shared_dim], dtype=tf.float32),
+            lambda: ZEROS_INTIALIZER(
+                shape=[2, self.shared_dim], dtype=tf.float32
+            ),
             trainable=True,
         )
 
@@ -177,7 +195,9 @@ class GAU(Layer):
         uv = self.proj1(x)
         uv = self.dropout2(uv, training=training)
 
-        u, v, base = tf.split(uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1)
+        u, v, base = tf.split(
+            uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1
+        )
 
         # generate q, k by scaled offset
         base = tf.einsum("bnr,hr->bnhr", base, self.gamma) + self.beta

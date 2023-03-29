@@ -1,9 +1,9 @@
 {
-    "name": "rewmlp-256",
+    "name": "retvec-base-256",
     "version": "0.1",
     "embedding_size": 256,
     "model": {
-        "type": "rewmlp",
+        "type": "base",
         "max_chars": 16,
         "char_encoding_size": 32,
         "char_encoding_type": "UTF-8",
