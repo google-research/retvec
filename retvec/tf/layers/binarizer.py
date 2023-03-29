@@ -176,7 +176,7 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         self.max_words = input_shape[-1] if len(input_shape) > 1 else 1
 
         # Initialize int binarizer layer here since we know max_words
-        self._int_binarizer = RETVecIntToBinary(
+        self._int_to_binary = RETVecIntToBinary(
             word_length=self.max_chars,
             sequence_length=self.max_words,
             encoding_size=self.encoding_size,
@@ -184,7 +184,7 @@ class RETVecBinarizer(tf.keras.layers.Layer):
 
     def call(self, inputs: Tensor) -> Tensor:
         char_encodings = self._integerizer(inputs)
-        embeddings = self._int_binarizer(char_encodings)
+        embeddings = self._int_to_binary(char_encodings)
         return embeddings
 
     def binarize(self, inputs: Tensor) -> Tensor:

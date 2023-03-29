@@ -19,15 +19,19 @@ from time import time
 from typing import Dict
 
 import tensorflow as tf
-import wandb
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tensorflow_addons.optimizers import LAMB
 from termcolor import cprint
-from wandb.keras import WandbCallback
+
+try:
+    import wandb
+    from wandb.keras import WandbCallback
+except ImportError:
+    print("Weights & Biases logging not available")
 
 from retvec.tf.dataset.io import get_dataset_samplers, get_outputs_info
-from retvec.tf.models.retvec_large import build_retvec_large_from_config
 from retvec.tf.models.retvec_base import build_retvec_base_from_config
+from retvec.tf.models.retvec_large import build_retvec_large_from_config
 from retvec.tf.optimizers.warmup_cosine_decay import WarmupCosineDecay
 from retvec.tf.utils import tf_cap_memory
 
@@ -172,7 +176,8 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     with open(results_path / "train_config.json", "w") as f:
         json.dump(config, f)
 
-    wandb.finish()
+    if args.wandb_project:
+        wandb.finish()
 
 
 def main(args: argparse.Namespace) -> None:

@@ -28,11 +28,11 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from ..layers.binarizer import RetVecBinarizer
+from ..layers import RETVecBinarizer
 
 
 def read_tfrecord(
-    tfrecord: Tensor, binarizer: RetVecBinarizer
+    tfrecord: Tensor, binarizer: RETVecBinarizer
 ) -> Dict[str, Tensor]:
     """Read TF record files for REW* training datasets.
 
@@ -101,7 +101,7 @@ def read_tfrecord(
 
 def Sampler(
     shards_list: List[str],
-    binarizer: RetVecBinarizer,
+    binarizer: RETVecBinarizer,
     batch_size: int = 32,
     process_record: Optional[Callable] = None,
     parallelism: int = tf.data.AUTOTUNE,
@@ -178,7 +178,6 @@ def get_process_tfrecord_fn(outputs: Set[str]) -> Callable:
     and extract only the outputs in `outputs`.
     """
 
-    @tf.function
     def process_tfrecord(e):
         x = {"token": e["aug_token"]}
         y = {
@@ -213,7 +212,7 @@ def get_dataset_samplers(
     batch_size = config["train"]["batch_size"]
     buffer_size = config["train"]["shuffle_buffer"]
     m = config["model"]
-    binarizer = RetVecBinarizer(
+    binarizer = RETVecBinarizer(
         max_chars=m["max_chars"],
         encoding_size=m["char_encoding_size"],
         encoding_type=m["char_encoding_type"],
