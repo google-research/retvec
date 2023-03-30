@@ -88,7 +88,7 @@ def build_retvec_large(
     encoder_attention_dropout: float = 0.0,
     encoder_spatial_dropout: float = 0.0,
     encoder_epsilon: float = 1e-5,
-    encoder_seq_pooling_type: Optional[str] = "flatten",
+    encoder_seq_pooling_type: str = "flatten",
     encoder_seq_output_dim: int = 0,
     encoder_seq_output_activation: Optional[str] = None,
     encoder_seq_output_dropout: float = 0.0,
@@ -153,7 +153,7 @@ def build_retvec_large(
         encoder_epsilon: Epsilon value for norm.
 
         encoder_seq_pooling_type: The type of pooling used for the encoder seq.
-             One of 'bert', 'avg', or 'flatten' or None.
+             One of 'bert', 'avg', or 'flatten'.
 
         encoder_seq_output_dim: Output encoder dimension to project encoder
             sequence outputs to if `encoder_sequence_pooling` is 'dense'.
