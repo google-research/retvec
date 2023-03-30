@@ -33,10 +33,10 @@ def build_retvec_large_from_config(config: Dict) -> tf.keras.Model:
     m = config["model"]
     o = config["outputs"]
     return build_retvec_large(
-        max_chars=m["max_chars"],
+        word_length=m["word_length"],
         char_encoding_size=m["char_encoding_size"],
         char_encoding_type=m["char_encoding_type"],
-        replacement_int=m["replacement_int"],
+        replacement_char=m["replacement_char"],
         initial_spatial_dropout_rate=m["initial_spatial_dropout_rate"],
         encoder_hidden_dim=m["encoder_hidden_dim"],
         encoder_abs_pos_encoding_type=m["encoder_abs_pos_encoding_type"],
@@ -70,30 +70,30 @@ def build_retvec_large_from_config(config: Dict) -> tf.keras.Model:
 
 
 def build_retvec_large(
-    max_chars: int = 16,
-    char_encoding_size: int = 32,
+    word_length: int = 16,
+    char_encoding_size: int = 24,
     char_encoding_type: str = "UTF-8",
-    replacement_int: int = 11,
+    replacement_char: int = 65533,
     initial_spatial_dropout_rate: float = 0.0625,
-    encoder_hidden_dim: int = 128,
+    encoder_hidden_dim: int = 32,
     encoder_abs_pos_encoding_type: str = "scaled_sin",
-    encoder_blocks: int = 2,
+    encoder_blocks: int = 3,
     encoder_shared_dim: int = 32,
     encoder_expansion_factor: int = 2,
     encoder_activation: str = "swish",
     encoder_attention_activation: str = "sqrrelu",
     encoder_norm_type: str = "scaled",
     encoder_position_encoding_type: str = "rope",
-    encoder_dropout: float = 0.1,
-    encoder_attention_dropout: float = 0.1,
+    encoder_dropout: float = 0.0,
+    encoder_attention_dropout: float = 0.0,
     encoder_spatial_dropout: float = 0.0,
-    encoder_epsilon: float = 1e-6,
-    encoder_seq_pooling_type: str = "flatten",
+    encoder_epsilon: float = 1e-5,
+    encoder_seq_pooling_type: Optional[str] = "flatten",
     encoder_seq_output_dim: int = 0,
     encoder_seq_output_activation: Optional[str] = None,
     encoder_seq_output_dropout: float = 0.0,
     tokenizer_pooling_type: str = "flatten",
-    tokenizer_dense_dim: int = 128,
+    tokenizer_dense_dim: int = 256,
     tokenizer_activation: str = "tanh",
     tokenizer_dropout: float = 0.0,
     similarity_dim: int = 256,
@@ -104,20 +104,20 @@ def build_retvec_large(
     outputs_dropout_rate: float = 0.0,
     similarity_norm_type: str = "l2",
 ) -> tf.keras.Model:
-    """REWformer model based on transformer architecture.
+    """RETVec model based on transformer architecture.
 
     The model is based on the FLASH architecture, introduced in the paper
     Transformer Quality in Linear Time (https://arxiv.org/abs/2202.10447).
 
     Args:
-        max_chars: Maximum number of characters in input string.
+        word_length: Maximum number of characters in input string.
 
         char_encoding_size: Size of output character encoding.
 
         char_encoding_type: String name for the unicode encoding that should
             be used to decode each string.
 
-        replacement_int: The replacement codepoint to be used in place
+        replacement_char: The replacement codepoint to be used in place
             of invalid substrings in input.
 
         initial_spatial_dropout_rate: Spatial dropout rate on character
@@ -205,10 +205,10 @@ def build_retvec_large(
 
     # character embedding
     encoder = RETVecBinarizer(
-        max_chars,
+        word_length=word_length,
         encoding_size=char_encoding_size,
         encoding_type=char_encoding_type,
-        replacement_int=replacement_int,
+        replacement_char=replacement_char,
         name="binarizer",
     )(inputs)
 
@@ -231,7 +231,7 @@ def build_retvec_large(
     for _ in range(encoder_blocks):
         encoder = GAU(
             dim=encoder_hidden_dim,
-            max_len=max_chars,
+            max_len=word_length,
             shared_dim=encoder_shared_dim,
             expansion_factor=encoder_expansion_factor,
             activation=encoder_activation,

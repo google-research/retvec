@@ -28,10 +28,10 @@ def build_retvec_base_from_config(config: Dict) -> tf.keras.Model:
     m = config["model"]
     o = config["outputs"]
     return build_retvec_base(
-        max_chars=m["max_chars"],
+        word_length=m["word_length"],
         char_encoding_size=m["char_encoding_size"],
         char_encoding_type=m["char_encoding_type"],
-        replacement_int=m["replacement_int"],
+        replacement_char=m["replacement_char"],
         initial_spatial_dropout_rate=m["initial_spatial_dropout_rate"],
         projection_dims=m["projection_dims"],
         encoder_dims=m["encoder_dims"],
@@ -58,10 +58,10 @@ def build_retvec_base_from_config(config: Dict) -> tf.keras.Model:
 
 
 def build_retvec_base(
-    max_chars: int = 16,
-    char_encoding_size: int = 32,
+    word_length: int = 16,
+    char_encoding_size: int = 24,
     char_encoding_type: str = "UTF-8",
-    replacement_int: int = 11,
+    replacement_char: int = 65533,
     initial_spatial_dropout_rate: float = 0.0625,
     projection_dims: List[int] = [32, 32],
     encoder_dims: List[int] = [256],
@@ -85,17 +85,17 @@ def build_retvec_base(
     outputs_dropout_rate: float = 0.0,
     similarity_norm_type: str = "l2",
 ) -> tf.keras.Model:
-    """REWMLP model based on MLP.
+    """RETVec model based on MLP architecture.
 
     Args:
-        max_chars: Maximum number of characters in input string.
+        word_length: Maximum number of characters in input string to.
 
         char_encoding_size: Size of output character encoding.
 
         char_encoding_type: String name for the unicode encoding that should
             be used to decode each string.
 
-        replacement_int: The replacement codepoint to be used in place
+        replacement_char: The replacement codepoint to be used in place
             of invalid substrings in input.
 
         initial_spatial_dropout_rate: Spatial dropout rate on character
@@ -164,10 +164,10 @@ def build_retvec_base(
 
     # character embedding
     char_encoding = RETVecBinarizer(
-        max_chars,
+        word_length=word_length,
         encoding_size=char_encoding_size,
         encoding_type=char_encoding_type,
-        replacement_int=replacement_int,
+        replacement_char=replacement_char,
         name="binarizer",
     )(inputs)
 

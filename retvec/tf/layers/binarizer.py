@@ -21,13 +21,10 @@ from tensorflow import Tensor, TensorShape
 
 from .integerizer import RETVecIntegerizer
 
-MAX_ENCODING_SIZE = 32
-
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
 class RETVecIntToBinary(tf.keras.layers.Layer):
-    """Convert UTF-8 code points tensor into their float binary
-    representation."""
+    """Convert Unicode integer code points to their float binary encoding."""
 
     def __init__(
         self,
@@ -36,34 +33,39 @@ class RETVecIntToBinary(tf.keras.layers.Layer):
         encoding_size: int = 24,
         **kwargs
     ) -> None:
-        """Initialize a RETVec integer binarizer.
+        """Initialize a RETVec int to binary converter.
 
         Args:
-            #FIXME: refactor
             sequence_length: Maximum number of words per sequence.
-            If max_words > 1 the first two dimensions of the output will be
-                [batch_size, max_words].
+                If sequence_length > 1, the output will be reshaped to
+                (`sequence_length`, `word_length`, `encoding_size`) for each
+                element of the batch. Otherwise, if sequence_length is 1,
+                the output will have shape (`word_length`, `encoding_size`).
 
-            word_length: Number of characters per word to binarize. If
-            the number of characters is above word_length it will be truncated.
-            if word_length is below the number it will be padded. Defaults to
-            16 which works well. . Note: if you are using
-            a pretrained model you can't change this as it will break it.
+            word_length: The number of characters per word to binarize.
+                If the number of characters is above `word_length`, it will
+                be truncated to `word_length` characters. If the number
+                of characters is below `word_length`, it will be padded to
+                `word_length`. Note: if you are using a pretrained RETVec
+                model, `word_length` must match the length used in the model
+                or else it will break.
 
-            encoding_size: Size of output character encoding. Defaults to 32
-            which ensure all printable code points can be perfectly
-            represented. Can be lowered if needed but doesn't
-            yield meaningful performance improvement. Note: if you are using
-            a pretrained model you can't change this as it will break it.
+            encoding_size: Size of output character encoding. Defaults to 24,
+                which ensures that all UTF-8 codepoints can be uniquely
+                represented. Note: if you are using a pretrained RETVec
+                model, `encoding_size` must match the encoding size used in
+                the model or else it will break.
+
+            **kwargs: Additional keyword args passed to the base Layer class.
         """
         super().__init__(**kwargs)
         self.word_length = word_length
         self.sequence_length = sequence_length
         self.encoding_size = encoding_size
 
-        max_int32 = tf.constant([2 ** (MAX_ENCODING_SIZE - 1)], dtype="int64")
+        max_int = tf.constant([2 ** (encoding_size - 1)], dtype="int64")
         bits_masks = tf.bitwise.right_shift(
-            max_int32, tf.range(MAX_ENCODING_SIZE, dtype="int64")
+            max_int, tf.range(encoding_size, dtype="int64")
         )
         bits_masks = tf.cast(bits_masks, dtype="int64")
         self.bits_masks = bits_masks
@@ -78,7 +80,6 @@ class RETVecIntToBinary(tf.keras.layers.Layer):
         embeddings = tf.cast(embeddings, dtype="float32")
 
         # reshape back to correct shape
-        encoding_start_idx = MAX_ENCODING_SIZE - self.encoding_size
         if self.sequence_length > 1:
             embeddings = tf.reshape(
                 embeddings,
@@ -86,15 +87,13 @@ class RETVecIntToBinary(tf.keras.layers.Layer):
                     batch_size,
                     self.sequence_length,
                     self.word_length,
-                    MAX_ENCODING_SIZE,
+                    self.encoding_size,
                 ),
             )
-            embeddings = embeddings[:, :, :, encoding_start_idx:]
         else:
             embeddings = tf.reshape(
-                embeddings, (batch_size, self.word_length, MAX_ENCODING_SIZE)
+                embeddings, (batch_size, self.word_length, self.encoding_size)
             )
-            embeddings = embeddings[:, :, encoding_start_idx:]
 
         return embeddings
 
@@ -109,8 +108,8 @@ class RETVecIntToBinary(tf.keras.layers.Layer):
         config: Dict = super().get_config()
         config.update(
             {
-                "max_chars": self.word_length,
-                "max_words": self.sequence_length,
+                "word_length": self.word_length,
+                "sequence_length": self.sequence_length,
                 "encoding_size": self.encoding_size,
             }
         )
@@ -119,66 +118,77 @@ class RETVecIntToBinary(tf.keras.layers.Layer):
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
 class RETVecBinarizer(tf.keras.layers.Layer):
-    """RETVec binarizer which encodes all characters in the input
-    into a compact binary representations.
+    """Transforms input text to a sequence of compact, binary representations
+    for each Unicode character. Pretrained RETVec models are trained on top of
+    this representation.
 
-    RETVec models are trained on top of this representation. This layer can
-    also operate as a substitute for other unicode character encoding
-    methodologies.
-
-    Inputs to this model can be 1D (batch_size,) or 2D (batch_size, max_words).
-    This layer supports both tf.Tensor and tf.RaggedTensor inputs.
+    Inputs to this model can be 1D (batches of single tokens) or 2D (batches of
+    token sequences). This layer supports both tf.Tensor and tf.RaggedTensor
+    inputs.
     """
 
     def __init__(
         self,
-        max_chars: int = 16,
+        word_length: int = 16,
         encoding_size: int = 24,
         encoding_type: str = "UTF-8",
-        replacement_int: int = 65533,
+        replacement_char: int = 65533,
         **kwargs
     ) -> None:
         """Initialize a RETVec binarizer.
 
         Args:
-            max_chars: Maximum number of characters to binarize. If the input
-                is 2d, i.e. (batch_size, num_words) this is still the max
-                characters per word.
+            word_length: The number of characters per word to binarize.
+                If the number of characters is above `word_length`, it will
+                be truncated to `word_length` characters. If the number
+                of characters is below `word_length`, it will be padded to
+                `word_length`. If the input is 2D, i.e. (batch_size,
+                sequence_length) this is still the max characters per word.
 
-            encoding_size: Size of output character encoding.
+                Note: if you are using a pretrained RETVec
+                model, `word_length` must match the length used in the model
+                or else it will break.
+
+            encoding_size: Size of output character encoding. Defaults to 24,
+                which ensures that all UTF-8 codepoints can be uniquely
+                represented.
+
+                Note: if you are using a pretrained RETVec
+                model, `encoding_size` must match the encoding size used in
+                the model or else it will break.
 
             encoding_type: String name for the unicode encoding that should
                 be used to decode each string.
 
-            replacement_int: The replacement integer to be used in place
-                of invalid characters in input.
+            replacement_char: The replacement Unicode integer codepoint to be
+                used in place of invalid substrings in the input.
 
-            **kwargs: Keyword args passed to the base Layer class.
+            **kwargs: Additional keyword args passed to the base Layer class.
         """
         super().__init__(**kwargs)
-
-        self.max_chars = max_chars
+        self.word_length = word_length
         self.encoding_size = encoding_size
         self.encoding_type = encoding_type
-        self.replacement_int = replacement_int
+        self.replacement_char = replacement_char
 
         # Set to True when 'binarize()' is called in eager mode
         self.eager = False
         self._integerizer = RETVecIntegerizer(
-            max_chars=self.max_chars,
+            word_length=self.word_length,
             encoding_type=self.encoding_type,
-            replacement_int=self.replacement_int,
+            replacement_char=self.replacement_char,
         )
 
     def build(
         self, input_shape: Union[TensorShape, List[TensorShape]]
     ) -> None:
-        self.max_words = input_shape[-1] if len(input_shape) > 1 else 1
+        self.sequence_length = input_shape[-1] if len(input_shape) > 1 else 1
 
-        # Initialize int binarizer layer here since we know max_words
+        # Initialize int binarizer layer here since we know sequence_length
+        # only once we known the input_shape
         self._int_to_binary = RETVecIntToBinary(
-            word_length=self.max_chars,
-            sequence_length=self.max_words,
+            word_length=self.word_length,
+            sequence_length=self.sequence_length,
             encoding_size=self.encoding_size,
         )
 
@@ -188,13 +198,13 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         return embeddings
 
     def binarize(self, inputs: Tensor) -> Tensor:
-        """Return RETVec binarizer encodings for a word or a list of words.
+        """Return binary encodings for a word or a list of words.
 
         Args:
             inputs: A single word or list of words to encode.
 
         Returns:
-            Retvec binarizer encodings for the input words(s).
+            RETVec binary encodings for the input words(s).
         """
         inputs_shape = inputs.shape
         if inputs_shape == tf.TensorShape([]):
@@ -210,7 +220,7 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         # Remove extra dim if input was a single word
         if inputs_shape == tf.TensorShape([]):
             embeddings = tf.reshape(
-                embeddings[0], (self.max_chars, self.encoding_size)
+                embeddings[0], (self.word_length, self.encoding_size)
             )
 
         return embeddings
@@ -219,10 +229,10 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         config: Dict = super().get_config()
         config.update(
             {
-                "max_chars": self.max_chars,
+                "word_length": self.word_length,
                 "encoding_size": self.encoding_size,
                 "encoding_type": self.encoding_type,
-                "replacement_int": self.replacement_int,
+                "replacement_char": self.replacement_char,
             }
         )
         return config

@@ -4,11 +4,10 @@
     "embedding_size": 256,
     "model": {
         "type": "base",
-        "max_chars": 16,
-        "char_encoding_size": 32,
+        "word_length": 16,
+        "char_encoding_size": 24,
         "char_encoding_type": "UTF-8",
-        "cls_int": null,
-        "replacement_int": 11,
+        "replacement_char": 65533,
         "initial_spatial_dropout_rate": 0.0625,
         "projection_dims": [32, 32],
         "encoder_dims": [256],
@@ -23,7 +22,6 @@
         "encoder_seq_output_dropout": 0.0,
         "tokenizer_dense_dim": 256,
         "tokenizer_activation": "tanh",
-        "tokenizer_pooling": "flatten",
         "tokenizer_dropout": 0.0
     },
     "outputs": {

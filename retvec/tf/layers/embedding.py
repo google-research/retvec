@@ -14,6 +14,7 @@
  limitations under the License.
  """
 
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import tensorflow as tf
@@ -22,20 +23,25 @@ from tensorflow import Tensor, TensorShape
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
 class RETVecEmbedding(tf.keras.layers.Layer):
-    """RetVec embedding layer leverages pre-trained word embedding models
-    to generate word embeddings. Those models are trained to be resilient
-    against adversarial attack and efficient to compute.
-    """
+    """Applies a pretrained RETVec word embedding model to binarized inputs
+    to generate word embeddings."""
 
     def __init__(
-        self, model: Optional[str] = None, trainable: bool = False, **kwargs
+        self,
+        model: Optional[Union[str, Path]] = None,
+        trainable: bool = False,
+        **kwargs
     ) -> None:
-        """Build a RETVecEmbedding layer.
+        """Initialize a RETVecEmbedding layer.
 
         Args:
-            model: Path to saved REW* model.
+            model: Path to saved pretrained RETVec model, str or pathlib.Path
+                object.
 
-            trainable: Whether to set this model to be trainable.
+            trainable: Whether to make the pretrained RETVec model trainable
+                or to freeze all weights.
+
+            **kwargs: Additional keyword args passed to the base Layer class.
         """
         if not model:
             raise ValueError("`model` must be set for RETVecEmbedding layer.")
@@ -45,7 +51,7 @@ class RETVecEmbedding(tf.keras.layers.Layer):
         self.trainable = trainable
 
         # Load REW* model
-        self.rewnet = self._load(model)
+        self.rewnet = self._load_model(model)
         self.embedding_size = self.rewnet.layers[-1].output_shape[-1]
 
     def build(
@@ -81,14 +87,16 @@ class RETVecEmbedding(tf.keras.layers.Layer):
 
         return output
 
-    def _load(self, path: Optional[str] = None) -> tf.keras.models.Model:
-        """Load REW* model for embedding.
+    def _load_model(
+        self, path: Optional[Union[str, Path]] = None
+    ) -> tf.keras.models.Model:
+        """Load pretrained RETVec model.
 
         Args:
             path: Path to the saved REW* model.
 
         Returns:
-            The REW* model, with trainable set to `self.trainable`.
+            The pretrained RETVec model, trainable set to `self.trainable`.
         """
         model = tf.keras.models.load_model(path)
         model.trainable = self.trainable

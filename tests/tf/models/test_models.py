@@ -64,7 +64,7 @@ def test_aug_decoder(NN):
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_aug_vector(NN):
     dim = 32
-    model = NN(max_chars=16, aug_vector_dim=dim)
+    model = NN(word_length=16, aug_vector_dim=dim)
 
     lyr = model.get_layer("aug_vector")
 
@@ -74,7 +74,7 @@ def test_aug_vector(NN):
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_aug_matrix(NN):
     dim = 64
-    model = NN(max_chars=16, aug_matrix_dim=dim)
+    model = NN(word_length=16, aug_matrix_dim=dim)
 
     model.summary()
     lyr = model.get_layer("aug_matrix")

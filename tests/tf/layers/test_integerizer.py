@@ -21,7 +21,7 @@ from retvec.tf.layers import RETVecIntegerizer
 
 def test_graph_mode():
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RETVecIntegerizer(max_chars=16)(i)
+    x = RETVecIntegerizer(word_length=16)(i)
     model = tf.keras.models.Model(i, x)
 
     test_inputs = [
@@ -36,7 +36,7 @@ def test_graph_mode():
 
 
 def test_eager_mode():
-    intergerizer = RETVecIntegerizer(max_chars=16)
+    intergerizer = RETVecIntegerizer(word_length=16)
 
     embeddings = intergerizer.integerize(tf.constant("Testing😀"))
     assert embeddings.shape == [16]
@@ -47,7 +47,7 @@ def test_eager_mode():
 
 def test_2d_inputs():
     i = tf.keras.layers.Input((2,), dtype=tf.string)
-    x = RETVecIntegerizer(max_chars=16)(i)
+    x = RETVecIntegerizer(word_length=16)(i)
     model = tf.keras.models.Model(i, x)
 
     test_input = tf.constant([["a", "b"], ["c", "d"]])
@@ -57,7 +57,7 @@ def test_2d_inputs():
 
 
 def test_tfds_map():
-    intergerizer = RETVecIntegerizer(max_chars=16)
+    intergerizer = RETVecIntegerizer(word_length=16)
 
     dataset = tf.data.Dataset.from_tensor_slices(["Testing😀", "Testing😀"])
     dataset = dataset.map(intergerizer.integerize)
@@ -75,7 +75,7 @@ def test_tfds_map():
 
 
 def test_determinism_eager_mode():
-    intergerizer = RETVecIntegerizer(max_chars=16)
+    intergerizer = RETVecIntegerizer(word_length=16)
 
     s = "Testing😀"
     test_input = tf.constant([s, s])
@@ -89,7 +89,7 @@ def test_determinism_eager_mode():
 
 def test_determinism_graph_mode():
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RETVecIntegerizer(max_chars=16)(i)
+    x = RETVecIntegerizer(word_length=16)(i)
     model = tf.keras.models.Model(i, x)
 
     s = "Testing😀"
@@ -104,7 +104,7 @@ def test_determinism_graph_mode():
 
 def test_serialization(tmp_path):
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RETVecIntegerizer(max_chars=16)(i)
+    x = RETVecIntegerizer(word_length=16)(i)
     model = tf.keras.models.Model(i, x)
 
     save_path = tmp_path / "test_serialization_integerizer"
@@ -115,16 +115,16 @@ def test_serialization(tmp_path):
 def test_common_parameters():
     test_input = tf.constant(["Testing😀", "Testing😀"])
 
-    for max_chars in [8, 16, 32]:
+    for word_length in [8, 16, 32]:
         for encoding_type in ["UTF-8", "UTF-16-BE"]:
-            for replacement_int in [0, 65533]:
+            for replacement_char in [0, 65533]:
                 i = tf.keras.layers.Input((1,), dtype=tf.string)
                 x = RETVecIntegerizer(
-                    max_chars=max_chars,
+                    word_length=word_length,
                     encoding_type=encoding_type,
-                    replacement_int=replacement_int,
+                    replacement_char=replacement_char,
                 )(i)
                 model = tf.keras.models.Model(i, x)
 
                 embedding = model(test_input)
-                assert embedding.shape == (2, max_chars)
+                assert embedding.shape == (2, word_length)

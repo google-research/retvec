@@ -36,7 +36,7 @@ def create_retvec_embedding(tmp_path):
 
 def test_rewnet_model(tmp_path):
     embedding_model = create_retvec_embedding(tmp_path)
-    binarizer = RETVecBinarizer(max_chars=16, encoding_size=32)
+    binarizer = RETVecBinarizer(word_length=16, encoding_size=32)
 
     test_inputs = [
         tf.constant(["Testing😀"]),
@@ -70,7 +70,7 @@ def test_2d_inputs(tmp_path):
 
 def test_binarizer_embedding_model(tmp_path):
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RETVecBinarizer(max_chars=16, encoding_size=32)(i)
+    x = RETVecBinarizer(word_length=16, encoding_size=32)(i)
     o = create_retvec_embedding(tmp_path)(x)
     model = tf.keras.models.Model(i, o)
 
@@ -87,7 +87,7 @@ def test_binarizer_embedding_model(tmp_path):
 
 def test_binarizer_embedding_model_2d(tmp_path):
     i = tf.keras.layers.Input((3,), dtype=tf.string)
-    x = RETVecBinarizer(max_chars=16, encoding_size=32)(i)
+    x = RETVecBinarizer(word_length=16, encoding_size=32)(i)
     o = create_retvec_embedding(tmp_path)(x)
     model = tf.keras.models.Model(i, o)
 

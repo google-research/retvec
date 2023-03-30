@@ -14,7 +14,8 @@
  limitations under the License.
  """
 
-from typing import Any, Dict, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional, Union
 
 import tensorflow as tf
 from tensorflow import Tensor
@@ -23,67 +24,114 @@ from tensorflow.keras import layers
 from .binarizer import RETVecBinarizer
 from .embedding import RETVecEmbedding
 
+LOWER_AND_STRIP_PUNCTUATION = "lower_and_strip_punctuation"
+STRIP_PUNCTUATION = "strip_punctuation"
+LOWER = "lower"
+
+
+# This is an explicit regex of all the tokens that will be stripped if
+# LOWER_AND_STRIP_PUNCTUATION is set. If an application requires other
+# stripping, a Callable should be passed into the 'standardize' arg.
+DEFAULT_STRIP_REGEX = r'[!"#$%&()\*\+,-\./:;<=>?@\[\\\]^_`{|}~\']'
+
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
 class RETVecTokenizer(tf.keras.layers.Layer):
-    """RETVec: Resilient and Efficient Text Vectorizer layer"""
+    """RETVec: Resilient and Efficient Text Vectorizer layer
+
+    This layer is typically placed as the first layer after the
+    input layer in a model, to convert raw input text into
+    sequences of RETVec embeddings. This layer is very efficient on
+    GPU and CPU. For running RETVec most efficiently on TPU,
+    please see the RETVec on TPU tutorial notebook.
+
+    Example usage:
+        i = tf.keras.layers.Input((1,), dtype=tf.string)
+        x = RETVecTokenizer(sequence_length=512, model=optional_model_path)(i)
+        ...
+        [Build the remainder of the model, i.e. BERT or LSTM encoder]
+        ...
+
+    """
 
     def __init__(
         self,
-        max_len: int = 128,
-        sep: str = "",
-        lowercase: bool = False,
-        model: Optional[str] = None,
+        sequence_length: int = 128,
+        model: Optional[Union[str, Path]] = None,
         trainable: bool = False,
-        max_chars: int = 16,
+        sep: str = "",
+        standardize: Optional[str] = None,
+        word_length: int = 16,
         char_encoding_size: int = 24,
         char_encoding_type: str = "UTF-8",
-        replacement_int: int = 65533,
+        replacement_char: int = 65533,
         dropout_rate: float = 0.0,
         spatial_dropout_rate: float = 0.0,
         norm_type: Optional[str] = None,
         **kwargs,
     ) -> None:
-        """Initialize a RetVec layer.
+        """Initialize a RETVec layer.
 
         Args:
-            max_len: Max length of text split by `sep`.
+            sequence_length: Maximum number of words per sequence. If the input
+                text is longer than `sequence_length` words after split by
+                `sep` separator, the input will be truncated to
+                `sequence_length` words.
+
+            model: Path to saved pretrained RETVec model, str or pathlib.Path
+                object.
+
+            trainable: Whether to make the pretrained RETVec model trainable
+                or to freeze all weights.
 
             sep: Separator to split input text on into words. Defaults to '',
                 which splits on all whitespace and stripts whitespace from
-                beginning or end of the text.
+                beginning or end of the text. See tf.strings.split for more
+                details.
 
-            lowercase: Whether to lowercase input text.
+            standardize: Optional specification for standardization to apply to
+                the input text. One of None, "lower_and_strip_punctuation",
+                "lower", "strip_punctuation", or a callable function which
+                applies standardization and returns a tf.string Tensor.
 
-            model: Path to saved REW* model. If None, this layer will default
-                to the RetVecBinarizer character encoding.
+            word_length: The number of characters per word to embed.
+                The integer representation of each word will be padded or
+                truncated to be `word_length` characters.
 
-            trainable: Whether or not this layer should be trainable.
+                Note: if you are using a pretrained RETVec model,
+                `word_length` must match the word length used in
+                the model or else it will break.
 
-            max_chars: Maximum number of characters per word to integerize.
+            char_encoding_size: Number of floats used to encode each
+                character in the binary representation. Defaults to 24,
+                which ensures that all UTF-8 codepoints can be uniquely
+                represented.
 
-            char_encoding_size: Size of the character encoding per word.
+                Note: if you are using a pretrained RETVec model,
+                `encoding_size` must match the encoding size used in
+                the model or else it will break.
 
             char_encoding_type: String name for the unicode encoding that
                 should be used to decode each string.
 
-            replacement_int: The replacement integer to be used in place
-                of invalid characters in input.
+            replacement_char: The replacement Unicode integer codepoint to be
+                used in place of invalid substrings in the input.
 
-            dropout_rate: Dropout to apply after RetVec embedding.
+            dropout_rate: Dropout rate to apply on RETVec embedding.
 
-            spatial_dropout_rate: Spatial dropout to apply after RetVec
+            spatial_dropout_rate: Spatial dropout rate to apply on RETVec
                 embedding.
 
-            norm_type: Norm to apply after RetVec embedding. One of
+            norm_type: Norm to apply on RETVec embedding. One of
                 [None, 'batch', or 'layer'].
 
+            **kwargs: Additional keyword args passed to the base Layer class.
         """
         super().__init__(**kwargs)
 
-        self.max_len = max_len
+        self.sequence_length = sequence_length
         self.sep = sep
-        self.lowercase = lowercase
+        self.standardize = standardize
         self.model = model
         self.trainable = trainable
 
@@ -96,15 +144,15 @@ class RETVecTokenizer(tf.keras.layers.Layer):
             self._embedding = None
 
         # RetVecBinarizer
-        self.max_chars = max_chars
+        self.word_length = word_length
         self.char_encoding_size = char_encoding_size
         self.char_encoding_type = char_encoding_type
-        self.replacement_int = replacement_int
+        self.replacement_char = replacement_char
         self._binarizer = RETVecBinarizer(
-            max_chars=self.max_chars,
+            word_length=self.word_length,
             encoding_size=self.char_encoding_size,
             encoding_type=self.char_encoding_type,
-            replacement_int=self.replacement_int,
+            replacement_char=self.replacement_char,
         )
 
         # Set to True when 'tokenize()' or 'binarize()' called in eager mode
@@ -114,7 +162,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
             self._embedding_size = self._embedding.embedding_size
         else:
             self._embedding = None
-            self._embedding_size = self.max_chars * self.char_encoding_size
+            self._embedding_size = self.word_length * self.char_encoding_size
 
         # Create post-embedding layers
         self.dropout_rate = dropout_rate
@@ -146,19 +194,30 @@ class RETVecTokenizer(tf.keras.layers.Layer):
     def call(self, inputs: Tensor, training: bool = False) -> Tensor:
         inputs = tf.stop_gradient(inputs)
 
-        if self.lowercase:
+        if self.standardize in (LOWER, LOWER_AND_STRIP_PUNCTUATION):
             inputs = tf.strings.lower(inputs)
+        if self.standardize in (
+            STRIP_PUNCTUATION,
+            LOWER_AND_STRIP_PUNCTUATION,
+        ):
+            inputs = tf.strings.regex_replace(inputs, DEFAULT_STRIP_REGEX, "")
+        if callable(self.standardize):
+            inputs = self.standardize(inputs)
 
-        rtensor = tf.strings.split(inputs, sep=self.sep, maxsplit=self.max_len)
+        rtensor = tf.strings.split(
+            inputs, sep=self.sep, maxsplit=self.sequence_length
+        )
 
         # Handle shape differences between eager and graph mode
         if self.eager:
             stensor = rtensor.to_tensor(
-                default_value="", shape=(rtensor.shape[0], self.max_len)
+                default_value="",
+                shape=(rtensor.shape[0], self.sequence_length),
             )
         else:
             stensor = rtensor.to_tensor(
-                default_value="", shape=(rtensor.shape[0], 1, self.max_len)
+                default_value="",
+                shape=(rtensor.shape[0], 1, self.sequence_length),
             )
             stensor = tf.squeeze(stensor, axis=1)
 
@@ -168,9 +227,11 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         if self._embedding:
             embeddings = self._embedding(binarized, training=training)
         else:
-            embsize = self._binarizer.encoding_size * self._binarizer.max_chars
+            embsize = (
+                self._binarizer.encoding_size * self._binarizer.word_length
+            )
             embeddings = tf.reshape(
-                binarized, (tf.shape(inputs)[0], self.max_len, embsize)
+                binarized, (tf.shape(inputs)[0], self.sequence_length, embsize)
             )
 
         # apply post-embedding norm and dropout layers
@@ -218,15 +279,15 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         config: Dict = super().get_config()
         config.update(
             {
-                "max_len": self.max_len,
+                "sequence_length": self.sequence_length,
                 "sep": self.sep,
-                "lowercase": self.lowercase,
+                "standardize": self.standardize,
                 "model": self.model,
                 "trainable": self.trainable,
-                "max_chars": self.max_chars,
+                "word_length": self.word_length,
                 "char_encoding_size": self.char_encoding_size,
                 "char_encoding_type": self.char_encoding_type,
-                "replacement_int": self.replacement_int,
+                "replacement_char": self.replacement_char,
                 "dropout_rate": self.dropout_rate,
                 "spatial_dropout_rate": self.spatial_dropout_rate,
                 "norm_type": self.norm_type,

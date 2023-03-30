@@ -34,12 +34,12 @@ from ..layers import RETVecBinarizer
 def read_tfrecord(
     tfrecord: Tensor, binarizer: RETVecBinarizer
 ) -> Dict[str, Tensor]:
-    """Read TF record files for REW* training datasets.
+    """Read TF record files for RETVec training datasets.
 
     Args:
         tfrecord: TF record input.
 
-        binarizer: RetVecBinarizer used to encode words.
+        binarizer: RETVecBinarizer used to encode words.
     """
     base_features = {
         "original_token": tf.io.FixedLenFeature([], tf.string),
@@ -110,7 +110,7 @@ def Sampler(
     buffer_size: Optional[int] = None,
     compression_type: Optional[str] = None,
 ) -> tf.data.Dataset:
-    """Dataset sampler for REW* model training.
+    """Dataset sampler for RETVec model training.
 
     Args:
         shards_list: List of input shards.
@@ -213,11 +213,10 @@ def get_dataset_samplers(
     buffer_size = config["train"]["shuffle_buffer"]
     m = config["model"]
     binarizer = RETVecBinarizer(
-        max_chars=m["max_chars"],
+        word_length=m["word_length"],
         encoding_size=m["char_encoding_size"],
         encoding_type=m["char_encoding_type"],
-        cls_int=m["cls_int"],
-        replacement_int=m["replacement_int"],
+        replacement_char=m["replacement_char"],
     )
 
     train_files = []
