@@ -14,4 +14,4 @@
  limitations under the License.
  """
 
-from .warmup_cosine_decay import WarmupCosineDecay
+from .warmup_cosine_decay import WarmupCosineDecay  # noqa
