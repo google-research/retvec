@@ -74,7 +74,7 @@ def read_tfrecord(
         record[feature] = tf.stack([rec[feature]] * 2)
 
     # encode using binarizer
-    reshape_size = (binarizer.max_chars * binarizer.encoding_size,)
+    reshape_size = (binarizer.word_length * binarizer.encoding_size,)
 
     aug_token0_encoded = tf.reshape(
         binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)),
@@ -91,8 +91,8 @@ def read_tfrecord(
 
     record["original_encoded"] = tf.stack([original_token_encoded] * 2)
     record["aug_encoded"] = tf.stack([aug_token0_encoded, aug_token1_encoded])
-    record["aug_vector"] = record["aug_vector"][:, : binarizer.max_chars]
-    record["aug_matrix"] = record["aug_matrix"][:, : binarizer.max_chars, :]
+    record["aug_vector"] = record["aug_vector"][:, : binarizer.word_length]
+    record["aug_matrix"] = record["aug_matrix"][:, : binarizer.word_length, :]
 
     flatten = tf.keras.layers.Flatten()
     record["aug_matrix"] = flatten(record["aug_matrix"])

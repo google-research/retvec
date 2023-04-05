@@ -199,8 +199,12 @@ class GAU(Layer):
             uv, [self.expand_dim, self.expand_dim, self.shared_dim], axis=-1
         )
 
-        # generate q, k by scaled offset
-        base = tf.einsum("bnr,hr->bnhr", base, self.gamma) + self.beta
+        # generate q, k by scaled offset using TF-Lite compatible ops instead of einsum
+        # base = tf.einsum("bnr,hr->bnhr", base, self.gamma) + self.beta
+        base = (
+            tf.tile(tf.expand_dims(base, 2), [1, 1, 2, 1]) * self.gamma
+            + self.beta
+        )
         q, k = tf.unstack(base, axis=-2)
 
         # compute key-query scores

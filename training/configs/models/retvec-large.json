@@ -7,7 +7,7 @@
         "word_length": 16,
         "char_encoding_size": 24,
         "char_encoding_type": "UTF-8",
-        "replacement_int": 65533,
+        "replacement_char": 65533,
         "initial_spatial_dropout_rate": 0.0625,
         "encoder_hidden_dim": 32,
         "encoder_abs_pos_encoding_type": "scaled_sin",

@@ -32,7 +32,7 @@ except ImportError:
 from retvec.tf.dataset.io import get_dataset_samplers, get_outputs_info
 from retvec.tf.models.retvec_base import build_retvec_base_from_config
 from retvec.tf.models.retvec_large import build_retvec_large_from_config
-from retvec.tf.optimizers.warmup_cosine_decay import WarmupCosineDecay
+from retvec.tf.optimizers import WarmupCosineDecay
 from retvec.tf.utils import tf_cap_memory
 
 
