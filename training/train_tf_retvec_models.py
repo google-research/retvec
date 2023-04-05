@@ -1,12 +1,9 @@
 """
  Copyright 2021 Google LLC
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
       https://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,21 +19,24 @@ from time import time
 from typing import Dict
 
 import tensorflow as tf
-import wandb
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tensorflow_addons.optimizers import LAMB
 from termcolor import cprint
-from wandb.keras import WandbCallback
 
-from tensorflow_retvec.datasets.io import get_dataset_samplers, get_outputs_info
-from tensorflow_retvec.optimizers import WarmupCosineDecay
-from tensorflow_retvec.rewnet.rewcnn import build_rewcnn_from_config
-from tensorflow_retvec.rewnet.rewformer import build_rewformer_from_config
-from tensorflow_retvec.utils import tf_cap_memory
+try:
+    import wandb
+    from wandb.keras import WandbCallback
+except ImportError:
+    print("Weights & Biases logging not available")
+
+from retvec.tf.dataset.io import get_dataset_samplers, get_outputs_info
+from retvec.tf.models.retvec_base import build_retvec_base_from_config
+from retvec.tf.models.retvec_large import build_retvec_large_from_config
+from retvec.tf.optimizers.warmup_cosine_decay import WarmupCosineDecay
+from retvec.tf.utils import tf_cap_memory
 
 
 def train(args: argparse.Namespace, config: Dict) -> None:
-
     # save paths
     if args.experiment_name:
         model_name = args.experiment_name
@@ -44,7 +44,9 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         model_name = "%s-v%s" % (config["name"], config["version"])
     cprint("[Model: %s]" % (model_name), "yellow")
     cprint("|-epochs: %s" % config["train"]["epochs"], "blue")
-    cprint("|-steps_per_epoch: %s" % config["train"]["steps_per_epoch"], "green")
+    cprint(
+        "|-steps_per_epoch: %s" % config["train"]["steps_per_epoch"], "green"
+    )
     cprint("|-batch_size: %s" % config["train"]["batch_size"], "blue")
     stub = "%s_%s" % (model_name, int(time()))
 
@@ -78,7 +80,9 @@ def train(args: argparse.Namespace, config: Dict) -> None:
 
     if save_freq_epochs:
         save_freq = save_freq_epochs * steps_per_epoch
-        mcc = ModelCheckpoint(mdl_path / "epoch_{epoch}", monitor="loss", save_freq=save_freq)
+        mcc = ModelCheckpoint(
+            mdl_path / "epoch_{epoch}", monitor="loss", save_freq=save_freq
+        )
     else:
         mcc = ModelCheckpoint(mdl_path, monitor="loss", save_best=True)
 
@@ -96,10 +100,10 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     # model
     with mirrored_strategy.scope():
         model_type = config["model"]["type"]
-        if model_type == "rewcnn":
-            model = build_rewcnn_from_config(config)
-        elif model_type == "rewformer":
-            model = build_rewformer_from_config(config)
+        if model_type == "large":
+            model = build_retvec_large_from_config(config)
+        elif model_type == "base":
+            model = build_retvec_base_from_config(config)
         else:
             raise ValueError("Unknown model %s" % model_type)
 
@@ -107,7 +111,8 @@ def train(args: argparse.Namespace, config: Dict) -> None:
             max_learning_rate=config["train"]["max_learning_rate"],
             total_steps=total_steps,
             warmup_steps=config["train"]["warmup_steps"],
-            alpha=config["train"]["end_lr"] / config["train"]["max_learning_rate"],
+            alpha=config["train"]["end_lr"]
+            / config["train"]["max_learning_rate"],
         )
 
         if config["train"]["optimizer"] == "adam":
@@ -120,7 +125,7 @@ def train(args: argparse.Namespace, config: Dict) -> None:
         model.compile(optimizer, loss=loss, metrics=metrics)
 
     # train
-    _ = model.fit(
+    history = model.fit(
         train_ds,
         validation_data=test_ds,
         epochs=epochs,
@@ -132,25 +137,47 @@ def train(args: argparse.Namespace, config: Dict) -> None:
     # extract and save tokenizer
     rewnet_path = Path(args.output_dir) / "rewnet" / stub
     embedding_path = Path(args.output_dir) / "embeddings" / stub
+    results_path = Path(args.output_dir) / "results" / stub
+
+    os.makedirs(rewnet_path, exist_ok=True)
+    os.makedirs(embedding_path, exist_ok=True)
+    os.makedirs(results_path, exist_ok=True)
 
     # check that model can be reloaded
     if save_freq_epochs:
-        saved_model = tf.keras.models.load_model(mdl_path / f"epoch_{epochs}")
+        saved_model_path = mdl_path / f"epoch_{epochs}"
     else:
-        saved_model = tf.keras.models.load_model(mdl_path)
+        saved_model_path = mdl_path
 
-    # save model without optimizer so it can be loaded with only tensorflow
-    saved_model.save(rewnet_path, include_optimizer=False)
+    if saved_model_path.exists():
+        saved_model = tf.keras.models.load_model(saved_model_path)
 
-    # if tokenizer layer is already defined in the model, save just the embedding model
-    if "tokenizer" in [l.name for l in model.layers]:
-        embedding_model = tf.keras.Model(saved_model.layers[2].input, saved_model.get_layer("tokenizer").output)
-        embedding_model.compile("adam", "mse")
-        embedding_model.summary()
-        embedding_model.save(embedding_path, include_optimizer=False)
-        cprint(f"Saving RetVec embedding model to {embedding_path}", "blue")
+        # save model without optimizer so it can be loaded with only tensorflow
+        saved_model.save(rewnet_path, include_optimizer=False)
 
-    wandb.finish()
+        # if tokenizer layer is already defined in the model,
+        # save the embedding model directly
+        if "tokenizer" in [layer.name for layer in model.layers]:
+            embedding_model = tf.keras.Model(
+                saved_model.layers[2].input,
+                saved_model.get_layer("tokenizer").output,
+            )
+            embedding_model.compile("adam", "mse")
+            embedding_model.summary()
+            embedding_model.save(embedding_path, include_optimizer=False)
+            cprint(
+                f"Saving RetVec embedding model to {embedding_path}", "blue"
+            )
+
+    # save training history and config
+    with open(results_path / "train_history.json", "w") as f:
+        json.dump(history.history, f)
+
+    with open(results_path / "train_config.json", "w") as f:
+        json.dump(config, f)
+
+    if args.wandb_project:
+        wandb.finish()
 
 
 def main(args: argparse.Namespace) -> None:
@@ -164,7 +191,9 @@ def main(args: argparse.Namespace) -> None:
     else:
         model_dir = Path(args.model_config)
         c_dir = sorted(os.listdir(model_dir))
-        model_config_paths = [str(model_dir / f) for f in c_dir if f.endswith(".json")]
+        model_config_paths = [
+            str(model_dir / f) for f in c_dir if f.endswith(".json")
+        ]
 
         start_idx = args.start_idx
         end_idx = args.end_idx if args.end_idx else len(model_config_paths)
@@ -187,19 +216,32 @@ if __name__ == "__main__":
         "--train_config",
         "-c",
         help="train config path",
-        default="../configs/train_full.json",
+        default="./configs/train_full.json",
     )
-    parser.add_argument("--model_config", "-m", help="model config file or folder path")
-    parser.add_argument("--output_dir", "-o", help="base output directory", default="./experiments/")
+    parser.add_argument(
+        "--model_config",
+        "-m",
+        help="model config file or folder path",
+        default="./configs/models/retvec-base.json",
+    )
+    parser.add_argument(
+        "--output_dir",
+        "-o",
+        help="base output directory",
+        default="./experiments/",
+    )
     parser.add_argument(
         "--start_idx",
         "-s",
         type=int,
-        help="start idx in alphabetically sorted experiment dir (zero-indexed, inclusive)",
+        help="start idx in alphabetically sorted experiment dir (inclusive)",
         default=0,
     )
     parser.add_argument(
-        "--end_idx", "-e", type=int, help="end idx in alphabetically sorted experiment dir (zero-indexed, exclusive)"
+        "--end_idx",
+        "-e",
+        type=int,
+        help="end idx in alphabetically sorted experiment dir (exclusive)",
     )
     parser.add_argument(
         "--dataset_bucket",
@@ -220,13 +262,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--wandb_project",
         "-w",
-        default="RetVec-REWNet-Pretraining",
+        default="REWNet-Pretraining",
         help="Wandb project to save to, none to disable.",
     )
     parser.add_argument(
         "--experiment_name",
         "-n",
-        help="Experiment name. If none, uses default of [model_name]-[version]",
+        help="Experiment name, defaults to [model_name]-[version]",
     )
     args = parser.parse_args()
 

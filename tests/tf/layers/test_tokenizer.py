@@ -16,16 +16,18 @@
 
 import tensorflow as tf
 
-from tensorflow_retvec import RetVec
+from retvec.tf.layers import RETVecTokenizer
 
-MAX_LEN = 128
-MAX_CHARS = 16
+SEQUENCE_LENGTH = 128
+WORD_LENGTH = 16
 CHAR_ENCODING_SIZE = 32
 EMBEDDING_SIZE = 128
 
 
 def create_and_save_retvec_embedding(tmp_path):
-    i = tf.keras.layers.Input((MAX_CHARS, CHAR_ENCODING_SIZE), dtype=tf.float32)
+    i = tf.keras.layers.Input(
+        (WORD_LENGTH, CHAR_ENCODING_SIZE), dtype=tf.float32
+    )
     x = tf.keras.layers.Flatten()(i)
     o = tf.keras.layers.Dense(EMBEDDING_SIZE)(x)
     model = tf.keras.models.Model(i, o)
@@ -39,50 +41,10 @@ def test_graph_mode_with_model(tmp_path):
     model_path = create_and_save_retvec_embedding(tmp_path)
 
     i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVec(
+    x = RETVecTokenizer(
+        sequence_length=SEQUENCE_LENGTH,
         model=model_path,
-        max_len=MAX_LEN,
-        max_chars=MAX_CHARS,
-        char_encoding_size=CHAR_ENCODING_SIZE,
-    )(i)
-    model = tf.keras.models.Model(i, x)
-
-    test_inputs = [
-        tf.constant(["Testing😀 a full sentence"]),
-        tf.constant(["Testing😀", "Testing😀"]),
-    ]
-
-    for test_input in test_inputs:
-        embeddings = model(test_input)
-        assert embeddings.shape == (test_input.shape[0], MAX_LEN, EMBEDDING_SIZE)
-
-
-def test_eager_mode_with_model(tmp_path):
-    model_path = create_and_save_retvec_embedding(tmp_path)
-
-    tokenizer = RetVec(
-        model=model_path,
-        max_len=MAX_LEN,
-        max_chars=MAX_CHARS,
-        char_encoding_size=CHAR_ENCODING_SIZE,
-    )
-    assert tokenizer.embedding_size == EMBEDDING_SIZE
-
-    s = "Testing😀 a full sentence"
-
-    embeddings = tokenizer.tokenize(tf.constant(s))
-    assert embeddings.shape == [MAX_LEN, EMBEDDING_SIZE]
-
-    embeddings = tokenizer.tokenize(tf.constant([s, s, s]))
-    assert embeddings.shape == [3, MAX_LEN, EMBEDDING_SIZE]
-
-
-def test_graph_mode_no_model():
-    i = tf.keras.layers.Input((1,), dtype=tf.string)
-    x = RetVec(
-        model=None,
-        max_len=MAX_LEN,
-        max_chars=MAX_CHARS,
+        word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
     )(i)
     model = tf.keras.models.Model(i, x)
@@ -96,37 +58,101 @@ def test_graph_mode_no_model():
         embeddings = model(test_input)
         assert embeddings.shape == (
             test_input.shape[0],
-            MAX_LEN,
-            MAX_CHARS * CHAR_ENCODING_SIZE,
+            SEQUENCE_LENGTH,
+            EMBEDDING_SIZE,
+        )
+
+
+def test_eager_mode_with_model(tmp_path):
+    model_path = create_and_save_retvec_embedding(tmp_path)
+
+    tokenizer = RETVecTokenizer(
+        model=model_path,
+        sequence_length=SEQUENCE_LENGTH,
+        word_length=WORD_LENGTH,
+        char_encoding_size=CHAR_ENCODING_SIZE,
+    )
+    assert tokenizer.embedding_size == EMBEDDING_SIZE
+
+    s = "Testing😀 a full sentence"
+
+    embeddings = tokenizer.tokenize(tf.constant(s))
+    assert embeddings.shape == [SEQUENCE_LENGTH, EMBEDDING_SIZE]
+
+    embeddings = tokenizer.tokenize(tf.constant([s, s, s]))
+    assert embeddings.shape == [3, SEQUENCE_LENGTH, EMBEDDING_SIZE]
+
+
+def test_graph_mode_no_model():
+    i = tf.keras.layers.Input((1,), dtype=tf.string)
+    x = RETVecTokenizer(
+        model=None,
+        sequence_length=SEQUENCE_LENGTH,
+        word_length=WORD_LENGTH,
+        char_encoding_size=CHAR_ENCODING_SIZE,
+    )(i)
+    model = tf.keras.models.Model(i, x)
+
+    test_inputs = [
+        tf.constant(["Testing😀 a full sentence"]),
+        tf.constant(["Testing😀", "Testing😀"]),
+    ]
+
+    for test_input in test_inputs:
+        embeddings = model(test_input)
+        assert embeddings.shape == (
+            test_input.shape[0],
+            SEQUENCE_LENGTH,
+            WORD_LENGTH * CHAR_ENCODING_SIZE,
         )
 
 
 def test_eager_mode_no_model():
-    tokenizer = RetVec(
+    tokenizer = RETVecTokenizer(
         model=None,
-        max_len=MAX_LEN,
-        max_chars=MAX_CHARS,
+        sequence_length=SEQUENCE_LENGTH,
+        word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
     )
 
-    assert tokenizer.embedding_size == MAX_CHARS * CHAR_ENCODING_SIZE
+    assert tokenizer.embedding_size == WORD_LENGTH * CHAR_ENCODING_SIZE
     s = "Testing😀 a full sentence"
 
     embeddings = tokenizer.tokenize(tf.constant(s))
-    assert embeddings.shape == [MAX_LEN, tokenizer.embedding_size]
+    assert embeddings.shape == [SEQUENCE_LENGTH, tokenizer.embedding_size]
 
     embeddings = tokenizer.tokenize(tf.constant([s, s, s]))
-    assert embeddings.shape == [3, MAX_LEN, tokenizer.embedding_size]
+    assert embeddings.shape == [3, SEQUENCE_LENGTH, tokenizer.embedding_size]
+
+
+def test_standardize():
+    for standardize in [
+        None,
+        "lower_and_strip_punctuation",
+        "strip_punctuation",
+        "lower",
+    ]:
+        tokenizer = RETVecTokenizer(
+            model=None,
+            sequence_length=SEQUENCE_LENGTH,
+            word_length=WORD_LENGTH,
+            char_encoding_size=CHAR_ENCODING_SIZE,
+            standardize=standardize,
+        )
+        s = "Testing 😀 a full sentence!"
+
+        embeddings = tokenizer.tokenize(tf.constant(s))
+        assert embeddings.shape == [SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
 def test_tfds_map_tokenize(tmp_path):
     model_path = create_and_save_retvec_embedding(tmp_path)
 
     for model in [None, model_path]:
-        tokenizer = RetVec(
+        tokenizer = RETVecTokenizer(
             model=model,
-            max_len=MAX_LEN,
-            max_chars=MAX_CHARS,
+            sequence_length=SEQUENCE_LENGTH,
+            word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
         )
 
@@ -134,7 +160,7 @@ def test_tfds_map_tokenize(tmp_path):
         dataset = dataset.map(tokenizer.tokenize)
 
         for ex in dataset.take(1):
-            assert ex.shape == [MAX_LEN, tokenizer.embedding_size]
+            assert ex.shape == [SEQUENCE_LENGTH, tokenizer.embedding_size]
 
         dataset = tf.data.Dataset.from_tensor_slices(["Testing😀"])
         dataset = dataset.repeat()
@@ -142,30 +168,7 @@ def test_tfds_map_tokenize(tmp_path):
         dataset = dataset.map(tokenizer.tokenize)
 
         for ex in dataset.take(1):
-            assert ex.shape == [2, MAX_LEN, tokenizer.embedding_size]
-
-
-def test_tfds_map_binarize(tmp_path):
-    tokenizer = RetVec(
-        model=None,
-        max_len=MAX_LEN,
-        max_chars=MAX_CHARS,
-        char_encoding_size=CHAR_ENCODING_SIZE,
-    )
-
-    dataset = tf.data.Dataset.from_tensor_slices(["Testing😀", "Testing😀"])
-    dataset = dataset.map(tokenizer.binarize)
-
-    for ex in dataset.take(1):
-        assert ex.shape == [MAX_CHARS, CHAR_ENCODING_SIZE]
-
-    dataset = tf.data.Dataset.from_tensor_slices(["Testing😀", "Testing😀"])
-    dataset = dataset.repeat()
-    dataset = dataset.batch(2)
-    dataset = dataset.map(tokenizer.binarize)
-
-    for ex in dataset.take(1):
-        assert ex.shape == [2, MAX_CHARS, CHAR_ENCODING_SIZE]
+            assert ex.shape == [2, SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
 def test_serialization(tmp_path):
@@ -173,10 +176,10 @@ def test_serialization(tmp_path):
 
     for model in [None, model_path]:
         i = tf.keras.layers.Input((1,), dtype=tf.string)
-        x = RetVec(
+        x = RETVecTokenizer(
             model=model,
-            max_len=MAX_LEN,
-            max_chars=MAX_CHARS,
+            sequence_length=SEQUENCE_LENGTH,
+            word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
         )(i)
         model = tf.keras.models.Model(i, x)

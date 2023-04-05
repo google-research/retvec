@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import Tensor
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class WarmupCosineDecay(tf.keras.optimizers.schedules.LearningRateSchedule):
     """A cosine decay LearningRateSchedule with a linear warmup period.
     See [Loshchilov & Hutter, ICLR2016](https://arxiv.org/abs/1608.03983),
@@ -45,7 +45,7 @@ class WarmupCosineDecay(tf.keras.optimizers.schedules.LearningRateSchedule):
         decayed = step / warmup_steps
       else:
         decay_steps = total_steps - warmup_steps
-        cosine_decay = 0.5 * (1. + cos(pi * (step - warmup_steps) / decay_steps))
+        cosine_decay = .5 * (1 + cos(pi * (step - warmup_steps) / decay_steps))
         decayed = (1 - alpha) * cosine_decay + alpha
 
       return max_learning_rate * decayed
@@ -83,11 +83,14 @@ class WarmupCosineDecay(tf.keras.optimizers.schedules.LearningRateSchedule):
 
           total_steps: Total number of steps in the schedule.
 
-          warmup_steps: Number of steps to warmup over. Must be smaller than the total number of steps.
+          warmup_steps: Number of steps to warmup over. Must be smaller
+            than the total number of steps.
 
-          alpha: Minimum learning rate value as a fraction of initial_learning_rate.
+          alpha: Minimum learning rate value as a fraction of
+            initial_learning_rate.
 
-          name: Optional name of the operation. Defaults to 'WarmupCosineDecay'.
+          name: Optional name of the operation. Defaults to
+            'WarmupCosineDecay'.
         """
         super().__init__()
 
@@ -100,11 +103,15 @@ class WarmupCosineDecay(tf.keras.optimizers.schedules.LearningRateSchedule):
         self.alpha = alpha
         self.name = name
 
-        self.max_learning_rate_tf = tf.convert_to_tensor(self.max_learning_rate, name="max_learning_rate")
+        self.max_learning_rate_tf = tf.convert_to_tensor(
+            self.max_learning_rate, name="max_learning_rate"
+        )
         self.dtype = self.max_learning_rate_tf.dtype
         self.warmup_steps_tf = tf.cast(self.warmup_steps, self.dtype)
 
-        self.cosine_decay = tf.keras.experimental.CosineDecay(max_learning_rate, total_steps - warmup_steps, alpha)
+        self.cosine_decay = tf.keras.experimental.CosineDecay(
+            max_learning_rate, total_steps - warmup_steps, alpha
+        )
 
     def __call__(self, step: Tensor) -> Tensor:
         with tf.name_scope(self.name or "WarmupCosineDecay"):
@@ -112,7 +119,8 @@ class WarmupCosineDecay(tf.keras.optimizers.schedules.LearningRateSchedule):
 
             learning_rate = tf.cond(
                 tf.math.less(step, self.warmup_steps_tf),
-                lambda: tf.math.divide_no_nan(step, self.warmup_steps_tf) * self.max_learning_rate_tf,
+                lambda: tf.math.divide_no_nan(step, self.warmup_steps_tf)
+                * self.max_learning_rate_tf,
                 lambda: self.cosine_decay(step - self.warmup_steps_tf),
             )
 

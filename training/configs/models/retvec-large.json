@@ -1,0 +1,50 @@
+{
+    "name": "retvec-large-256",
+    "version": "0.1",
+    "embedding_size": 256,
+    "model": {
+        "type": "large",
+        "word_length": 16,
+        "char_encoding_size": 24,
+        "char_encoding_type": "UTF-8",
+        "replacement_int": 65533,
+        "initial_spatial_dropout_rate": 0.0625,
+        "encoder_hidden_dim": 32,
+        "encoder_abs_pos_encoding_type": "scaled_sin",
+        "encoder_blocks": 3,
+        "encoder_shared_dim": 32,
+        "encoder_expansion_factor": 2,
+        "encoder_activation": "swish",
+        "encoder_attention_activation": "sqrrelu",
+        "encoder_norm_type": "scaled",
+        "encoder_position_encoding_type": "rope",
+        "encoder_dropout": 0.0,
+        "encoder_attention_dropout": 0.0,
+        "encoder_spatial_dropout": 0.0,
+        "encoder_epsilon": 1e-5,
+        "encoder_seq_pooling_type": null,
+        "encoder_seq_output_dim": 0,
+        "encoder_seq_output_activation": null,
+        "encoder_seq_output_dropout": 0.0,
+        "tokenizer_pooling_type": "flatten",
+        "tokenizer_dense_dim": 256,
+        "tokenizer_activation": "tanh",
+        "tokenizer_dropout": 0.0
+    },
+    "outputs": {
+        "similarity_dim": 256,
+        "original_decoder_size": 0,
+        "aug_decoder_size": 0,
+        "aug_vector_dim": 0,
+        "aug_matrix_dim": 0,
+        "outputs_dropout_rate": 0.0,
+        "similarity_norm_type": "l2",
+        "similarity_loss": {
+            "type": "multisim",
+            "alpha": 4,
+            "beta": 40,
+            "lmda": 0.5,
+            "epsilon": 0.1
+        }
+    }
+}

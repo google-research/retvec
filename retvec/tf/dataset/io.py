@@ -21,7 +21,6 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 import tensorflow as tf
 from google.cloud import storage
 from tensorflow import Tensor
-from tensorflow.keras.losses import Loss
 from tensorflow_similarity.losses import (
     CircleLoss,
     MultiSimilarityLoss,
@@ -29,16 +28,18 @@ from tensorflow_similarity.losses import (
     TripletLoss,
 )
 
-from ..binarizers import RetVecBinarizer
+from ..layers import RETVecBinarizer
 
 
-@tf.function
-def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Tensor]:
-    """Read TF record files for REW* training datasets.
+def read_tfrecord(
+    tfrecord: Tensor, binarizer: RETVecBinarizer
+) -> Dict[str, Tensor]:
+    """Read TF record files for RETVec training datasets.
 
     Args:
         tfrecord: TF record input.
-        binarizer: RetVecBinarizer used to encode words.
+
+        binarizer: RETVecBinarizer used to encode words.
     """
     base_features = {
         "original_token": tf.io.FixedLenFeature([], tf.string),
@@ -46,6 +47,7 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     }
 
     features = base_features.copy()
+
     for i in range(2):
         features["aug_token%s" % i] = tf.io.FixedLenFeature([], tf.string)
         features["aug_matrix%s" % i] = tf.io.FixedLenFeature([], tf.string)
@@ -55,7 +57,9 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     rec = tf.io.parse_single_example(tfrecord, features)
 
     for i in range(2):
-        rec["aug_matrix%s" % i] = tf.io.parse_tensor(rec["aug_matrix%s" % i], out_type=tf.float64)
+        rec["aug_matrix%s" % i] = tf.io.parse_tensor(
+            rec["aug_matrix%s" % i], out_type=tf.float64
+        )
 
     # output a single record containing each augmented example
     record = {}
@@ -72,10 +76,17 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
     # encode using binarizer
     reshape_size = (binarizer.max_chars * binarizer.encoding_size,)
 
-    aug_token0_encoded = tf.reshape(binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)), reshape_size)
-    aug_token1_encoded = tf.reshape(binarizer.binarize(tf.expand_dims(rec["aug_token1"], axis=0)), reshape_size)
+    aug_token0_encoded = tf.reshape(
+        binarizer.binarize(tf.expand_dims(rec["aug_token0"], axis=0)),
+        reshape_size,
+    )
+    aug_token1_encoded = tf.reshape(
+        binarizer.binarize(tf.expand_dims(rec["aug_token1"], axis=0)),
+        reshape_size,
+    )
     original_token_encoded = tf.reshape(
-        binarizer.binarize(tf.expand_dims(rec["original_token"], axis=0)), reshape_size
+        binarizer.binarize(tf.expand_dims(rec["original_token"], axis=0)),
+        reshape_size,
     )
 
     record["original_encoded"] = tf.stack([original_token_encoded] * 2)
@@ -90,7 +101,7 @@ def read_tfrecord(tfrecord: Tensor, binarizer: RetVecBinarizer) -> Dict[str, Ten
 
 def Sampler(
     shards_list: List[str],
-    binarizer: RetVecBinarizer,
+    binarizer: RETVecBinarizer,
     batch_size: int = 32,
     process_record: Optional[Callable] = None,
     parallelism: int = tf.data.AUTOTUNE,
@@ -99,7 +110,7 @@ def Sampler(
     buffer_size: Optional[int] = None,
     compression_type: Optional[str] = None,
 ) -> tf.data.Dataset:
-    """Dataset sampler for REW* model training.
+    """Dataset sampler for RETVec model training.
 
     Args:
         shards_list: List of input shards.
@@ -133,7 +144,9 @@ def Sampler(
 
         # interleave so we draw examples from different shards
         ds = ds.interleave(
-            lambda x: tf.data.TFRecordDataset(x, compression_type=compression_type),  # noqa
+            lambda x: tf.data.TFRecordDataset(
+                x, compression_type=compression_type
+            ),  # noqa
             block_length=1,  # problem here is that we have non flat record
             num_parallel_calls=file_parallelism,
             cycle_length=file_parallelism,
@@ -165,7 +178,6 @@ def get_process_tfrecord_fn(outputs: Set[str]) -> Callable:
     and extract only the outputs in `outputs`.
     """
 
-    @tf.function
     def process_tfrecord(e):
         x = {"token": e["aug_token"]}
         y = {
@@ -200,22 +212,28 @@ def get_dataset_samplers(
     batch_size = config["train"]["batch_size"]
     buffer_size = config["train"]["shuffle_buffer"]
     m = config["model"]
-    binarizer = RetVecBinarizer(
-        max_chars=m["max_chars"],
+    binarizer = RETVecBinarizer(
+        word_length=m["word_length"],
         encoding_size=m["char_encoding_size"],
         encoding_type=m["char_encoding_type"],
-        cls_int=m["cls_int"],
-        replacement_int=m["replacement_int"],
+        replacement_char=m["replacement_char"],
     )
 
     train_files = []
     test_files = []
 
-    for blob in client.list_blobs(bucket, prefix=train_path):
-        train_files.append(blob.name)
+    train_paths = train_path.split(",")
+    test_paths = test_path.split(",")
 
-    for blob in client.list_blobs(bucket, prefix=test_path):
-        test_files.append(blob.name)
+    for path in train_paths:
+        for blob in client.list_blobs(bucket, prefix=path):
+            if blob.name.endswith(".tfrecord"):
+                train_files.append(blob.name)
+
+    for path in test_paths:
+        for blob in client.list_blobs(bucket, prefix=path):
+            if blob.name.endswith(".tfrecord"):
+                test_files.append(blob.name)
 
     train_shards = []
     test_shards = []
@@ -234,7 +252,7 @@ def get_dataset_samplers(
         file_parallelism=core_count * 2,
         parallelism=core_count,
         buffer_size=buffer_size,
-        prefetch_size=10,
+        prefetch_size=1000,
     )
 
     test_ds = Sampler(
@@ -249,7 +267,9 @@ def get_dataset_samplers(
     return train_ds, test_ds
 
 
-def get_outputs_info(config: Dict) -> Tuple[List[Any], List[List[str]], Set[str]]:
+def get_outputs_info(
+    config: Dict,
+) -> Tuple[List[Any], List[List[str]], Set[str]]:
     """Returns the losses, metrics, and output names in the config."""
     loss = []
     metrics: List[List[str]] = []

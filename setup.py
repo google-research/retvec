@@ -15,6 +15,7 @@
  """
 
 import os
+
 from setuptools import find_packages, setup
 
 
@@ -45,10 +46,9 @@ setup(
     author_email="retvec@google.com",
     url="https://github.com/google-research/retvec",
     license="Apache License 2.0",
+    install_requires=[],
     extras_require={
-        "tensorflow": {
-            "tensorflow>=2.6"
-        },
+        "tensorflow": ["tensorflow>=2.6"],
         "dev": [
             "datasets",
             "tokenizers",
@@ -64,7 +64,9 @@ setup(
             "numpy",
             "tqdm",
             "tensorflow_similarity",
-        ]
+            "black",
+            "isort",
+        ],
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -76,5 +78,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    packages=find_packages()
+    packages=find_packages(),
 )

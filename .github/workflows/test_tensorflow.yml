@@ -27,22 +27,22 @@ jobs:
     
     - name: Install package
       run: |
-        pip install "./tensorflow_retvec[dev]"
+        pip install ".[tensorflow,dev]"
         
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 79 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics
     
     - name: Static analysis
       run: |
-        mypy  tensorflow_retvec/src/ --raise-exceptions
+        mypy  retvec/ --raise-exceptions
     
     - name: Test with pytest
       run: |
-        coverage run -m pytest tests/tensorflow_retvec/
+        coverage run -m pytest tests/
     - name: Upload coverage to Coveralls
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |

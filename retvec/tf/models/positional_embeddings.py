@@ -23,7 +23,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class PositionalEmbedding(Layer):
     """
     Injects positional encoding signal described in section 3.5 of the original
@@ -31,7 +31,12 @@ class PositionalEmbedding(Layer):
     coordinate encoding described in "Universal Transformers".
     """
 
-    def __init__(self, min_timescale: float = 1.0, max_timescale: float = 1.0e4, **kwargs):
+    def __init__(
+        self,
+        min_timescale: float = 1.0,
+        max_timescale: float = 1.0e4,
+        **kwargs,
+    ):
         self.min_timescale = min_timescale
         self.max_timescale = max_timescale
         self.signal = None
@@ -45,7 +50,9 @@ class PositionalEmbedding(Layer):
 
     def build(self, input_shape):
         _, length, hidden_size = input_shape
-        self.signal = positional_signal(hidden_size, length, self.min_timescale, self.max_timescale)
+        self.signal = positional_signal(
+            hidden_size, length, self.min_timescale, self.max_timescale
+        )
         return super().build(input_shape)
 
     def call(self, inputs, **kwargs):
@@ -65,20 +72,28 @@ def positional_signal(
     """
 
     if hidden_size % 2 != 0:
-        raise ValueError(f"The hidden dimension of the model must be divisible by 2." f"Currently it is {hidden_size}")
+        raise ValueError(
+            f"The hidden dimension of the model must be divisible by 2."
+            f"Currently it is {hidden_size}"
+        )
     position = K.arange(0, length, dtype=K.floatx())
     num_timescales = hidden_size // 2
     log_timescale_increment = K.constant(
-        (np.log(float(max_timescale) / float(min_timescale)) / (num_timescales - 1)),
+        (
+            np.log(float(max_timescale) / float(min_timescale))
+            / (num_timescales - 1)
+        ),
         dtype=K.floatx(),
     )
-    inv_timescales = min_timescale * K.exp(K.arange(num_timescales, dtype=K.floatx()) * -log_timescale_increment)
+    inv_timescales = min_timescale * K.exp(
+        K.arange(num_timescales, dtype=K.floatx()) * -log_timescale_increment
+    )
     scaled_time = K.expand_dims(position, 1) * K.expand_dims(inv_timescales, 0)
     signal = K.concatenate([K.sin(scaled_time), K.cos(scaled_time)], axis=1)
     return K.expand_dims(signal, axis=0)
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 class ScaledSinusoidalPositionalEmbedding(Layer):
     """Creates a positional embedding with a learnable scalar for stability.
 
@@ -86,7 +101,6 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
     functions with geometrically increasing wavelengths. Defined and
     formulized in "Attention is All You Need", section 3.5.
     (https://arxiv.org/abs/1706.03762).
-
     """
 
     def __init__(
@@ -99,6 +113,7 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
         """Initialize a ScaledSinusoidalPositionalEmbedding layer.
 
         Args:
+
             hidden_size: Size of the hidden layer.
 
             min_timescale: Minimum scale that will be applied at each position.
@@ -132,7 +147,9 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
             "min_timescale": self._min_timescale,
             "max_timescale": self._max_timescale,
         }
-        base_config = super(ScaledSinusoidalPositionalEmbedding, self).get_config()
+        base_config = super(
+            ScaledSinusoidalPositionalEmbedding, self
+        ).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
     def call(self, inputs):
@@ -142,14 +159,19 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
         min_timescale, max_timescale = self._min_timescale, self._max_timescale
 
         # compute sinusoidal pos encodings
-        log_timescale_increment = tf.math.log(float(max_timescale) / float(min_timescale)) / (
-            tf.cast(num_timescales, tf.float32) - 1
-        )
+        log_timescale_increment = tf.math.log(
+            float(max_timescale) / float(min_timescale)
+        ) / (tf.cast(num_timescales, tf.float32) - 1)
         inv_timescales = min_timescale * tf.exp(
-            tf.cast(tf.range(num_timescales), tf.float32) * -log_timescale_increment
+            tf.cast(tf.range(num_timescales), tf.float32)
+            * -log_timescale_increment
         )
-        scaled_time = tf.expand_dims(position, 1) * tf.expand_dims(inv_timescales, 0)
-        position_embeddings = tf.concat([tf.sin(scaled_time), tf.cos(scaled_time)], axis=1)
+        scaled_time = tf.expand_dims(position, 1) * tf.expand_dims(
+            inv_timescales, 0
+        )
+        position_embeddings = tf.concat(
+            [tf.sin(scaled_time), tf.cos(scaled_time)], axis=1
+        )
 
         # scale pos encodings with a learnable scalar
         position_embeddings = position_embeddings * self._scale
@@ -157,7 +179,7 @@ class ScaledSinusoidalPositionalEmbedding(Layer):
         return inputs + position_embeddings
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
     """RoPE positional encoding.
 
@@ -181,7 +203,9 @@ def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
         total_len = 1
         for i in spatial_shape:
             total_len *= i
-        position = tf.reshape(tf.cast(tf.range(total_len, delta=1.0), tf.float32), spatial_shape)
+        position = tf.reshape(
+            tf.cast(tf.range(total_len, delta=1.0), tf.float32), spatial_shape
+        )
     else:
         raise ValueError(f"Unsupported shape: {shape}")
 
@@ -201,7 +225,7 @@ def rope(x: Tensor, axis: Union[List[int], int]) -> Tensor:
     return tf.concat([x1 * cos - x2 * sin, x2 * cos + x1 * sin], axis=-1)
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 def toeplitz_matrix_rope(n: int, a: Tensor, b: Tensor) -> Tensor:
     """Obtain Toeplitz matrix using rope."""
     a = rope(tf.tile(a[None, :], [n, 1]), axis=0)
@@ -209,7 +233,7 @@ def toeplitz_matrix_rope(n: int, a: Tensor, b: Tensor) -> Tensor:
     return tf.einsum("mk,nk->mn", a, b)
 
 
-@tf.keras.utils.register_keras_serializable(package="tensorflow_retvec")
+@tf.keras.utils.register_keras_serializable(package="retvec")
 def toeplitz_matrix(n: int, w: Tensor) -> Tensor:
     """Toeplitz matrix of shape [num_heads, n, n] or [n, n]."""
     paddings = [[0, n]]

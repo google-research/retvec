@@ -14,9 +14,7 @@
  limitations under the License.
  """
 
-from .layers import (  # noqa
-    RETVecBinarizer,
-    RETVecEmbedding,
-    RETVecIntToBinary,
-    RETVecTokenizer,
-)
+from .binarizer import RETVecBinarizer, RETVecIntToBinary  # noqa
+from .embedding import RETVecEmbedding  # noqa
+from .integerizer import RETVecIntegerizer  # noqa
+from .tokenizer import RETVecTokenizer  # noqa

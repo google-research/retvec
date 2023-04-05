@@ -18,13 +18,14 @@ import pytest
 import tensorflow as tf
 from tensorflow_similarity.losses import MultiSimilarityLoss
 
-from tensorflow_retvec import RetVec
-from tensorflow_retvec.rewnet import REWCNN, REWformer
+from retvec.tf.layers import RETVecTokenizer
+from retvec.tf.models.retvec_base import build_retvec_base
+from retvec.tf.models.retvec_large import build_retvec_large
 
 tf.config.set_visible_devices([], "GPU")
 
-architectures = [REWCNN, REWformer]
-architectures_names = ["rewcnn", "rewformer"]
+architectures = [build_retvec_base, build_retvec_large]
+architectures_names = ["base", "large"]
 
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
@@ -63,7 +64,7 @@ def test_aug_decoder(NN):
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_aug_vector(NN):
     dim = 32
-    model = NN(max_chars=16, aug_vector_dim=dim)
+    model = NN(word_length=16, aug_vector_dim=dim)
 
     lyr = model.get_layer("aug_vector")
 
@@ -73,7 +74,7 @@ def test_aug_vector(NN):
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_aug_matrix(NN):
     dim = 64
-    model = NN(max_chars=16, aug_matrix_dim=dim)
+    model = NN(word_length=16, aug_matrix_dim=dim)
 
     model.summary()
     lyr = model.get_layer("aug_matrix")
@@ -83,7 +84,6 @@ def test_aug_matrix(NN):
 
 @pytest.mark.parametrize("NN", architectures, ids=architectures_names)
 def test_save_and_reload(tmpdir, NN):
-
     path = str(tmpdir / "test/")
     model = NN()
     model.compile(optimizer="adam", loss=MultiSimilarityLoss())
@@ -96,7 +96,9 @@ def test_save_and_reload(tmpdir, NN):
 def test_extract_tokenizer(tmpdir, NN):
     path = str(tmpdir / "test/")
     model = NN()
-    tokenizer = tf.keras.Model(model.input, model.get_layer("tokenizer").output)
+    tokenizer = tf.keras.Model(
+        model.input, model.get_layer("tokenizer").output
+    )
     tokenizer.compile("adam", "mse")
     tokenizer.save(path)
-    _ = RetVec(model=path)
+    _ = RETVecTokenizer(model=path)
