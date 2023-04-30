@@ -1,8 +1,8 @@
 {
-    "epochs": 70,
+    "epochs": 100,
     "batch_size": 1024,
     "steps_per_epoch": 5000,
-    "save_freq_epochs": 35,
+    "save_freq_epochs": 20,
     "validation_steps": 10,
     "optimizer": "adam",
     "max_learning_rate": 0.001,
