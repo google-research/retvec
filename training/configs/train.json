@@ -1,5 +1,5 @@
 {
-    "epochs": 350,
+    "epochs": 70,
     "batch_size": 1024,
     "steps_per_epoch": 5000,
     "save_freq_epochs": 35,
@@ -7,6 +7,6 @@
     "optimizer": "adam",
     "max_learning_rate": 0.001,
     "warmup_steps": 10000,
-    "end_lr": 0.00001,
-    "shuffle_buffer": 1000000
+    "end_lr": 0.0001,
+    "shuffle_buffer": 100000
 }

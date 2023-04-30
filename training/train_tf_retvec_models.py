@@ -216,19 +216,19 @@ if __name__ == "__main__":
         "--train_config",
         "-c",
         help="train config path",
-        default="./configs/train_full.json",
+        default="./configs/train.json",
     )
     parser.add_argument(
         "--model_config",
         "-m",
         help="model config file or folder path",
-        default="./configs/models/retvec-base.json",
+        default="./configs/models/retvec_model.json",
     )
     parser.add_argument(
         "--output_dir",
         "-o",
         help="base output directory",
-        default="./experiments/",
+        default="./models/",
     )
     parser.add_argument(
         "--start_idx",
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--wandb_project",
         "-w",
-        default="REWNet-Pretraining",
+        default="RETVec-Pretraining",
         help="Wandb project to save to, none to disable.",
     )
     parser.add_argument(
