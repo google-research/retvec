@@ -1,0 +1,45 @@
+{
+    "name": "retvec-model-256-circle-loss-128-0.4",
+    "version": "0.1.0",
+    "embedding_size": 256,
+    "model": {
+        "type": "base",
+        "word_length": 16,
+        "char_encoding_size": 24,
+        "char_encoding_type": "UTF-8",
+        "replacement_char": 65533,
+        "initial_spatial_dropout_rate": 0.0625,
+        "projection_dims": [],
+        "encoder_dims": [
+            256,
+            256
+        ],
+        "encoder_dropout": 0.0,
+        "encoder_spatial_dropout_rate": 0.0,
+        "encoder_initializer": "glorot_uniform",
+        "encoder_norm_type": null,
+        "encoder_norm_epsilon": 1e-06,
+        "encoder_activation": "gelu",
+        "encoder_seq_output_dim": 0,
+        "encoder_seq_output_activation": null,
+        "encoder_seq_output_dropout": 0.0,
+        "tokenizer_dense_dim": 256,
+        "tokenizer_activation": "tanh",
+        "tokenizer_dropout": 0.0
+    },
+    "outputs": {
+        "similarity_dim": 256,
+        "original_decoder_size": 0,
+        "aug_decoder_size": 0,
+        "aug_vector_dim": 0,
+        "aug_matrix_dim": 0,
+        "outputs_dropout_rate": 0.0,
+        "outputs_norm_type": null,
+        "similarity_norm_type": "l2",
+        "similarity_loss": {
+            "type": "circle",
+            "gamma": 128,
+            "margin": 0.4
+        }
+    }
+}
