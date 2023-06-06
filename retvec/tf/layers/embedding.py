@@ -20,6 +20,8 @@ from typing import Any, Dict, List, Optional, Union
 import tensorflow as tf
 from tensorflow import Tensor, TensorShape
 
+from ..utils import RETVEC_MODEL_URLS, download_retvec_saved_model
+
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
 class RETVecEmbedding(tf.keras.layers.Layer):
@@ -36,7 +38,8 @@ class RETVecEmbedding(tf.keras.layers.Layer):
 
         Args:
             model: Path to saved pretrained RETVec model, str or pathlib.Path
-                object.
+                object. 'retvec-v1' to use V1 of the pre-trained RETVec word
+                embedding model.
 
             trainable: Whether to make the pretrained RETVec model trainable
                 or to freeze all weights.
@@ -93,11 +96,16 @@ class RETVecEmbedding(tf.keras.layers.Layer):
         """Load pretrained RETVec model.
 
         Args:
-            path: Path to the saved REW* model.
+            model: Path to saved pretrained RETVec model. Either a pre-defined
+                RETVec model name, str or pathlib.Path.
 
         Returns:
             The pretrained RETVec model, trainable set to `self.trainable`.
         """
+        path_str = str(path)
+        if path_str in RETVEC_MODEL_URLS:
+            path = download_retvec_saved_model(path_str)
+
         model = tf.keras.models.load_model(path)
         model.trainable = self.trainable
         model.compile("adam", "mse")

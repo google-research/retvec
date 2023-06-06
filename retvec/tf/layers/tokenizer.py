@@ -79,7 +79,9 @@ class RETVecTokenizer(tf.keras.layers.Layer):
                 `sequence_length` words.
 
             model: Path to saved pretrained RETVec model, str or pathlib.Path
-                object.
+                object. 'retvec-v1' to use V1 of the pre-trained RETVec word
+                embedding model, None to use the default RETVec character
+                encoding.
 
             trainable: Whether to make the pretrained RETVec model trainable
                 or to freeze all weights.
