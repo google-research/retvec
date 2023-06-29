@@ -24,6 +24,17 @@ RETVEC_MODEL_URLS = {
     "retvec-v1": "https://storage.googleapis.com/tensorflow/keras-applications/retvec-v1"
 }
 
+# TODO (marinazh): we should download RETVec model weights instead of SavedModel files
+RETVEC_COMPONENTS_HASHES = {
+    "retvec-v1": {
+        "fingerprint.pb": "5c3991599c293ba653c55e8cceae8e10815eeedea6aff75a64905cd71587d4c1",
+        "keras_metadata.pb": "e87e8b660ef66f8a058c4c0aa8bfaa8b683bcd4669c21e4bf71055148f8c6afc",
+        "saved_model.pb": "337c8e91c92946513d127b256f2872a497545186c4d2c2c09afc7d76b55454b7",
+        "variables.data-00000-of-00001": "22d4760b452fe8110ef2fa96b3d84186372f5259b8f6c4041a05c3ab58d93d37",
+        "variables.index": "431d19b7426b939c9834bb7d55d515a4ee7d7a6cda78ef0bf7b8ba03e67e480b",
+    }
+}
+
 
 def tf_cap_memory():
     """Avoid TF to hog memory before needing it"""
@@ -58,31 +69,21 @@ def download_retvec_saved_model(
     model_url = RETVEC_MODEL_URLS[model_name]
     model_cache_subdir_variables = f"{model_cache_subdir}/variables"
 
-    model_components = [
-        "fingerprint.pb",
-        "keras_metadata.pb",
-        "saved_model.pb",
-    ]
-
-    model_components_variables = [
-        "variables.data-00000-of-00001",
-        "variables.index",
-    ]
-
     # download model components
-    for component_name in model_components:
-        tf.keras.utils.get_file(
-            origin=f"{model_url}/{component_name}",
-            extract=True,
-            cache_subdir=model_cache_subdir,
-        )
+    retvec_components = RETVEC_COMPONENTS_HASHES[model_name]
+    for component_name in retvec_components.keys():
+        if "variables" in component_name:
+            origin = f"{model_url}/variables/{component_name}"
+            cache_subdir = model_cache_subdir_variables
+        else:
+            origin = f"{model_url}/{component_name}"
+            cache_subdir = model_cache_subdir
 
-    # download variables which are under a different folder
-    for component_name in model_components_variables:
         tf.keras.utils.get_file(
-            origin=f"{model_url}/variables/{component_name}",
+            origin=origin,
             extract=True,
-            cache_subdir=model_cache_subdir_variables,
+            cache_subdir=cache_subdir,
+            file_hash=retvec_components[component_name],
         )
 
     retvec_model_dir = cache_dir + model_cache_subdir
