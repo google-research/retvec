@@ -1,5 +1,5 @@
 """
- Copyright 2021 Google LLC
+ Copyright 2023 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,30 +20,15 @@ from retvec.tf.layers import RETVecTokenizer
 
 SEQUENCE_LENGTH = 128
 WORD_LENGTH = 16
-CHAR_ENCODING_SIZE = 32
-EMBEDDING_SIZE = 128
-
-
-def create_and_save_retvec_embedding(tmp_path):
-    i = tf.keras.layers.Input(
-        (WORD_LENGTH, CHAR_ENCODING_SIZE), dtype=tf.float32
-    )
-    x = tf.keras.layers.Flatten()(i)
-    o = tf.keras.layers.Dense(EMBEDDING_SIZE)(x)
-    model = tf.keras.models.Model(i, o)
-
-    save_path = tmp_path / "test_retvec_embedding"
-    model.save(save_path)
-    return str(save_path)
+CHAR_ENCODING_SIZE = 24
+RETVEC_MODEL = "retvec-v1"
 
 
 def test_graph_mode_with_model(tmp_path):
-    model_path = create_and_save_retvec_embedding(tmp_path)
-
     i = tf.keras.layers.Input((1,), dtype=tf.string)
     x = RETVecTokenizer(
         sequence_length=SEQUENCE_LENGTH,
-        model=model_path,
+        model=RETVEC_MODEL,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
     )(i)
@@ -59,28 +44,25 @@ def test_graph_mode_with_model(tmp_path):
         assert embeddings.shape == (
             test_input.shape[0],
             SEQUENCE_LENGTH,
-            EMBEDDING_SIZE,
+            256,
         )
 
 
 def test_eager_mode_with_model(tmp_path):
-    model_path = create_and_save_retvec_embedding(tmp_path)
-
     tokenizer = RETVecTokenizer(
-        model=model_path,
+        model=RETVEC_MODEL,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
     )
-    assert tokenizer.embedding_size == EMBEDDING_SIZE
 
     s = "Testing😀 a full sentence"
 
     embeddings = tokenizer.tokenize(tf.constant(s))
-    assert embeddings.shape == [SEQUENCE_LENGTH, EMBEDDING_SIZE]
+    assert embeddings.shape == [SEQUENCE_LENGTH, tokenizer.embedding_size]
 
     embeddings = tokenizer.tokenize(tf.constant([s, s, s]))
-    assert embeddings.shape == [3, SEQUENCE_LENGTH, EMBEDDING_SIZE]
+    assert embeddings.shape == [3, SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
 def test_graph_mode_no_model():
@@ -146,11 +128,9 @@ def test_standardize():
 
 
 def test_tfds_map_tokenize(tmp_path):
-    model_path = create_and_save_retvec_embedding(tmp_path)
-
-    for model in [None, model_path]:
+    for model_path in [None, RETVEC_MODEL]:
         tokenizer = RETVecTokenizer(
-            model=model,
+            model=model_path,
             sequence_length=SEQUENCE_LENGTH,
             word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
@@ -172,12 +152,10 @@ def test_tfds_map_tokenize(tmp_path):
 
 
 def test_serialization(tmp_path):
-    model_path = create_and_save_retvec_embedding(tmp_path)
-
-    for model in [None, model_path]:
+    for model_path in [None, RETVEC_MODEL]:
         i = tf.keras.layers.Input((1,), dtype=tf.string)
         x = RETVecTokenizer(
-            model=model,
+            model=model_path,
             sequence_length=SEQUENCE_LENGTH,
             word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
