@@ -57,7 +57,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
     def __init__(
         self,
         sequence_length: int = 128,
-        model: Optional[Union[str, Path]] = None,
+        model: Optional[Union[str, Path]] = 'retvec-v1',
         trainable: bool = False,
         sep: str = "",
         standardize: Optional[str] = None,
