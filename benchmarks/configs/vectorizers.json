@@ -1,0 +1,74 @@
+{
+    "learned-256": {
+        "name": "learned-256",
+        "type": "learned",
+        "version": 1,
+        "pretokenized": false,
+        "embedding_size": 256,
+        "voc_size": 32000,
+        "standardize": "lower"
+    },
+    "retvec-no-model": {
+        "name": "retvec-no-model",
+        "type": "retvec",
+        "version": 1,
+        "pretokenized": false,
+        "model": null,
+        "sep": " ",
+        "trainable": false,
+        "max_chars": 16,
+        "char_encoding_size": 24,
+        "char_encoding_type": "UTF-8",
+        "dropout_rate": 0.0,
+        "spatial_dropout_rate": 0.0,
+        "embedding_size": 256,
+        "norm_type": "batch",
+        "lowercase": true
+    },
+    "bpe-256": {
+        "name": "bpe-256",
+        "type": "byte_level_bpe",
+        "version": 1,
+        "pretokenized": true,
+        "embedding_size": 256,
+        "voc_size": 32000,
+        "lowercase": true
+    },
+    "fasttext-300": {
+        "name": "fasttext-300",
+        "type": "fasttext",
+        "version": 1,
+        "pretokenized": true,
+        "embedding_size": 300,
+        "lowercase": true
+    },
+    "sentencepiece-256": {
+        "name": "sentencepiece-256",
+        "type": "sentencepiece",
+        "pretokenized": true,
+        "embedding_size": 256,
+        "voc_size": 32000,
+        "lowercase": true,
+        "model_path": null,
+        "model_type": "unigram",
+        "lowercase": true,
+        "save_dir": "./benchmarking/data/"
+    },
+    "retvec-model-256-v0.1.0": {
+        "name": "retvec-model-256-v0.1.0",
+        "type": "retvec",
+        "version": 1,
+        "pretokenized": false,
+        "model": "../training/retvec_final_experiments/embeddings/retvec-model-256-encoder-act-gelu-v0.1.0_1682940542",
+        "sep": " ",
+        "trainable": false,
+        "max_chars": 16,
+        "char_encoding_size": 24,
+        "char_encoding_type": "UTF-8",
+        "dropout_rate": 0.0,
+        "spatial_dropout_rate": 0.0,
+        "embedding_size": 256,
+        "norm_type": null,
+        "lowercase": true
+    }
+}

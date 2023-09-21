@@ -1,0 +1,35 @@
+{
+    "ag_news": {
+        "name": "ag_news",
+        "version": 1,
+        "language": "en",
+        "num_labels": 4
+    },
+    "yelp_polarity": {
+        "name": "yelp_polarity",
+        "version": 1,
+        "language": "en",
+        "num_labels": 2
+    },
+    "amazon_reviews_all_polarity": {
+        "name": "amazon_reviews_all_polarity",
+        "datasets": ["amazon_reviews_polarity_de", "amazon_reviews_polarity_en", "amazon_reviews_polarity_fr",
+                 "amazon_reviews_polarity_es", "amazon_reviews_polarity_ja", "amazon_reviews_polarity_zh"],
+        "version": 1,
+        "language": ["en", "de", "fr", "es", "ja", "zh"],
+        "num_labels": 2
+    },
+    "dbpedia_14": {
+        "name": "dbpedia_14",
+        "version": 1,
+        "language": "en",
+        "num_labels": 14
+    },
+    "massive_intent": {
+        "name": "massive_intent",
+        "datasets": ["massive_af", "massive_am", "massive_ar", "massive_az", "massive_bn", "massive_cy", "massive_da", "massive_de", "massive_el", "massive_en", "massive_es", "massive_fa", "massive_fi", "massive_fr", "massive_he", "massive_hi", "massive_hu", "massive_hy", "massive_id", "massive_is", "massive_it", "massive_ja", "massive_jv", "massive_ka", "massive_km", "massive_kn", "massive_ko", "massive_lv", "massive_ml", "massive_mn", "massive_ms", "massive_my", "massive_nb", "massive_nl", "massive_pl", "massive_pt", "massive_ro", "massive_ru", "massive_sl", "massive_sq", "massive_sv", "massive_sw", "massive_ta", "massive_te", "massive_th", "massive_tl", "massive_tr", "massive_ur", "massive_vi", "massive_zh"],
+        "version": 1,
+        "language": ["af", "am", "ar", "az", "bn", "cy", "da", "de", "el", "en", "es", "fa", "fi", "fr", "he", "hi", "hu", "hy", "id", "is", "it", "ja", "jv", "ka", "km", "kn", "ko", "lv", "ml", "mn", "ms", "my", "no", "nl", "pl", "pt", "ro", "ru", "sl", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "ur", "vi", "zh", "zh"],
+        "num_labels": 60
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "base_dir": "experiments/",
+    "wandb_project": "RETVec-Classification-Benchmarks",
+    "max_len": 128,
+    "batch_size": 256,
+    "num_train_steps": 100000,
+    "steps_per_epoch": 1000,
+    "num_warmup_steps": 0,
+    "early_stopping_patience_steps": 0,
+    "loss": "categorical_crossentropy",
+    "metrics": ["acc"],
+    "optimizer": {
+        "type": "adam",
+        "init_lr": 1e-3,
+        "weight_decay_rate": 0.0,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "end_lr": 0.0,
+        "decay_fn": "cosine"
+    },
+    "lowercase": true
+}

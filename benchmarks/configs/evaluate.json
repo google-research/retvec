@@ -1,0 +1,15 @@
+{
+    "models_dir": "./experiments/",
+    "datasets_dir": "./datasets/",
+    "batch_size": 256,
+    "seed": 0,
+    "overwrite": false,
+    "augmentations": {
+        "type": ["mixed"],
+        "block_size": [2],
+        "pct_words_to_swap": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        "augmentations_per_example": 1,
+        "min_len": 4
+    },
+    "lowercase": true
+}

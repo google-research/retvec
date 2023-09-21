@@ -1,0 +1,36 @@
+{
+    "RNN-LSTM-4-256": {
+        "name": "RNN-LSTM-4-256",
+        "version": 1,
+        "type": "rnn",
+        "dims": 128,
+        "depth": 4,
+        "dropout": 0.1,
+        "recurrent_layer_type": "lstm",
+        "final_activation": "softmax" 
+    },
+    "DPCNN-6-256-0.5": {
+        "name": "DPCNN-6-256-0.5",
+        "version": 1,
+        "type": "dpcnn",
+        "blocks": 6,
+        "filters": 256,
+        "kernel_size": 3,
+        "pool_size": 3,
+        "activation": "relu",
+        "final_dropout": 0.5,
+        "final_activation": "softmax"
+    },
+    "BERT-4-256-1024": {
+        "name": "BERT-4-256-1024",
+        "version": 1,
+        "type": "bert",
+        "hidden_dim": 256,
+        "intermediate_dim": 1024,
+        "encoders": 4,
+        "activation": "gelu",
+        "heads": 4,
+        "dropout": 0.1,
+        "final_activation": "softmax"
+    }
+}
