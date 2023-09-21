@@ -7,7 +7,7 @@ release.sh
 archive/
 wandb/
 experiments/
-
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

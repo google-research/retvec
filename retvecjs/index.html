@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <script async src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js" crossorigin="anonymous"></script>
+        <style>
+            .loading {
+                display: none;
+            }
+
+            #prev {
+                display:flex;
+                justify-content: center;
+                place-items: center;
+            }
+        </style>
+    </head>
+    <body>
+        <input class="input" type="input" placeholder="password" id="prev">
+
+        <div id="result"></div>
+    </body>
+
+    <script type="module">
+        import RetVec from "./dist/retvec.js"
+        var model = null;
+
+
+        const modelPath = "retvecjs/deeppass/model.json"
+
+        window.onload = loading
+        
+        // trigger the model.
+        let prev = document.getElementById('prev')
+
+        async function loading() {
+            prev.classList.toggle("loading")
+            await RetVec.init("../v1/model/model.json")
+            //load the model in init
+            model = await tf.loadGraphModel(modelPath);
+            console.debug('model loaded');
+
+            //unhide the input field
+            prev.classList.toggle("loading")
+        }
+
+
+
+        async function classify(e) {
+
+            let word = prev.value;
+
+            let inputs = RetVec.binarizer(word);
+
+            inputs = tf.expandDims(inputs, 0)  // make it a batch
+            let res = await model.predict(inputs)
+            //console.log(res.dataSync())
+            //res = tf.tensor(res).dataSync();
+            let compromised_proba = Math.round(res[0].dataSync() * 100)
+            let zxvbn_buckets = res[1].dataSync()
+            let zxvbn_bucket = tf.argMax(zxvbn_buckets).dataSync()
+            let zxvbn_proba = Math.round(zxvbn_buckets[zxvbn_bucket] * 100)
+
+
+            //
+            //let zxvbn_proba = res[0][1][zxvbn_bucket]
+
+            //let npass = pnew.value;
+
+            /*
+            console.log(ppass, npass);
+            let pemb = await embed(ppass);
+            let nemb = await embed(npass);
+            console.log(nemb, pemb)
+            distance = pemb.matMul(pemb, transposeB=true);
+            console.log(distance);
+            distance = tf.sum(distance);
+            // distance = 1 - distance?
+            */
+
+            let output = `compromised proba:${compromised_proba}<br>
+            zxvbn: ${zxvbn_bucket} (${zxvbn_proba})
+            `
+            result.innerHTML = output;
+
+        }
+        prev.onchange = classify
+
+
+    </script>
+
+</html>

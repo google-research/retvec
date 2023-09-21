@@ -1,0 +1,32 @@
+{
+  "name": "retvec",
+  "version": "1.0.0",
+  "description": "RetVec JavaScript port to be used with TFJS to run models trained with RetVec on the Web and Node.",
+  "main": "dist/retvec.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "npm run test:dev && npm run test:prod",
+    "serve": "wds --watch",
+    "serve:prod": "MODE=prod npm run serve"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@web/dev-server": "^0.1.31",
+    "@web/dev-server-legacy": "^1.0.0",
+    "typescript": "~4.7.4"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.10.0",
+    "file-url": "^4.0.0",
+    "path-browserify": "^1.0.1"
+  },
+  "imports": {
+    "./models": "./retvecjs/v1/model/model.json"
+  },
+  "serve": {
+    "./models": "v1/model"
+  }
+}
