@@ -7,7 +7,7 @@ jobs:
   publish:
     # Prevent Publish from running on forks.
     if: |
-      github.ref == 'refs/heads/master' &&
+      github.ref == 'refs/heads/main' &&
       github.repository == 'google-research/retvec'
 
     runs-on: ubuntu-latest
