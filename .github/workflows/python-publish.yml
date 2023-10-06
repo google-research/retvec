@@ -33,4 +33,4 @@ jobs:
 
     - name: Publish package
       run: |
-              twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPY_TOKEN }} dist/* --verbose
+              twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_TOKEN }} dist/* --verbose
