@@ -62,7 +62,7 @@ Please cite this reference if you use RETVec in your research:
 
 ```bibtex
 @article{retvec2023,
-    title={RetVec: Resilient and Efficient Text Vectorizer}, 
+    title={RETVec: Resilient and Efficient Text Vectorizer}, 
     author={Elie Bursztein, Marina Zhang, Owen Vallis, Xinyu Jia, and Alexey Kurakin},
     year={2023},
     eprint={2302.09207}
