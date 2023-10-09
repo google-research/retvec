@@ -1,5 +1,5 @@
 # How to Contribute
-Thanks for considering contributing to TF similarity!
+Thanks for considering contributing to RETVec!
 
 Here is what you need to know to make a successful contribution. There are
 just a few small guidelines you need to follow.
@@ -31,7 +31,7 @@ pull request:
 - Ideally one PR corespond to one feature or improvement to make it easier to
   review. So **try** to split your contribution in meaning logical units.
 - Your code **must** pass the unit-tests. We use `pytest` so simply run it at the root of the project.
-- Your code **must** passs static analyis. We use `mypy` so simply run `mypy tensorflow_similarity/` from the root of the project.
+- Your code **must** passs static analyis. We use `mypy` so simply run `mypy retvec/` from the root of the project.
 - Your code **must** comes with unit-tests to ensure long term quality
 - Your functions **must** be documented except obvious ones using the Google style.
 - Your functions **must** be typed.
