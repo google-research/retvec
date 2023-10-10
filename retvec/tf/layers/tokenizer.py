@@ -21,6 +21,11 @@ import tensorflow as tf
 from tensorflow import Tensor
 from tensorflow.keras import layers
 
+try:
+    from tensorflow_text import WhitespaceTokenizer
+except ImportError:
+    WhitespaceTokenizer = None
+
 from .binarizer import RETVecBinarizer
 from .embedding import RETVecEmbedding
 
@@ -61,6 +66,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         trainable: bool = False,
         sep: str = "",
         standardize: Optional[str] = None,
+        use_native_tf_ops: bool = False,
         word_length: int = 16,
         char_encoding_size: int = 24,
         char_encoding_type: str = "UTF-8",
@@ -95,6 +101,13 @@ class RETVecTokenizer(tf.keras.layers.Layer):
                 the input text. One of None, "lower_and_strip_punctuation",
                 "lower", "strip_punctuation", or a callable function which
                 applies standardization and returns a tf.string Tensor.
+
+            use_native_tf_ops: A boolean indicating whether to use
+                native TensorFlow ops, to ensure TF Lite compatibility.
+                `sep` and `standardize` will not be used and whitespace
+                splitting will be always used, so preprocessing such
+                as lowercasing should happen before the text is passed
+                into this layer.
 
             word_length: The number of characters per word to embed.
                 The integer representation of each word will be padded or
@@ -134,8 +147,14 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         self.sequence_length = sequence_length
         self.sep = sep
         self.standardize = standardize
+        self.use_native_tf_ops = use_native_tf_ops
         self.model = model
         self.trainable = trainable
+
+        # Use whitesapce tokenizer for TF Lite compatibility
+        self._native_mode = self.use_native_tf_ops and WhitespaceTokenizer
+        if self._native_mode:
+            self._whitespace_tokenizer = WhitespaceTokenizer()
 
         # RetVecEmbedding
         if self.model:
@@ -155,6 +174,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
             encoding_size=self.char_encoding_size,
             encoding_type=self.char_encoding_type,
             replacement_char=self.replacement_char,
+            use_native_tf_ops=use_native_tf_ops
         )
 
         # Set to True when 'tokenize()' or 'binarize()' called in eager mode
@@ -196,21 +216,28 @@ class RETVecTokenizer(tf.keras.layers.Layer):
     def call(self, inputs: Tensor, training: bool = False) -> Tensor:
         inputs = tf.stop_gradient(inputs)
 
-        if self.standardize in (LOWER, LOWER_AND_STRIP_PUNCTUATION):
-            inputs = tf.strings.lower(inputs)
-        if self.standardize in (
-            STRIP_PUNCTUATION,
-            LOWER_AND_STRIP_PUNCTUATION,
-        ):
-            inputs = tf.strings.regex_replace(inputs, DEFAULT_STRIP_REGEX, "")
-        if callable(self.standardize):
-            inputs = self.standardize(inputs)
+        # if native mode, use whitespace tokenization for tf lite compatibility
+        if self._native_mode:
+            rtensor = self._whitespace_tokenizer.tokenize(inputs)
 
-        rtensor = tf.strings.split(
-            inputs, sep=self.sep, maxsplit=self.sequence_length
-        )
+        else:
+            if self.standardize in (LOWER, LOWER_AND_STRIP_PUNCTUATION):
+                inputs = tf.strings.lower(inputs)
+            if self.standardize in (
+                STRIP_PUNCTUATION,
+                LOWER_AND_STRIP_PUNCTUATION,
+            ):
+                inputs = tf.strings.regex_replace(
+                    inputs, DEFAULT_STRIP_REGEX, ""
+                )
+            if callable(self.standardize):
+                inputs = self.standardize(inputs)
 
-        # Handle shape differences between eager and graph mode
+            rtensor = tf.strings.split(
+                inputs, sep=self.sep, maxsplit=self.sequence_length
+            )
+
+        #Handle shape differences between eager and graph mode
         if self.eager:
             stensor = rtensor.to_tensor(
                 default_value="",
@@ -284,6 +311,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
                 "sequence_length": self.sequence_length,
                 "sep": self.sep,
                 "standardize": self.standardize,
+                "use_native_tf_ops": self.use_native_tf_ops,
                 "model": self.model,
                 "trainable": self.trainable,
                 "word_length": self.word_length,
