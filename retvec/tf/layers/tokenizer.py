@@ -62,7 +62,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
     def __init__(
         self,
         sequence_length: int = 128,
-        model: Optional[Union[str, Path]] = None,
+        model: Optional[Union[str, Path]] = "retvec-v1",
         trainable: bool = False,
         sep: str = "",
         standardize: Optional[str] = None,
@@ -85,7 +85,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
                 `sequence_length` words.
 
             model: Path to saved pretrained RETVec model, str or pathlib.Path
-                object. 'retvec-v1' to use V1 of the pre-trained RETVec word
+                object. "retvec-v1" to use V1 of the pre-trained RETVec word
                 embedding model, None to use the default RETVec character
                 encoding.
 
