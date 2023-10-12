@@ -21,7 +21,7 @@ You can use pip to install the latest TensorFlow version of RETVec:
 pip install retvec
 ```
 
-RETVec has been tested on TensorFlow 2.6+ and python 3.7+.
+RETVec has been tested on TensorFlow 2.6+ and python 3.8+.
 
 ### Basic Usage
 

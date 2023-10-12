@@ -242,7 +242,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
 
             # apply native binarization op
             # NOTE: utf8_binarize used here because RaggedTensorToTensor isn't
-            # supported in TF Text / TF Lite conversion, this is a workaround
+            # supported in TF Lite for strings, this is a workaround
             binarized = utf8_binarize(tokenized.flat_values)
             binarized = tf.RaggedTensor.from_row_lengths(
                 values=binarized, row_lengths=row_lengths
