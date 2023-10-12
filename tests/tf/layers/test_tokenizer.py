@@ -14,9 +14,16 @@
  limitations under the License.
  """
 
+import numpy as np
+import pytest
 import tensorflow as tf
+import tensorflow_text as tf_text
+from tensorflow.lite.python import interpreter
 
 from retvec.tf.layers import RETVecTokenizer
+
+use_native = [True, False]
+use_native_names = ["native_tf", "tf"]
 
 SEQUENCE_LENGTH = 128
 WORD_LENGTH = 16
@@ -24,13 +31,15 @@ CHAR_ENCODING_SIZE = 24
 RETVEC_MODEL = "retvec-v1"
 
 
-def test_graph_mode_with_model(tmp_path):
-    i = tf.keras.layers.Input((1,), dtype=tf.string)
+@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
+def test_graph_mode_with_model(use_native_tf_ops):
+    i = tf.keras.Input((1,), dtype=tf.string)
     x = RETVecTokenizer(
         sequence_length=SEQUENCE_LENGTH,
         model=RETVEC_MODEL,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
+        use_native_tf_ops=use_native_tf_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -48,12 +57,14 @@ def test_graph_mode_with_model(tmp_path):
         )
 
 
-def test_eager_mode_with_model(tmp_path):
+@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
+def test_eager_mode_with_model(use_native_tf_ops):
     tokenizer = RETVecTokenizer(
         model=RETVEC_MODEL,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
+        use_native_tf_ops=use_native_tf_ops,
     )
 
     s = "Testing😀 a full sentence"
@@ -65,13 +76,15 @@ def test_eager_mode_with_model(tmp_path):
     assert embeddings.shape == [3, SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
-def test_graph_mode_no_model():
-    i = tf.keras.layers.Input((1,), dtype=tf.string)
+@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
+def test_graph_mode_no_model(use_native_tf_ops):
+    i = tf.keras.Input((1,), dtype=tf.string)
     x = RETVecTokenizer(
         model=None,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
+        use_native_tf_ops=use_native_tf_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -89,12 +102,14 @@ def test_graph_mode_no_model():
         )
 
 
-def test_eager_mode_no_model():
+@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
+def test_eager_mode_no_model(use_native_tf_ops):
     tokenizer = RETVecTokenizer(
         model=None,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
+        use_native_tf_ops=use_native_tf_ops,
     )
 
     assert tokenizer.embedding_size == WORD_LENGTH * CHAR_ENCODING_SIZE
@@ -127,13 +142,15 @@ def test_standardize():
         assert embeddings.shape == [SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
-def test_tfds_map_tokenize(tmp_path):
+@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
+def test_tfds_map_tokenize(use_native_tf_ops):
     for model_path in [None, RETVEC_MODEL]:
         tokenizer = RETVecTokenizer(
             model=model_path,
             sequence_length=SEQUENCE_LENGTH,
             word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
+            use_native_tf_ops=use_native_tf_ops,
         )
 
         dataset = tf.data.Dataset.from_tensor_slices(["Testing😀"])
@@ -165,3 +182,35 @@ def test_serialization(tmp_path):
         save_path = tmp_path / "test_retvec_serialization"
         model.save(save_path)
         tf.keras.models.load_model(save_path)
+
+
+def test_tf_lite_conversion():
+    for model_path in [None, RETVEC_MODEL]:
+        i = tf.keras.layers.Input((1,), dtype=tf.string, name="input")
+        x = RETVecTokenizer(
+            model=model_path,
+            sequence_length=SEQUENCE_LENGTH,
+            word_length=WORD_LENGTH,
+            char_encoding_size=CHAR_ENCODING_SIZE,
+            use_native_tf_ops=True,
+        )(i)
+        model = tf.keras.models.Model(i, {"tokens": x})
+
+        converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
+        converter.allow_custom_ops = True
+        tflite_model = converter.convert()
+
+        # Perform TensorFlow Lite inference.
+        interp = interpreter.InterpreterWithCustomOps(
+            model_content=tflite_model,
+            custom_op_registerers=tf_text.tflite_registrar.SELECT_TFTEXT_OPS,
+        )
+        interp.get_signature_list()
+
+        input_data = np.array(
+            ["Some minds are better kept apart", "this is a test"]
+        )
+
+        tokenize = interp.get_signature_runner("serving_default")
+        output = tokenize(input=input_data)

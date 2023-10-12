@@ -52,9 +52,7 @@ setup(
         "dev": [
             "datasets",
             "tokenizers",
-            "tensorflow_addons",
             "google-cloud-storage",
-            "wandb",
             "mypy",
             "pytest",
             "flake8",
@@ -64,6 +62,7 @@ setup(
             "numpy",
             "tqdm",
             "tensorflow_similarity",
+            "tensorflow-text",
             "black",
             "isort",
         ],
