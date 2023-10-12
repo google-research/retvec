@@ -54,7 +54,7 @@ Detailed example colabs for RETVec can be found at under [notebooks](notebooks/)
 We have the following example colabs:
 
 - Training RETVec-based models using TensorFlow: [train_hello_world_tf.ipynb](notebooks/train_hello_world_tf.ipynb) for GPU/CPU training, and [train_tpu.ipynb](notebooks/train_tpu.ipynb) for a TPU-compatible training example.
-- (Coming soon!) Converting RETVec models into TF Lite models to run on-device.
+- Converting RETVec models into TF Lite models to run on-device: [tf_lite_retvec.ipynb](notebooks/tf_lite_retvec.ipynb)
 - (Coming soon!) Using RETVec JS to deploy RETVec models in the web using TensorFlow.js
 
 ## Citing

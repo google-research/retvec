@@ -14,9 +14,9 @@
  limitations under the License.
  """
 
-from typing import Any, Dict, List, Union
 import logging
 import re
+from typing import Any, Dict, List, Union
 
 import tensorflow as tf
 from tensorflow import Tensor, TensorShape
@@ -29,9 +29,13 @@ except ImportError:
 from .integerizer import RETVecIntegerizer
 
 
-def _reshape_embeddings(embeddings: tf.Tensor, batch_size: int,
-                        sequence_length: int, word_length: int,
-                        encoding_size: int) -> tf.Tensor:
+def _reshape_embeddings(
+    embeddings: tf.Tensor,
+    batch_size: int,
+    sequence_length: int,
+    word_length: int,
+    encoding_size: int,
+) -> tf.Tensor:
     if sequence_length > 1:
         return tf.reshape(
             embeddings,
@@ -43,8 +47,7 @@ def _reshape_embeddings(embeddings: tf.Tensor, batch_size: int,
             ),
         )
     else:
-        return tf.reshape(embeddings,
-                          (batch_size, word_length, encoding_size))
+        return tf.reshape(embeddings, (batch_size, word_length, encoding_size))
 
 
 @tf.keras.utils.register_keras_serializable(package="retvec")
@@ -105,10 +108,13 @@ class RETVecIntToBinary(tf.keras.layers.Layer):
         embeddings = tf.cast(embeddings, dtype="float32")
 
         # reshape back to correct shape
-        return _reshape_embeddings(embeddings, batch_size=batch_size,
-                                   sequence_length=self.sequence_length,
-                                   word_length=self.word_length,
-                                   encoding_size=self.encoding_size)
+        return _reshape_embeddings(
+            embeddings,
+            batch_size=batch_size,
+            sequence_length=self.sequence_length,
+            word_length=self.word_length,
+            encoding_size=self.encoding_size,
+        )
 
     def _project(self, chars: Tensor, masks: Tensor) -> Tensor:
         """Project chars in subspace"""
@@ -191,21 +197,29 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         self.use_native_tf_ops = use_native_tf_ops
 
         # Check if the native `utf8_binarize` op is available for use.
-        is_utf8_encoding = re.match('^utf-?8$', encoding_type, re.IGNORECASE)
-        self._native_mode = (use_native_tf_ops and
-                             is_utf8_encoding and
-                             utf8_binarize is not None)
+        is_utf8_encoding = re.match("^utf-?8$", encoding_type, re.IGNORECASE)
+        self._native_mode = (
+            use_native_tf_ops
+            and is_utf8_encoding
+            and utf8_binarize is not None
+        )
         if use_native_tf_ops and not self._native_mode:
-            logging.warning('Native support for `RETVecBinarizer` unavailable. '
-                            'Check `tensorflow_text.utf8_binarize` availability'
-                            ' and its parameter contraints.')
+            logging.warning(
+                "Native support for `RETVecBinarizer` unavailable. "
+                "Check `tensorflow_text.utf8_binarize` availability"
+                " and its parameter contraints."
+            )
 
         # Set to True when 'binarize()' is called in eager mode
         self.eager = False
-        self._integerizer = None if self._native_mode else RETVecIntegerizer(
-            word_length=self.word_length,
-            encoding_type=self.encoding_type,
-            replacement_char=self.replacement_char,
+        self._integerizer = (
+            None
+            if self._native_mode
+            else RETVecIntegerizer(
+                word_length=self.word_length,
+                encoding_type=self.encoding_type,
+                replacement_char=self.replacement_char,
+            )
         )
 
     def build(
@@ -215,23 +229,35 @@ class RETVecBinarizer(tf.keras.layers.Layer):
 
         # Initialize int binarizer layer here since we know sequence_length
         # only once we known the input_shape
-        self._int_to_binary = None if self._native_mode else RETVecIntToBinary(
-            word_length=self.word_length,
-            sequence_length=self.sequence_length,
-            encoding_size=self.encoding_size,
+        self._int_to_binary = (
+            None
+            if self._native_mode
+            else RETVecIntToBinary(
+                word_length=self.word_length,
+                sequence_length=self.sequence_length,
+                encoding_size=self.encoding_size,
+            )
         )
 
     def call(self, inputs: Tensor) -> Tensor:
         if self._native_mode:
-            embeddings = utf8_binarize(inputs,
-                                       word_length=self.word_length,
-                                       bits_per_char=self.encoding_size,
-                                       replacement_char=self.replacement_char)
+            embeddings = utf8_binarize(
+                inputs,
+                word_length=self.word_length,
+                bits_per_char=self.encoding_size,
+                replacement_char=self.replacement_char,
+            )
             batch_size = tf.shape(inputs)[0]
-            return _reshape_embeddings(embeddings, batch_size=batch_size,
-                                       sequence_length=self.sequence_length,
-                                       word_length=self.word_length,
-                                       encoding_size=self.encoding_size)
+            embeddings = _reshape_embeddings(
+                embeddings,
+                batch_size=batch_size,
+                sequence_length=self.sequence_length,
+                word_length=self.word_length,
+                encoding_size=self.encoding_size,
+            )
+            # TODO (marinazh): little vs big-endian order mismatch
+            return tf.reverse(embeddings, axis=[-1])
+
         else:
             assert self._integerizer is not None
             char_encodings = self._integerizer(inputs)
@@ -245,7 +271,7 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         """Return binary encodings for a word or a list of words.
 
         Args:
-            inputs: A single word or list of words to encode.
+            inputs: Tensor of a single word or list of words to encode.
 
         Returns:
             RETVec binary encodings for the input words(s).
