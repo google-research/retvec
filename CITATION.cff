@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- given-names: "Dougal"
+  family-names: "Maclaurin"
+- given-names: "Adam"
+  family-names: "Paszke"
+title: "RETVec: Resilient and Efficient Text Vectorizer"
+version: 1.0.2
+date-released: 2023-10-12
+url: "https://github.com/google-research/retvec"
+preferred-citation:
+  type: article
+  authors:
+  - given-names: "Elie"
+    family-names: "Bursztein"
+  - given-names: "Marina"
+    family-names: "Zhang"
+  - given-names: "Owen"
+    family-names: "Vallis"
+  - given-names: "Xinyu"
+    family-names: "Jia"
+  - given-names: "Alexey"
+    family-names: "Kurakin"
+  doi: "10.48550/arXiv.2302.09207"
+  title: "RETVec: Resilient and Efficient Text Vectorizer"
+  year: 2023
+  month: 10
+  journal: "arXiv"
+  url: "https://arxiv.org/abs/2302.09207"
+  publisher:
+    name: "arXiv"

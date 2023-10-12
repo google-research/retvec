@@ -23,11 +23,15 @@ use_native = [True, False]
 use_native_names = ["native_tf", "tf"]
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_graph_mode(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_graph_mode(use_tf_lite_compatible_ops):
     i = tf.keras.layers.Input((1,), dtype=tf.string)
     x = RETVecBinarizer(
-        word_length=16, encoding_size=24, use_native_tf_ops=use_native_tf_ops
+        word_length=16,
+        encoding_size=24,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -42,10 +46,14 @@ def test_graph_mode(use_native_tf_ops):
         assert embeddings.shape == (test_input.shape[0], 16, 24)
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_eager_mode(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_eager_mode(use_tf_lite_compatible_ops):
     binarizer = RETVecBinarizer(
-        word_length=16, encoding_size=24, use_native_tf_ops=use_native_tf_ops
+        word_length=16,
+        encoding_size=24,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )
 
     s = "Testing😀"
@@ -57,11 +65,15 @@ def test_eager_mode(use_native_tf_ops):
     assert embeddings.shape == [3, 16, 24]
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_2d_inputs(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_2d_inputs(use_tf_lite_compatible_ops):
     i = tf.keras.layers.Input((2,), dtype=tf.string)
     x = RETVecBinarizer(
-        word_length=16, encoding_size=24, use_native_tf_ops=use_native_tf_ops
+        word_length=16,
+        encoding_size=24,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -71,10 +83,14 @@ def test_2d_inputs(use_native_tf_ops):
     assert embeddings.shape == (2, 2, 16, 24)
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_tfds_map(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_tfds_map(use_tf_lite_compatible_ops):
     binarizer = RETVecBinarizer(
-        word_length=16, encoding_size=24, use_native_tf_ops=use_native_tf_ops
+        word_length=16,
+        encoding_size=24,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )
 
     dataset = tf.data.Dataset.from_tensor_slices(["Testing😀", "Testing😀"])
@@ -92,10 +108,14 @@ def test_tfds_map(use_native_tf_ops):
         assert ex.shape == [2, 16, 24]
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_determinism_eager_mode(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_determinism_eager_mode(use_tf_lite_compatible_ops):
     binarizer = RETVecBinarizer(
-        word_length=16, encoding_size=24, use_native_tf_ops=use_native_tf_ops
+        word_length=16,
+        encoding_size=24,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )
 
     s = "Testing😀"
@@ -108,11 +128,15 @@ def test_determinism_eager_mode(use_native_tf_ops):
     assert tf.reduce_all(tf.equal(embeddings[0], embeddings2[1]))
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_determinism_graph_mode(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_determinism_graph_mode(use_tf_lite_compatible_ops):
     i = tf.keras.layers.Input((1,), dtype=tf.string)
     x = RETVecBinarizer(
-        word_length=16, encoding_size=24, use_native_tf_ops=use_native_tf_ops
+        word_length=16,
+        encoding_size=24,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -149,7 +173,7 @@ def test_native_values():
                         encoding_size=encoding_size,
                         encoding_type=encoding_type,
                         replacement_char=replacement_char,
-                        use_native_tf_ops=False,
+                        use_tf_lite_compatible_ops=False,
                     )(i)
                     model = tf.keras.models.Model(i, x)
 
@@ -161,7 +185,7 @@ def test_native_values():
                         encoding_size=encoding_size,
                         encoding_type=encoding_type,
                         replacement_char=replacement_char,
-                        use_native_tf_ops=True,
+                        use_tf_lite_compatible_ops=True,
                     )(i)
                     model = tf.keras.models.Model(i, x)
                     embedding_native = model(test_input)

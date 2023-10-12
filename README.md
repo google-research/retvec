@@ -6,9 +6,9 @@ RETVec is a next-gen text vectorizer designed to be efficient, multilingual, and
 
 RETVec is trained to be resilient against character-level manipulations including insertion, deletion, typos, homoglyphs, LEET substitution, and more. The RETVec model is trained on top of a novel character encoder which can encode all UTF-8 characters and words efficiently. Thus, RETVec works out-of-the-box on over 100 languages without the need for a lookup table or fixed vocabulary size. Furthermore, RETVec is a layer, which means that it can be inserted into any TF model without the need for a separate pre-processing step.
 
-RETVec's speed and size (~200k instead of millions) also makes it a great choice for on-device and web use cases. It is natively supported in TensorFlow Lite via custom ops implemented in TensorFlow Text, and we provide a Javascript implementation of RETVec which allows you to deploy web models via TensorFlow.js.
+RETVec's speed and size (~200k instead of millions) also makes it a great choice for on-device and web use cases. It is [natively supported in TensorFlow Lite](notebooks/tf_lite_retvec.ipynb) via [custom ops in TensorFlow Text](https://www.tensorflow.org/text/api_docs/python/text/utf8_binarize), and we provide a Javascript implementation of RETVec which allows you to deploy web models via TensorFlow.js.
 
-Please see our example colabs on how to get started with training your own models with RETVec.
+Please see our example colabs on how to get started with training your own models with RETVec. [train_retvec_model_tf.ipynb](notebooks/train_retvec_model_tf.ipynb) is a great starting point for training a TF model using RETVec.
 
 ## Getting started
 
@@ -21,13 +21,13 @@ You can use pip to install the latest TensorFlow version of RETVec:
 pip install retvec
 ```
 
-RETVec has been tested on TensorFlow 2.6+ and python 3.7+.
+RETVec has been tested on TensorFlow 2.6+ and python 3.8+.
 
 ### Basic Usage
 
 You can use RETVec as the vectorization layer in any TensorFlow model with just a single line of code. RETVec operates on raw strings with pre-processing options built-in (e.g. lowercasing text). For example:
 
-```
+```python
 import tensorflow as tf
 from tensorflow.keras import layers
 
@@ -53,7 +53,7 @@ Detailed example colabs for RETVec can be found at under [notebooks](notebooks/)
 
 We have the following example colabs:
 
-- Training RETVec-based models using TensorFlow: [train_hello_world_tf.ipynb](notebooks/train_hello_world_tf.ipynb) for GPU/CPU training, and [train_tpu.ipynb](notebooks/train_tpu.ipynb) for a TPU-compatible training example.
+- Training RETVec-based models using TensorFlow: [train_retvec_model_tf.ipynb](notebooks/train_retvec_model_tf.ipynb) for GPU/CPU training, and [train_tpu.ipynb](notebooks/train_tpu.ipynb) for a TPU-compatible training example.
 - Converting RETVec models into TF Lite models to run on-device: [tf_lite_retvec.ipynb](notebooks/tf_lite_retvec.ipynb)
 - (Coming soon!) Using RETVec JS to deploy RETVec models in the web using TensorFlow.js
 

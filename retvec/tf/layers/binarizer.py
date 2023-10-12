@@ -152,7 +152,7 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         encoding_size: int = 24,
         encoding_type: str = "UTF-8",
         replacement_char: int = 65533,
-        use_native_tf_ops: bool = False,
+        use_tf_lite_compatible_ops: bool = False,
         **kwargs
     ) -> None:
         """Initialize a RETVec binarizer.
@@ -183,9 +183,9 @@ class RETVecBinarizer(tf.keras.layers.Layer):
             replacement_char: The replacement Unicode integer codepoint to be
                 used in place of invalid substrings in the input.
 
-            use_native_tf_ops: A boolean indicating whether to use
-                `tensorflow_text.utf8_binarize` whenever possible
-                (limited by its availability and constraints).
+            use_tf_lite_compatible_ops: A boolean indicating whether to use
+                `tensorflow_text.utf8_binarize` whenever possible for TF Lite
+                compatibility (limited by availability and constraints).
 
             **kwargs: Additional keyword args passed to the base Layer class.
         """
@@ -194,16 +194,16 @@ class RETVecBinarizer(tf.keras.layers.Layer):
         self.encoding_size = encoding_size
         self.encoding_type = encoding_type
         self.replacement_char = replacement_char
-        self.use_native_tf_ops = use_native_tf_ops
+        self.use_tf_lite_compatible_ops = use_tf_lite_compatible_ops
 
         # Check if the native `utf8_binarize` op is available for use.
         is_utf8_encoding = re.match("^utf-?8$", encoding_type, re.IGNORECASE)
         self._native_mode = (
-            use_native_tf_ops
+            use_tf_lite_compatible_ops
             and is_utf8_encoding
             and utf8_binarize is not None
         )
-        if use_native_tf_ops and not self._native_mode:
+        if use_tf_lite_compatible_ops and not self._native_mode:
             logging.warning(
                 "Native support for `RETVecBinarizer` unavailable. "
                 "Check `tensorflow_text.utf8_binarize` availability"
@@ -304,7 +304,7 @@ class RETVecBinarizer(tf.keras.layers.Layer):
                 "encoding_size": self.encoding_size,
                 "encoding_type": self.encoding_type,
                 "replacement_char": self.replacement_char,
-                "use_native_tf_ops": self.use_native_tf_ops,
+                "use_tf_lite_compatible_ops": self.use_tf_lite_compatible_ops,
             }
         )
         return config

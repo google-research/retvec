@@ -68,7 +68,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         trainable: bool = False,
         sep: str = "",
         standardize: Optional[str] = None,
-        use_native_tf_ops: bool = False,
+        use_tf_lite_compatible_ops: bool = False,
         word_length: int = 16,
         char_encoding_size: int = 24,
         char_encoding_type: str = "UTF-8",
@@ -104,8 +104,8 @@ class RETVecTokenizer(tf.keras.layers.Layer):
                 "lower", "strip_punctuation", or a callable function which
                 applies standardization and returns a tf.string Tensor.
 
-            use_native_tf_ops: A boolean indicating whether to use
-                native TensorFlow ops, to ensure TF Lite compatibility.
+            use_tf_lite_compatible_ops: A boolean indicating whether to only
+                TF Lite compatible ops that are supported natively in TF.
                 `sep` and `standardize` will not be used and whitespace
                 splitting will be always used, so preprocessing such
                 as lowercasing should happen before the text is passed
@@ -149,7 +149,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         self.sequence_length = sequence_length
         self.sep = sep
         self.standardize = standardize
-        self.use_native_tf_ops = use_native_tf_ops
+        self.use_tf_lite_compatible_ops = use_tf_lite_compatible_ops
         self.model = model
         self.trainable = trainable
 
@@ -157,10 +157,12 @@ class RETVecTokenizer(tf.keras.layers.Layer):
         # TODO (marinazh): use TF Text functions like regex_split to offer
         # more flexibility and preprocessing options
         self._native_mode = (
-            self.use_native_tf_ops and WhitespaceTokenizer and utf8_binarize
+            self.use_tf_lite_compatible_ops
+            and WhitespaceTokenizer
+            and utf8_binarize
         )
 
-        if use_native_tf_ops and not self._native_mode:
+        if use_tf_lite_compatible_ops and not self._native_mode:
             logging.warning(
                 "Native support for `RETVecTokenizer` unavailable. "
                 "Check `tensorflow_text.utf8_binarize` availability"
@@ -188,7 +190,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
             encoding_size=self.char_encoding_size,
             encoding_type=self.char_encoding_type,
             replacement_char=self.replacement_char,
-            use_native_tf_ops=use_native_tf_ops,
+            use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
         )
 
         # Set to True when 'tokenize()' or 'binarize()' called in eager mode
@@ -242,7 +244,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
 
             # apply native binarization op
             # NOTE: utf8_binarize used here because RaggedTensorToTensor isn't
-            # supported in TF Text / TF Lite conversion, this is a workaround
+            # supported in TF Lite for strings, this is a workaround
             binarized = utf8_binarize(tokenized.flat_values)
             binarized = tf.RaggedTensor.from_row_lengths(
                 values=binarized, row_lengths=row_lengths
@@ -359,7 +361,7 @@ class RETVecTokenizer(tf.keras.layers.Layer):
                 "sequence_length": self.sequence_length,
                 "sep": self.sep,
                 "standardize": self.standardize,
-                "use_native_tf_ops": self.use_native_tf_ops,
+                "use_tf_lite_compatible_ops": self.use_tf_lite_compatible_ops,
                 "model": self.model,
                 "trainable": self.trainable,
                 "word_length": self.word_length,
