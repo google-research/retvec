@@ -31,15 +31,17 @@ CHAR_ENCODING_SIZE = 24
 RETVEC_MODEL = "retvec-v1"
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_graph_mode_with_model(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_graph_mode_with_model(use_tf_lite_compatible_ops):
     i = tf.keras.Input((1,), dtype=tf.string)
     x = RETVecTokenizer(
         sequence_length=SEQUENCE_LENGTH,
         model=RETVEC_MODEL,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
-        use_native_tf_ops=use_native_tf_ops,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -57,14 +59,16 @@ def test_graph_mode_with_model(use_native_tf_ops):
         )
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_eager_mode_with_model(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_eager_mode_with_model(use_tf_lite_compatible_ops):
     tokenizer = RETVecTokenizer(
         model=RETVEC_MODEL,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
-        use_native_tf_ops=use_native_tf_ops,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )
 
     s = "Testing😀 a full sentence"
@@ -76,15 +80,17 @@ def test_eager_mode_with_model(use_native_tf_ops):
     assert embeddings.shape == [3, SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_graph_mode_no_model(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_graph_mode_no_model(use_tf_lite_compatible_ops):
     i = tf.keras.Input((1,), dtype=tf.string)
     x = RETVecTokenizer(
         model=None,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
-        use_native_tf_ops=use_native_tf_ops,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )(i)
     model = tf.keras.models.Model(i, x)
 
@@ -102,14 +108,16 @@ def test_graph_mode_no_model(use_native_tf_ops):
         )
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_eager_mode_no_model(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_eager_mode_no_model(use_tf_lite_compatible_ops):
     tokenizer = RETVecTokenizer(
         model=None,
         sequence_length=SEQUENCE_LENGTH,
         word_length=WORD_LENGTH,
         char_encoding_size=CHAR_ENCODING_SIZE,
-        use_native_tf_ops=use_native_tf_ops,
+        use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
     )
 
     assert tokenizer.embedding_size == WORD_LENGTH * CHAR_ENCODING_SIZE
@@ -142,15 +150,17 @@ def test_standardize():
         assert embeddings.shape == [SEQUENCE_LENGTH, tokenizer.embedding_size]
 
 
-@pytest.mark.parametrize("use_native_tf_ops", use_native, ids=use_native_names)
-def test_tfds_map_tokenize(use_native_tf_ops):
+@pytest.mark.parametrize(
+    "use_tf_lite_compatible_ops", use_native, ids=use_native_names
+)
+def test_tfds_map_tokenize(use_tf_lite_compatible_ops):
     for model_path in [None, RETVEC_MODEL]:
         tokenizer = RETVecTokenizer(
             model=model_path,
             sequence_length=SEQUENCE_LENGTH,
             word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
-            use_native_tf_ops=use_native_tf_ops,
+            use_tf_lite_compatible_ops=use_tf_lite_compatible_ops,
         )
 
         dataset = tf.data.Dataset.from_tensor_slices(["Testing😀"])
@@ -192,7 +202,7 @@ def test_tf_lite_conversion():
             sequence_length=SEQUENCE_LENGTH,
             word_length=WORD_LENGTH,
             char_encoding_size=CHAR_ENCODING_SIZE,
-            use_native_tf_ops=True,
+            use_tf_lite_compatible_ops=True,
         )(i)
         model = tf.keras.models.Model(i, {"tokens": x})
 
