@@ -42,6 +42,7 @@ setup(
     version=get_version("retvec/__init__.py"),
     description="Resilient and Efficient Text Vectorizer",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author="Google",
     author_email="retvec@google.com",
     url="https://github.com/google-research/retvec",
