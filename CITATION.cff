@@ -1,10 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- given-names: "Dougal"
-  family-names: "Maclaurin"
-- given-names: "Adam"
-  family-names: "Paszke"
+  - given-names: "Elie"
+    family-names: "Bursztein"
+  - given-names: "Marina"
+    family-names: "Zhang"
+  - given-names: "Owen"
+    family-names: "Vallis"
+  - given-names: "Yury"
+    family-names: "Kartynnik"
 title: "RETVec: Resilient and Efficient Text Vectorizer"
 version: 1.0.2
 date-released: 2023-10-12
