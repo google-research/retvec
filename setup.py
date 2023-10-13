@@ -40,9 +40,9 @@ long_description = read("README.md")
 setup(
     name="retvec",
     version=get_version("retvec/__init__.py"),
-    description="Resilient and Efficient Text Vectorizer",
+    description="RETVec: Resilient and Efficient Text Vectorizer",
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     author="Google",
     author_email="retvec@google.com",
     url="https://github.com/google-research/retvec",
