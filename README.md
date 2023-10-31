@@ -6,7 +6,7 @@ RETVec is a next-gen text vectorizer designed to be efficient, multilingual, and
 
 RETVec is trained to be resilient against character-level manipulations including insertion, deletion, typos, homoglyphs, LEET substitution, and more. The RETVec model is trained on top of a novel character encoder which can encode all UTF-8 characters and words efficiently. Thus, RETVec works out-of-the-box on over 100 languages without the need for a lookup table or fixed vocabulary size. Furthermore, RETVec is a layer, which means that it can be inserted into any TF model without the need for a separate pre-processing step.
 
-RETVec's speed and size (~200k instead of millions) also makes it a great choice for on-device and web use cases. It is [natively supported in TensorFlow Lite](notebooks/tf_lite_retvec.ipynb) via [custom ops in TensorFlow Text](https://www.tensorflow.org/text/api_docs/python/text/utf8_binarize), and we provide a Javascript implementation of RETVec which allows you to deploy web models via TensorFlow.js.
+RETVec's speed and size (~200k instead of millions of parameters) also makes it a great choice for on-device and web use cases. It is [natively supported in TensorFlow Lite](notebooks/tf_lite_retvec.ipynb) via [custom ops in TensorFlow Text](https://www.tensorflow.org/text/api_docs/python/text/utf8_binarize), and we provide a JavaScript implementation of RETVec which allows you to deploy web models via TensorFlow.js.
 
 Please see our example colabs on how to get started with training your own models with RETVec. [train_retvec_model_tf.ipynb](notebooks/train_retvec_model_tf.ipynb) is a great starting point for training a TF model using RETVec.
 
@@ -15,7 +15,7 @@ Please see our example colabs on how to get started with training your own model
 
 ### Installation
 
-You can use pip to install the latest TensorFlow version of RETVec:
+You can use `pip` to install the latest TensorFlow version of RETVec:
 
 ```python
 pip install retvec
