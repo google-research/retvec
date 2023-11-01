@@ -1,13 +1,7 @@
-<script setup>
-import RetVec from './components/RetVec.vue'
-</script>
-
 <template>
-  <div>
-    Hello
-  </div>
-  <RetVec/>
+  <RetVec />
 </template>
 
-<style scoped>
-</style>
+<script setup>
+import RetVec from "./components/RetVec.vue";
+</script>
