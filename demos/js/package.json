@@ -1,0 +1,24 @@
+{
+  "name": "retvec-demo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "install-retvecjs-locally": "cp -r ../../retvecjs/src/ retvecjs",
+    "predev": "npm run install-retvecjs-locally",
+    "dev": "vite",
+    "prebuild": "npm run install-retvecjs-locally",
+    "build": "vite build",
+    "prebuild-github": "npm run install-retvecjs-locally",
+    "build-github": "vite build  --base=/retvec/",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.12.0",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.8"
+  }
+}
