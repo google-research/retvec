@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  deploy-pages:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -36,6 +36,7 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: Install dependencies
         run: npm install
       - name: Build
