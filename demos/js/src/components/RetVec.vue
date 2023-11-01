@@ -16,11 +16,11 @@
 import { onMounted, ref, computed } from "vue";
 // We import RetVec from a local copy.
 // TODO: npm install it instead, as the user would do.
-import RetVec from "../../retvecjs/src/retvec.ts";
+import RetVec from "../../retvecjs/retvec.ts";
 
 // We import the model here to make sure that it's available in a production build.
-import modelUrl from "../../retvecjs/src/model/v1/model.json?url";
-import modelWeightsUrl from "../../retvecjs/src/model/v1/group1-shard1of1.bin?url";
+import modelUrl from "../../retvecjs/model/v1/model.json?url";
+import modelWeightsUrl from "../../retvecjs/model/v1/group1-shard1of1.bin?url";
 
 // Reactive elements of the page.
 const message = ref(0);
