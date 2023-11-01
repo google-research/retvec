@@ -1,6 +1,6 @@
 # Retvec JS demo
 
-You can load this demo in your browser [here](https://google.github.io/wasefire/).
+You can load this demo in your browser [here](https://google.github.io/retvec/).
 
 To quicky edit the demo and get a feel on how to run retvec, click [here](https://codespaces.new/google-research/retvec) to start a Github Codespace (that is, a temporary virtual machine).
 
