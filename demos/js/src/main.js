@@ -9,8 +9,9 @@ import EmotionDemo from "./components/EmotionDemo.vue";
 const router = createRouter( {
     history: createWebHistory(),
     routes: [
-        {path: '/', name: 'Home', component: BinarizerDemo},
-        {path: '/emotion_demo', name: 'EmotionDemo', component: EmotionDemo},
+        { path: '/', name: "Default", redirect: { name: 'Home' }},
+        {path: '/retvec/', name: 'Home', component: BinarizerDemo},
+        {path: '/retvec/emotion_demo', name: 'EmotionDemo', component: EmotionDemo},
     ]
 });
 
