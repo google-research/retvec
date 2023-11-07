@@ -33,7 +33,7 @@ const binarized = computed(() => {
 // Load RetVec at startup.
 onMounted(async () => {
   message.value = "Initializing RetVec...";
-  await RetVec.init('/retvec_model/model.json');
+  await RetVec.init(`${import.meta.env.BASE_URL}retvec_model/model.json`);
   message.value = "RetVec ready!";
   initialized.value = true;
 });

@@ -81,9 +81,9 @@ watch(userInput, async () => {
 // Load RetVec at startup.
 onMounted(async () => {
   message.value = "Initializing RetVec...";
-  await RetVec.init('/retvec_model/model.json', RETVEC_ENCODING_SIZE);
+  await RetVec.init(`${import.meta.env.BASE_URL}retvec_model/model.json`);
   message.value = "Loading model...";
-  model = await tf.loadGraphModel('/emotion_model/model.json');
+  model = await tf.loadGraphModel(`${import.meta.env.BASE_URL}emotion_model/model.json`);
   message.value = "RetVec ready!";
   initialized.value = true;
   console.log(tf.getBackend());
