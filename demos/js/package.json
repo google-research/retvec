@@ -11,6 +11,7 @@
     "build": "vite build",
     "prebuild-github": "npm run install-retvecjs-locally",
     "build-github": "vite build  --base=/retvec/",
+    "postbuild-github": "cp dist/index.html dist/404.html",
     "preview": "vite preview"
   },
   "dependencies": {
