@@ -61,8 +61,7 @@ let model = null;
 
 const runInference = debounce(async () => {
   console.log(`running inference on ${userInput.value}`);
-  let inputs = RetVec.binarizer(userInput.value, RETVEC_STR_LENGTH);
-
+  let inputs = RetVec.tokenizer(userInput.value , 16);
   inputs = tf.expandDims(inputs, 0); // make it a batch
   let prediction = await model.executeAsync(inputs);
   fullOutput.value = await prediction.data();
@@ -81,7 +80,7 @@ watch(userInput, async () => {
 // Load RetVec at startup.
 onMounted(async () => {
   message.value = "Initializing RetVec...";
-  await RetVec.init(`${import.meta.env.BASE_URL}retvec_model/model.json`);
+  await RetVec.init(`${import.meta.env.BASE_URL}retvec_model/model.json`, 24);
   message.value = "Loading model...";
   model = await tf.loadGraphModel(`${import.meta.env.BASE_URL}emotion_model/model.json`);
   message.value = "RetVec ready!";
