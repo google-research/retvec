@@ -18,10 +18,6 @@ import { onMounted, ref, computed } from "vue";
 // TODO: npm install it instead, as the user would do.
 import RetVec from "../../retvecjs/retvec.ts";
 
-// We import the model here to make sure that it's available in a production build.
-import modelUrl from "../../retvecjs/model/v1/model.json?url";
-import modelWeightsUrl from "../../retvecjs/model/v1/group1-shard1of1.bin?url";
-
 // Reactive elements of the page.
 const message = ref(0);
 const initialized = ref(false);
@@ -37,7 +33,7 @@ const binarized = computed(() => {
 // Load RetVec at startup.
 onMounted(async () => {
   message.value = "Initializing RetVec...";
-  await RetVec.init(modelUrl);
+  await RetVec.init('/retvec_model/model.json');
   message.value = "RetVec ready!";
   initialized.value = true;
 });

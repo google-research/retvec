@@ -16,11 +16,6 @@ import * as tf from "@tensorflow/tfjs";
 import RetVec from "../../retvecjs/retvec.ts";
 import debounce from "lodash/debounce";
 
-// We import the model here to make sure that it's available in a production build.
-import retvecModelUrl from "../../retvecjs/model/v1/model.json?url";
-import retvecModelWeightsUrl from "../../retvecjs/model/v1/group1-shard1of1.bin?url";
-import modelUrl from "../../../../notebooks/demo_models/emotion_model_tfjs_converted/model.json?url";
-import modelWeightsUrl from "../../../../notebooks/demo_models/emotion_model_tfjs_converted/group1-shard1of1.bin?url";
 
 const RETVEC_ENCODING_SIZE = 256;
 const RETVEC_STR_LENGTH = 128;
@@ -86,9 +81,9 @@ watch(userInput, async () => {
 // Load RetVec at startup.
 onMounted(async () => {
   message.value = "Initializing RetVec...";
-  await RetVec.init(retvecModelUrl, RETVEC_ENCODING_SIZE);
+  await RetVec.init('/retvec_model/model.json', RETVEC_ENCODING_SIZE);
   message.value = "Loading model...";
-  model = await tf.loadGraphModel(modelUrl);
+  model = await tf.loadGraphModel('/emotion_model/model.json');
   message.value = "RetVec ready!";
   initialized.value = true;
   console.log(tf.getBackend());
