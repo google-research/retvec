@@ -51,6 +51,29 @@ const LABELS = [
   "neutral",
 ];
 
+/*
+array([b'I\xe2\x80\x99m really sorry about your situation :( Although I love the names Sapphira, Cirilla, and Scarlett!',
+       b"It's wonderful because it's awful. At not with.",
+       b'Kings fan here, good luck to you guys! Will be an interesting game to watch! ',
+       b"I didn't know that, thank you for teaching me something today!",
+       b'They got bored from haunting earth for thousands of years and ultimately moved on to the afterlife.',
+       b'Thank you for asking questions and recognizing that there may be things that you don\xe2\x80\x99t know or understand about police tactics. Seriously. Thank you.',
+       b'You\xe2\x80\x99re welcome', b'100%! Congrats on your job too!',
+       b'I\xe2\x80\x99m sorry to hear that friend :(. It\xe2\x80\x99s for the best most likely if she didn\xe2\x80\x99t accept you for who you are',
+       b'Girlfriend weak as well, that jump was pathetic.',
+       b"[NAME] has towed the line of the Dark Side. He wouldn't cross it by doing something like this.",
+       b'Lol! But I love your last name though. XD',
+       b'Translation }}} I wish I could afford it.',
+       b"It's great that you're a recovering addict, that's cool. Have you ever tried DMT?",
+       b"I've also heard that intriguing but also kinda scary",
+       b'I never wanted to punch osap harder after seeing that However not too hardly I cant afford them taking everything away',
+       b'The thought of shooting anything at asylum seekers is appalling.',
+       b"if the pain doesn't go away after 4 hours or so, it's broke.",
+       b"Triggered:: Welp guess it's time for me to re-up lol",
+       b"I'm autistic and I'd appreciate if you remove that comment. Thanks."],
+      dtype=object)>
+      */
+
 // Reactive elements of the page.
 const message = ref(0);
 const initialized = ref(false);
@@ -61,8 +84,11 @@ let model = null;
 
 const runInference = debounce(async () => {
   console.log(`running inference on ${userInput.value}`);
-  let inputs = RetVec.tokenizer(userInput.value , 16);
+  const splits = userInput.value.split(' ');
+  let inputs = RetVec.tokenizer(userInput.value.split(' ') , 16);
+  console.log('in', inputs, inputs[0].shape)
   inputs = tf.expandDims(inputs, 0); // make it a batch
+  console.log('in', inputs.shape)
   let prediction = await model.executeAsync(inputs);
   fullOutput.value = await prediction.data();
   const topKprediction = prediction.as1D().topk();
