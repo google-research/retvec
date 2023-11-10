@@ -182,7 +182,7 @@ const runInference = debounce(async () => {
   topKprediction.values.dispose();
   topKprediction.indices.dispose();
   // Debounce this inference so that we only run it after typing has stopped.
-}, 500);
+}, 150);
 
 // When the user types something, trigger the model.
 watch(userText, async () => {
