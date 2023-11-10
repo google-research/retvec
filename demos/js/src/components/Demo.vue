@@ -1,7 +1,5 @@
-/* Demo boilerplate.
- *
- * Keeps demos to the point by hiding a little bit of complexity.
- */
+/* Demo boilerplate. * * Keeps demos to the point by hiding a little bit of
+complexity. */
 <template>
   <div>
     <div class="text-h2 pb-3">{{ title }}</div>
