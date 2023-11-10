@@ -33,7 +33,7 @@ export default {
         value: 1,
         props: {
           prependIcon: "mdi-emoticon-excited-outline",
-          href: "/emotion_demo",
+          href: "/retvec/emotion_demo",
         },
       },
       {
@@ -41,7 +41,7 @@ export default {
         value: 2,
         props: {
           prependIcon: "mdi-barcode",
-          href: "/binarizer_demo",
+          href: "/retvec/binarizer_demo",
         },
       },
     ],
