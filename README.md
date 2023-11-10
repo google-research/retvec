@@ -10,6 +10,10 @@ RETVec's speed and size (~200k instead of millions of parameters) also makes it 
 
 Please see our example colabs on how to get started with training your own models with RETVec. [train_retvec_model_tf.ipynb](notebooks/train_retvec_model_tf.ipynb) is a great starting point for training a TF model using RETVec.
 
+## Demos
+
+To see RetVec in action, visit [our demos](https://google-research.github.io/retvec/).
+
 ## Getting started
 
 
@@ -62,7 +66,7 @@ Please cite this reference if you use RETVec in your research:
 
 ```bibtex
 @article{retvec2023,
-    title={RETVec: Resilient and Efficient Text Vectorizer}, 
+    title={RETVec: Resilient and Efficient Text Vectorizer},
     author={Elie Bursztein, Marina Zhang, Owen Vallis, Xinyu Jia, and Alexey Kurakin},
     year={2023},
     eprint={2302.09207}
