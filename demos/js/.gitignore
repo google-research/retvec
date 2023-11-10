@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignore local copy of retvecjs
+# Ignore local copy of retvecjs.
 retvecjs
+# Ignore public files.
+public/

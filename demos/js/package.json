@@ -4,21 +4,39 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "install-retvecjs-locally": "cp -r ../../retvecjs/src/ retvecjs",
-    "predev": "npm run install-retvecjs-locally",
+    "install-retvecjs-locally": "cp -r ../../retvecjs/src/ retvecjs; cp -r retvecjs/model/v1 public/retvec_model",
+    "copy-models-to-public-directory": "mkdir -p public; cp -r ../../notebooks/demo_models/emotion_model_tfjs_converted/ public/emotion_model",
+    "pre-actions": "npm run copy-models-to-public-directory; npm run install-retvecjs-locally",
+    "predev": "npm run pre-actions",
     "dev": "vite",
-    "prebuild": "npm run install-retvecjs-locally",
+    "prebuild": "npm run pre-actions",
     "build": "vite build",
-    "prebuild-github": "npm run install-retvecjs-locally",
+    "prebuild-github": "npm run pre-actions",
     "build-github": "vite build  --base=/retvec/",
-    "preview": "vite preview"
+    "postbuild-github": "cp dist/index.html dist/404.html",
+    "preview": "vite preview",
+    "lint": "eslint . --fix --ignore-path .gitignore",
+    "code-format": "prettier --write ."
   },
   "dependencies": {
+    "@mdi/font": "7.0.96",
     "@tensorflow/tfjs": "^4.12.0",
-    "vue": "^3.3.4"
+    "core-js": "^3.29.0",
+    "lodash": "^4.17.21",
+    "roboto-fontface": "*",
+    "vue": "^3.2.0",
+    "vue-router": "^4.0.0",
+    "vuetify": "^3.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "vite": "^4.4.8"
+    "eslint": "^8.53.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-vue": "^9.18.1",
+    "sass": "^1.60.0",
+    "unplugin-fonts": "^1.0.3",
+    "vite": "^4.2.0",
+    "vite-plugin-vuetify": "^1.0.0"
   }
 }
