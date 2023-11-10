@@ -9,9 +9,10 @@
     <a href="https://arxiv.org/abs/2302.09207"> in our paper</a>.
   </p>
 
-  <v-row align="center" justify="center" class="mt-3">
+  <v-row align="stretch" justify="center" class="mt-3">
     <v-col cols="auto" v-for="(item, i) in ITEMS" :key="i">
       <v-card
+        height="100%"
         class="mx-auto"
         max-width="320"
         :title="item.title"

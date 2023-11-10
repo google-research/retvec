@@ -26,7 +26,7 @@
       </p>
     </div>
 
-    <div class="text-h4 pt-3 pb-5">Inputs</div>
+    <div class="text-h4 pt-3 pb-5">Input</div>
 
     <v-text-field
       clearable
@@ -36,6 +36,7 @@
       append-inner-icon="mdi-arrow-right"
     >
     </v-text-field>
+    <div class="text-h4 pt-3 pb-5">Output</div>
     <div v-if="binarized" class="binarized">
       <div v-for="element in binarized" :class="{[`el-${element}`]: true}">
         {{ element }}
