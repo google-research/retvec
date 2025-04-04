@@ -1,5 +1,6 @@
 # RETVec: Resilient & Efficient Text Vectorizer
 
+_NOTE (4/3/2025): This repository has been archived and no longer actively maintained._
 
 ## Overview
 RETVec is a next-gen text vectorizer designed to be efficient, multilingual, and provide built-in adversarial resilience using robust word embeddings trained with [similarity learning](https://github.com/tensorflow/similarity/). You can read the paper [here](https://arxiv.org/abs/2302.09207).
